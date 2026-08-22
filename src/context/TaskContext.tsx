@@ -51,7 +51,9 @@ interface TaskContextType {
   deleteTask: (id: string) => Promise<void>;
   updateTaskStatus: (id: string, newStatus: TaskStatus) => Promise<void>;
   updateTaskDueDate: (id: string, newDueDate: string) => Promise<void>;
+  updateTaskDate: (id: string, newDueDate: string) => Promise<void>;
   toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
+  resetFilters: () => void;
   addCategory: (name: string, color?: string) => void;
   updateCategory: (id: string, name: string, color?: string) => void;
   deleteCategory: (id: string) => void;
@@ -387,7 +389,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks((prev) =>
       prev.map((task) => {
         if (task.id === id) {
-          addActivity(id, task.title, 'due_date_changed', `เลื่อนกำหนดส่งเป็น: ${newDueDate}`);
+          addActivity(id, task.title, 'rescheduled', `เลื่อนกำหนดส่งเป็น: ${newDueDate}`);
           return { ...task, dueDate: newDueDate, updatedAt: new Date().toISOString() };
         }
         return task;
@@ -587,7 +589,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteTask,
         updateTaskStatus,
         updateTaskDueDate,
+        updateTaskDate: updateTaskDueDate,
         toggleSubtask,
+        resetFilters: () => setFilters(DEFAULT_FILTERS),
         addCategory,
         updateCategory,
         deleteCategory,
