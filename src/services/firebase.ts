@@ -15,8 +15,6 @@ import {
   collection, 
   doc, 
   setDoc,
-  addDoc, 
-  updateDoc, 
   deleteDoc, 
   getDocs, 
   limit, 
@@ -134,14 +132,13 @@ export async function testFirestoreConnection(): Promise<{ success: boolean; mes
 // Firestore Realtime Task Subscription
 export function subscribeToTasks(
   userId: string, 
-  onTasksUpdate: (tasks: Task[], isFirstLoad: boolean) => void, 
+  onTasksUpdate: (tasks: Task[]) => void, 
   onError?: (err: Error) => void
 ) {
   if (!db || !userId) {
     return () => {};
   }
 
-  let isFirst = true;
   const tasksRef = collection(db, 'tasks');
   const q = query(tasksRef, where('userId', '==', userId));
 
@@ -154,27 +151,21 @@ export function subscribeToTasks(
       } as Task);
     });
     
-    // Sort tasks by createdAt or priority
+    // Sort tasks by createdAt desc
     tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
-    onTasksUpdate(tasks, isFirst);
-    isFirst = false;
+    onTasksUpdate(tasks);
   }, (err) => {
     console.error('Firestore snapshot error:', err);
     if (onError) onError(err);
   });
 }
 
-export async function syncCreateTaskToFirestore(task: Omit<Task, 'id'>): Promise<string | null> {
-  if (!db) return null;
-  const docRef = await addDoc(collection(db, 'tasks'), task);
-  return docRef.id;
-}
-
-export async function syncUpdateTaskToFirestore(id: string, updates: Partial<Task>): Promise<void> {
-  if (!db) return;
-  const docRef = doc(db, 'tasks', id);
-  await updateDoc(docRef, updates);
+// Write/Save task to Firestore using setDoc with exact ID (Safe for creates & updates)
+export async function syncSaveTaskToFirestore(task: Task): Promise<void> {
+  if (!db || !task.userId) return;
+  const docRef = doc(db, 'tasks', task.id);
+  await setDoc(docRef, task, { merge: true });
 }
 
 export async function syncDeleteTaskFromFirestore(id: string): Promise<void> {
