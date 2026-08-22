@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState, useMemo } from '
 import { 
   Task, 
   TaskStatus, 
-  TaskPriority, 
   CategoryItem, 
   ActivityLog, 
   TaskFilterOptions 

@@ -6,12 +6,12 @@ import {
   AlertTriangle, 
   Trash2, 
   Edit3, 
-  ArrowRight,
-  ArrowLeft,
-  GripVertical,
-  CheckSquare
+  ArrowRight, 
+  ArrowLeft, 
+  GripVertical, 
+  CheckSquare 
 } from 'lucide-react';
-import { Task, TaskPriority, TaskStatus } from '../../types/task';
+import { Task, TaskStatus } from '../../types/task';
 import { formatDate, isOverdue } from '../../utils/date';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';

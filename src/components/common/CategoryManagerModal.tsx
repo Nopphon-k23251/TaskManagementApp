@@ -5,9 +5,7 @@ import {
   Edit2, 
   Check, 
   X, 
-  FolderPlus, 
-  Sparkles,
-  Palette
+  FolderPlus
 } from 'lucide-react';
 import { Modal } from './Modal';
 import { useTasks, COLOR_OPTIONS } from '../../context/TaskContext';

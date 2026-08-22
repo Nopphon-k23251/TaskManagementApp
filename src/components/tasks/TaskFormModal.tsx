@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Plus, 
   Trash2, 
-  Tag, 
-  Calendar, 
   AlertCircle,
   FolderTree
 } from 'lucide-react';
