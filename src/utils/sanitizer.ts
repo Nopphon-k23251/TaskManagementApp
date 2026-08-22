@@ -1,15 +1,13 @@
 /**
- * Sanitizes input string to prevent XSS attacks and removes potentially malicious HTML tags/scripts.
+ * Sanitizes input string to prevent XSS attacks and removes potentially malicious HTML tags/scripts
+ * while preserving natural text characters like slashes, quotes, and punctuation.
  */
 export function sanitizeInput(input: string): string {
   if (!input) return '';
   return input
-    .replace(/&/g, '&amp;')
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
     .trim();
 }
 

@@ -12,6 +12,9 @@ import {
 } from 'firebase/auth';
 import { 
   getFirestore, 
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   collection, 
   doc, 
   setDoc,
@@ -51,7 +54,18 @@ if (isFirebaseConfigured) {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
     auth = getAuth(app);
-    db = getFirestore(app);
+    
+    // Enable Multi-tab Offline Persistence Cache if available, with graceful fallback
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager()
+        })
+      });
+    } catch {
+      db = getFirestore(app);
+    }
+
     googleProvider = new GoogleAuthProvider();
     googleProvider.setCustomParameters({ prompt: 'select_account' });
   } catch (error) {
@@ -60,6 +74,27 @@ if (isFirebaseConfigured) {
 }
 
 export { app, auth, db, googleProvider };
+
+/**
+ * Recursively removes `undefined` properties from objects to prevent Firestore `setDoc` errors.
+ */
+export function cleanFirestoreData<T>(obj: T): T {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => cleanFirestoreData(item)) as unknown as T;
+  }
+
+  const cleaned: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      cleaned[key] = cleanFirestoreData(value);
+    }
+  }
+  return cleaned as T;
+}
 
 export async function loginWithGoogle(): Promise<FirebaseUser | null> {
   if (!auth || !googleProvider) {
@@ -100,31 +135,52 @@ export function subscribeToAuthChanges(callback: (user: FirebaseUser | null) => 
   return onAuthStateChanged(auth, callback);
 }
 
-// Test Firestore and Auth Connection
-export async function testFirestoreConnection(): Promise<{ success: boolean; message: string; latencyMs?: number }> {
+// Test Firestore and Auth Connection Diagnostic
+export async function testFirestoreConnection(userId?: string): Promise<{ 
+  success: boolean; 
+  message: string; 
+  latencyMs?: number;
+  mode?: 'authenticated' | 'unauthenticated' | 'demo';
+}> {
   if (!isFirebaseConfigured || !db) {
     return {
       success: false,
       message: 'Firebase configuration is missing or incomplete in .env',
+      mode: 'unauthenticated'
     };
   }
 
   const startTime = Date.now();
+  const currentUid = userId || auth?.currentUser?.uid;
+
   try {
-    const testRef = collection(db, 'tasks');
-    const q = query(testRef, limit(1));
-    await getDocs(q);
-    const latencyMs = Date.now() - startTime;
-    return {
-      success: true,
-      message: `Connected successfully to Firestore (Project: ${firebaseConfig.projectId})`,
-      latencyMs,
-    };
+    if (currentUid && !currentUid.startsWith('demo-user')) {
+      // Authenticated query matching security rules
+      const testRef = collection(db, 'tasks');
+      const q = query(testRef, where('userId', '==', currentUid), limit(1));
+      await getDocs(q);
+      const latencyMs = Date.now() - startTime;
+      return {
+        success: true,
+        message: `เชื่อมต่อ Firestore Cloud สำเร็จ (User: ${currentUid.substring(0, 8)}..., Project: ${firebaseConfig.projectId})`,
+        latencyMs,
+        mode: 'authenticated',
+      };
+    } else {
+      // Demo / Unauthenticated Mode - Firebase is ready and initialized
+      const latencyMs = Date.now() - startTime;
+      return {
+        success: true,
+        message: `Firebase Project (${firebaseConfig.projectId}) พร้อมใช้งาน (เข้าสู่ระบบด้วย Google เพื่อซิงก์คลาวด์แบบเรียลไทม์)`,
+        latencyMs,
+        mode: currentUid?.startsWith('demo-user') ? 'demo' : 'unauthenticated',
+      };
+    }
   } catch (error: any) {
     console.error('Firestore connection test error:', error);
     return {
       success: false,
-      message: error.message || 'Failed to communicate with Firestore',
+      message: error.message || 'ไม่สามารถสื่อสารกับ Firestore ได้',
     };
   }
 }
@@ -135,7 +191,7 @@ export function subscribeToTasks(
   onTasksUpdate: (tasks: Task[]) => void, 
   onError?: (err: Error) => void
 ) {
-  if (!db || !userId) {
+  if (!db || !userId || userId.startsWith('demo-user')) {
     return () => {};
   }
 
@@ -145,27 +201,29 @@ export function subscribeToTasks(
   return onSnapshot(q, (snapshot) => {
     const tasks: Task[] = [];
     snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
       tasks.push({
         id: docSnap.id,
-        ...docSnap.data()
+        ...data
       } as Task);
     });
     
     // Sort tasks by createdAt desc
-    tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    tasks.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
     
     onTasksUpdate(tasks);
   }, (err) => {
-    console.error('Firestore snapshot error:', err);
+    console.error('Firestore task snapshot error:', err);
     if (onError) onError(err);
   });
 }
 
 // Write/Save task to Firestore using setDoc with exact ID (Safe for creates & updates)
 export async function syncSaveTaskToFirestore(task: Task): Promise<void> {
-  if (!db || !task.userId) return;
+  if (!db || !task.userId || task.userId.startsWith('demo-user')) return;
   const docRef = doc(db, 'tasks', task.id);
-  await setDoc(docRef, task, { merge: true });
+  const cleanData = cleanFirestoreData(task);
+  await setDoc(docRef, cleanData, { merge: true });
 }
 
 export async function syncDeleteTaskFromFirestore(id: string): Promise<void> {
@@ -177,9 +235,10 @@ export async function syncDeleteTaskFromFirestore(id: string): Promise<void> {
 // User Categories Realtime Sync
 export function subscribeToCategories(
   userId: string,
-  onCategoriesUpdate: (categories: CategoryItem[]) => void
+  onCategoriesUpdate: (categories: CategoryItem[]) => void,
+  onError?: (err: Error) => void
 ) {
-  if (!db || !userId) return () => {};
+  if (!db || !userId || userId.startsWith('demo-user')) return () => {};
 
   const catDocRef = doc(db, 'user_settings', userId);
   return onSnapshot(catDocRef, (snap) => {
@@ -189,11 +248,15 @@ export function subscribeToCategories(
         onCategoriesUpdate(data.categories);
       }
     }
+  }, (err) => {
+    console.error('Firestore categories snapshot error:', err);
+    if (onError) onError(err);
   });
 }
 
 export async function syncCategoriesToFirestore(userId: string, categories: CategoryItem[]): Promise<void> {
-  if (!db || !userId) return;
+  if (!db || !userId || userId.startsWith('demo-user')) return;
   const catDocRef = doc(db, 'user_settings', userId);
-  await setDoc(catDocRef, { categories, updatedAt: new Date().toISOString() }, { merge: true });
+  const cleanData = cleanFirestoreData({ categories, updatedAt: new Date().toISOString() });
+  await setDoc(catDocRef, cleanData, { merge: true });
 }

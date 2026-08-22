@@ -30,7 +30,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     resetToSampleData, 
     clearAllTasks, 
     exportTasksJson, 
-    importTasksJson 
+    importTasksJson,
+    syncStatus 
   } = useTasks();
   const { language, setLanguage, t } = useLanguage();
 
@@ -43,7 +44,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setIsTestingDb(true);
     setDbTestResult(null);
     try {
-      const res = await testFirestoreConnection();
+      const res = await testFirestoreConnection(user?.uid);
       setDbTestResult(res);
     } catch (e: any) {
       setDbTestResult({ success: false, message: e.message || 'Error connecting to database' });
@@ -138,15 +139,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
             </div>
 
-            <span
-              className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                isFirebaseActive
-                  ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300'
-              }`}
-            >
-              {isFirebaseActive ? t('online') : t('offline')}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                  syncStatus === 'synced'
+                    ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                    : syncStatus === 'syncing'
+                    ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 animate-pulse'
+                    : syncStatus === 'error'
+                    ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300'
+                    : syncStatus === 'demo'
+                    ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300'
+                    : 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300'
+                }`}
+              >
+                {syncStatus === 'synced'
+                  ? 'Cloud Synced'
+                  : syncStatus === 'syncing'
+                  ? 'Syncing...'
+                  : syncStatus === 'error'
+                  ? 'Sync Error'
+                  : syncStatus === 'demo'
+                  ? 'Demo Mode'
+                  : t('offline')}
+              </span>
+            </div>
           </div>
 
           {/* Database Live Test Button & Diagnostic Panel */}
@@ -268,9 +285,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (window.confirm(t('confirmReset'))) {
-                  resetToSampleData();
+                  await resetToSampleData();
                   onClose();
                 }
               }}
@@ -281,9 +298,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </button>
 
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (window.confirm(t('confirmClear'))) {
-                  clearAllTasks();
+                  await clearAllTasks();
                   onClose();
                 }
               }}

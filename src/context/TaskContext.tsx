@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { 
   Task, 
   TaskStatus, 
@@ -37,6 +37,8 @@ export const COLOR_OPTIONS = [
   { name: 'Slate (เทาคลาสสิก)', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
 ];
 
+export type SyncStatus = 'synced' | 'syncing' | 'error' | 'offline' | 'demo';
+
 interface TaskContextType {
   tasks: Task[];
   filteredTasks: Task[];
@@ -44,6 +46,7 @@ interface TaskContextType {
   activityLogs: ActivityLog[];
   filters: TaskFilterOptions;
   isRealtimeSyncing: boolean;
+  syncStatus: SyncStatus;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilterOptions>>;
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
@@ -56,8 +59,8 @@ interface TaskContextType {
   addCategory: (name: string, color?: string) => void;
   updateCategory: (id: string, name: string, color?: string) => void;
   deleteCategory: (id: string) => void;
-  resetToSampleData: () => void;
-  clearAllTasks: () => void;
+  resetToSampleData: () => Promise<void>;
+  clearAllTasks: () => Promise<void>;
   exportTasksJson: () => string;
   importTasksJson: (jsonStr: string) => boolean;
 }
@@ -138,42 +141,51 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
   }
 ];
 
+function getScopedKey(key: string, userId?: string | null): string {
+  const uid = userId || 'demo-user-123';
+  return `tm_${key}_${uid}`;
+}
+
+function loadScopedData<T>(key: string, userId?: string | null, fallback?: T): T {
+  try {
+    const raw = localStorage.getItem(getScopedKey(key, userId));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed !== null && parsed !== undefined) return parsed;
+    }
+  } catch (e) {
+    console.warn(`Error loading cache for ${key}:`, e);
+  }
+  return fallback as T;
+}
+
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isFirebaseActive } = useAuth();
+  const currentUserId = user?.uid || 'demo-user-123';
+  const isDemoUser = Boolean(!user || user.isDemo);
+
   const [isRealtimeSyncing, setIsRealtimeSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(isDemoUser ? 'demo' : 'syncing');
   const broadcastChannelRef = useRef<BroadcastChannel | null>(null);
-  
+
+  // Initialize state scoped to current user
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const cached = localStorage.getItem('tm_tasks');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
-    return INITIAL_SAMPLE_TASKS;
+    const cached = loadScopedData<Task[]>('tasks', currentUserId);
+    if (Array.isArray(cached) && cached.length > 0) return cached;
+    return isDemoUser ? INITIAL_SAMPLE_TASKS : [];
   });
 
   const [categories, setCategories] = useState<CategoryItem[]>(() => {
-    const cached = localStorage.getItem('tm_categories');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
+    const cached = loadScopedData<CategoryItem[]>('categories', currentUserId);
+    if (Array.isArray(cached) && cached.length > 0) return cached;
     return DEFAULT_CATEGORIES;
   });
 
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>(() => {
-    const cached = localStorage.getItem('tm_activity_logs');
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch {}
-    }
+    const cached = loadScopedData<ActivityLog[]>('logs', currentUserId);
+    if (Array.isArray(cached) && cached.length > 0) return cached;
     return [
       {
         id: 'log-1',
@@ -188,17 +200,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [filters, setFilters] = useState<TaskFilterOptions>(DEFAULT_FILTERS);
 
-  // Setup Cross-Tab BroadcastChannel for instantaneous (0ms) sync between tabs in the same browser
+  // 1. Cross-Tab Synchronization with User Verification
   useEffect(() => {
     try {
       const bc = new BroadcastChannel('tm_sync_channel');
       broadcastChannelRef.current = bc;
       bc.onmessage = (event) => {
-        if (event.data?.type === 'TASKS_UPDATED' && Array.isArray(event.data.tasks)) {
-          setTasks(event.data.tasks);
+        const msg = event.data;
+        if (msg?.userId && msg.userId !== currentUserId) return;
+
+        if (msg?.type === 'TASKS_UPDATED' && Array.isArray(msg.tasks)) {
+          setTasks(msg.tasks);
         }
-        if (event.data?.type === 'CATEGORIES_UPDATED' && Array.isArray(event.data.categories)) {
-          setCategories(event.data.categories);
+        if (msg?.type === 'CATEGORIES_UPDATED' && Array.isArray(msg.categories)) {
+          setCategories(msg.categories);
         }
       };
       return () => {
@@ -207,78 +222,115 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // BroadcastChannel unsupported fallback
     }
-  }, []);
+  }, [currentUserId]);
 
-  const broadcastLocalUpdate = (updatedTasks: Task[], updatedCategories?: CategoryItem[]) => {
-    localStorage.setItem('tm_tasks', JSON.stringify(updatedTasks));
+  const broadcastLocalUpdate = useCallback((updatedTasks: Task[], updatedCategories?: CategoryItem[]) => {
+    localStorage.setItem(getScopedKey('tasks', currentUserId), JSON.stringify(updatedTasks));
     if (broadcastChannelRef.current) {
-      broadcastChannelRef.current.postMessage({ type: 'TASKS_UPDATED', tasks: updatedTasks });
+      broadcastChannelRef.current.postMessage({
+        type: 'TASKS_UPDATED',
+        tasks: updatedTasks,
+        userId: currentUserId
+      });
       if (updatedCategories) {
-        broadcastChannelRef.current.postMessage({ type: 'CATEGORIES_UPDATED', categories: updatedCategories });
+        broadcastChannelRef.current.postMessage({
+          type: 'CATEGORIES_UPDATED',
+          categories: updatedCategories,
+          userId: currentUserId
+        });
       }
     }
-  };
+  }, [currentUserId]);
 
-  // Cache to localStorage
+  // 2. User Switch Handler: Switch local state when user logs in/out
   useEffect(() => {
-    localStorage.setItem('tm_tasks', JSON.stringify(tasks));
-  }, [tasks]);
+    const cachedTasks = loadScopedData<Task[]>('tasks', currentUserId);
+    const cachedCats = loadScopedData<CategoryItem[]>('categories', currentUserId);
+    const cachedLogs = loadScopedData<ActivityLog[]>('logs', currentUserId);
+
+    if (Array.isArray(cachedTasks)) {
+      setTasks(cachedTasks);
+    } else if (isDemoUser) {
+      setTasks(INITIAL_SAMPLE_TASKS);
+    } else {
+      setTasks([]);
+    }
+
+    if (Array.isArray(cachedCats) && cachedCats.length > 0) {
+      setCategories(cachedCats);
+    } else {
+      setCategories(DEFAULT_CATEGORIES);
+    }
+
+    if (Array.isArray(cachedLogs)) {
+      setActivityLogs(cachedLogs);
+    }
+  }, [currentUserId, isDemoUser]);
+
+  // 3. Cache to Scoped localStorage
+  useEffect(() => {
+    localStorage.setItem(getScopedKey('tasks', currentUserId), JSON.stringify(tasks));
+  }, [tasks, currentUserId]);
 
   useEffect(() => {
-    localStorage.setItem('tm_categories', JSON.stringify(categories));
-  }, [categories]);
+    localStorage.setItem(getScopedKey('categories', currentUserId), JSON.stringify(categories));
+  }, [categories, currentUserId]);
 
   useEffect(() => {
-    localStorage.setItem('tm_activity_logs', JSON.stringify(activityLogs));
-  }, [activityLogs]);
+    localStorage.setItem(getScopedKey('logs', currentUserId), JSON.stringify(activityLogs));
+  }, [activityLogs, currentUserId]);
 
-  // Realtime Cloud Synchronization with Firestore (Cross-Device: Desktop <-> Mobile)
+  // 4. Realtime Cloud Synchronization with Firestore (Cross-Device)
   useEffect(() => {
-    if (!isFirebaseActive || !user || user.isDemo) {
+    if (!isFirebaseActive || isDemoUser || !user) {
       setIsRealtimeSyncing(false);
+      setSyncStatus(isDemoUser ? 'demo' : 'offline');
       return;
     }
 
     setIsRealtimeSyncing(true);
+    setSyncStatus('syncing');
 
-    // 1. Subscribe to User Tasks in Realtime from Cloud Firestore
-    const unsubscribeTasks = subscribeToTasks(user.uid, (cloudTasks) => {
-      if (cloudTasks && cloudTasks.length > 0) {
+    // Subscribe to User Tasks in Realtime from Cloud Firestore
+    const unsubscribeTasks = subscribeToTasks(
+      user.uid,
+      (cloudTasks) => {
+        // Authoritative cloud update: update tasks state & scoped local cache
         setTasks(cloudTasks);
-        localStorage.setItem('tm_tasks', JSON.stringify(cloudTasks));
-      } else {
-        // If user has 0 tasks on Firestore, upload local sample tasks so other devices see them
-        const localTasks = tasks;
-        if (localTasks.length > 0) {
-          localTasks.forEach((t) => {
-            syncSaveTaskToFirestore({
-              ...t,
-              userId: user.uid,
-              createdAt: t.createdAt || new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }).catch(() => {});
-          });
-        }
+        localStorage.setItem(getScopedKey('tasks', user.uid), JSON.stringify(cloudTasks));
+        setIsRealtimeSyncing(false);
+        setSyncStatus('synced');
+      },
+      (err) => {
+        console.error('Realtime tasks sync error:', err);
+        setIsRealtimeSyncing(false);
+        setSyncStatus('error');
       }
-    });
+    );
 
-    // 2. Subscribe to User Categories in Realtime from Cloud Firestore
-    const unsubscribeCategories = subscribeToCategories(user.uid, (cloudCategories) => {
-      if (cloudCategories && cloudCategories.length > 0) {
-        setCategories(cloudCategories);
-        localStorage.setItem('tm_categories', JSON.stringify(cloudCategories));
+    // Subscribe to User Categories in Realtime from Cloud Firestore
+    const unsubscribeCategories = subscribeToCategories(
+      user.uid,
+      (cloudCategories) => {
+        if (cloudCategories && cloudCategories.length > 0) {
+          setCategories(cloudCategories);
+          localStorage.setItem(getScopedKey('categories', user.uid), JSON.stringify(cloudCategories));
+        }
+      },
+      (err) => {
+        console.error('Realtime categories sync error:', err);
       }
-    });
+    );
 
     return () => {
       unsubscribeTasks();
       unsubscribeCategories();
     };
-  }, [user, isFirebaseActive]);
+  }, [user, isFirebaseActive, isDemoUser]);
 
   const addActivity = (taskId: string, taskTitle: string, action: ActivityLog['action'], details?: string) => {
     const newLog: ActivityLog = {
-      id: 'log-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+      id: 'log-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
       taskId,
       taskTitle,
       action,
@@ -296,7 +348,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: taskId,
       title: sanitizeInput(taskData.title),
       description: sanitizeInput(taskData.description),
-      userId: user?.uid,
+      userId: user?.uid || currentUserId,
       createdAt: now,
       updatedAt: now,
     };
@@ -308,7 +360,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo) {
-      await syncSaveTaskToFirestore(newTask);
+      await syncSaveTaskToFirestore(newTask).catch((err) => {
+        console.error('Failed to sync new task to Firestore:', err);
+        setSyncStatus('error');
+      });
     }
 
     return taskId;
@@ -323,7 +378,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let updatedTargetTask: Task | null = null;
     const nextTasks = tasks.map((task) => {
       if (task.id === id) {
-        const updated = { ...task, ...cleanUpdates };
+        const updated = { ...task, ...cleanUpdates, userId: user?.uid || task.userId || currentUserId };
         updatedTargetTask = updated;
         addActivity(id, updated.title, 'updated', 'อัปเดตรายละเอียดงาน');
         return updated;
@@ -336,7 +391,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo && updatedTargetTask) {
-      await syncSaveTaskToFirestore({ ...(updatedTargetTask as Task), userId: user.uid });
+      await syncSaveTaskToFirestore(updatedTargetTask).catch((err) => {
+        console.error('Failed to sync task update to Firestore:', err);
+        setSyncStatus('error');
+      });
     }
   };
 
@@ -351,7 +409,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo) {
-      await syncDeleteTaskFromFirestore(id);
+      await syncDeleteTaskFromFirestore(id).catch((err) => {
+        console.error('Failed to sync task deletion to Firestore:', err);
+      });
     }
   };
 
@@ -367,7 +427,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const nextTasks = tasks.map((task) => {
       if (task.id === id) {
         addActivity(id, task.title, 'status_changed', `ย้ายไปยัง ${statusTitles[newStatus]}`);
-        const updated = { ...task, status: newStatus, updatedAt: new Date().toISOString() };
+        const updated = { 
+          ...task, 
+          status: newStatus, 
+          updatedAt: new Date().toISOString(),
+          userId: user?.uid || task.userId || currentUserId
+        };
         updatedTargetTask = updated;
         return updated;
       }
@@ -379,7 +444,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo && updatedTargetTask) {
-      await syncSaveTaskToFirestore({ ...(updatedTargetTask as Task), userId: user.uid });
+      await syncSaveTaskToFirestore(updatedTargetTask).catch((err) => {
+        console.error('Failed to sync task status to Firestore:', err);
+      });
     }
   };
 
@@ -388,7 +455,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const nextTasks = tasks.map((task) => {
       if (task.id === id) {
         addActivity(id, task.title, 'rescheduled', `เลื่อนกำหนดส่งเป็น: ${newDueDate}`);
-        const updated = { ...task, dueDate: newDueDate, updatedAt: new Date().toISOString() };
+        const updated = { 
+          ...task, 
+          dueDate: newDueDate, 
+          updatedAt: new Date().toISOString(),
+          userId: user?.uid || task.userId || currentUserId
+        };
         updatedTargetTask = updated;
         return updated;
       }
@@ -400,7 +472,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo && updatedTargetTask) {
-      await syncSaveTaskToFirestore({ ...(updatedTargetTask as Task), userId: user.uid });
+      await syncSaveTaskToFirestore(updatedTargetTask).catch((err) => {
+        console.error('Failed to sync task due date to Firestore:', err);
+      });
     }
   };
 
@@ -415,6 +489,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...task,
           subtasks: updatedSubtasks,
           updatedAt: new Date().toISOString(),
+          userId: user?.uid || task.userId || currentUserId
         };
         updatedTargetTask = updated;
         return updated;
@@ -427,7 +502,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Sync to Firestore
     if (isFirebaseActive && user && !user.isDemo && updatedTargetTask) {
-      await syncSaveTaskToFirestore({ ...(updatedTargetTask as Task), userId: user.uid });
+      await syncSaveTaskToFirestore(updatedTargetTask).catch((err) => {
+        console.error('Failed to sync subtask to Firestore:', err);
+      });
     }
   };
 
@@ -486,11 +563,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const resetToSampleData = () => {
+  const resetToSampleData = async () => {
     const seeded = INITIAL_SAMPLE_TASKS.map((t) => ({
       ...t,
-      id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
-      userId: user?.uid,
+      id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      userId: user?.uid || currentUserId,
     }));
     setTasks(seeded);
     setCategories(DEFAULT_CATEGORIES);
@@ -498,20 +575,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     broadcastLocalUpdate(seeded, DEFAULT_CATEGORIES);
 
     if (isFirebaseActive && user && !user.isDemo) {
-      seeded.forEach((t) => syncSaveTaskToFirestore(t).catch(() => {}));
-      syncCategoriesToFirestore(user.uid, DEFAULT_CATEGORIES).catch(() => {});
+      await Promise.all(seeded.map((t) => syncSaveTaskToFirestore(t).catch(() => {})));
+      await syncCategoriesToFirestore(user.uid, DEFAULT_CATEGORIES).catch(() => {});
     }
   };
 
-  const clearAllTasks = () => {
-    tasks.forEach((t) => {
-      if (isFirebaseActive && user && !user.isDemo) {
-        syncDeleteTaskFromFirestore(t.id).catch(() => {});
-      }
-    });
+  const clearAllTasks = async () => {
+    const tasksToDelete = [...tasks];
     setTasks([]);
     setActivityLogs([]);
     broadcastLocalUpdate([]);
+
+    if (isFirebaseActive && user && !user.isDemo) {
+      await Promise.all(tasksToDelete.map((t) => syncDeleteTaskFromFirestore(t.id).catch(() => {})));
+    }
   };
 
   const exportTasksJson = (): string => {
@@ -531,7 +608,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data && Array.isArray(data.tasks)) {
         const importedTasks = data.tasks.map((t: Task) => ({
           ...t,
-          userId: user?.uid,
+          userId: user?.uid || currentUserId,
         }));
         setTasks(importedTasks);
         if (Array.isArray(data.categories)) setCategories(data.categories);
@@ -603,6 +680,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         activityLogs,
         filters,
         isRealtimeSyncing,
+        syncStatus,
         setFilters,
         addTask,
         updateTask,
@@ -633,3 +711,4 @@ export function useTasks() {
   }
   return context;
 }
+

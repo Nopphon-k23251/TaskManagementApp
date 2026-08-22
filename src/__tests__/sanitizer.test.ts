@@ -2,18 +2,17 @@ import { describe, it, expect } from 'vitest';
 import { sanitizeInput, validateTaskForm } from '../utils/sanitizer';
 
 describe('Sanitizer & Security Utils', () => {
-  it('should escape HTML tags and malicious script tags', () => {
+  it('should remove malicious script tags and escape dangerous HTML', () => {
     const raw = '<script>alert("xss")</script>';
     const sanitized = sanitizeInput(raw);
     expect(sanitized).not.toContain('<script>');
-    expect(sanitized).toContain('&lt;script&gt;');
+    expect(sanitized).not.toContain('alert("xss")');
   });
 
-  it('should sanitize quote marks and slashes', () => {
-    const raw = 'onClick="steal()"';
+  it('should preserve natural slashes and quotes in task titles', () => {
+    const raw = 'ออกแบบ UI/UX ระบบ "Kanban" และ Today\'s Tasks';
     const sanitized = sanitizeInput(raw);
-    expect(sanitized).toContain('&quot;');
-    expect(sanitized).not.toContain('"');
+    expect(sanitized).toBe('ออกแบบ UI/UX ระบบ "Kanban" และ Today\'s Tasks');
   });
 
   it('should return empty string for null or empty values', () => {
