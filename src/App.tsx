@@ -14,6 +14,7 @@ import { TodoList } from './components/todo/TodoList';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { CategoryManagerModal } from './components/common/CategoryManagerModal';
+import { AuthErrorModal } from './components/common/AuthErrorModal';
 
 const AppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
@@ -118,6 +119,9 @@ const AppContent: React.FC = () => {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+
+      {/* Google Auth Diagnostic & Error Modal */}
+      <AuthErrorModal />
     </div>
   );
 };

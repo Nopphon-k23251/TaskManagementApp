@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
 import { 
   Task, 
   TaskStatus, 
@@ -9,52 +9,51 @@ import {
 import { useAuth } from './AuthContext';
 import { 
   subscribeToTasks, 
+  subscribeToCategories,
   syncCreateTaskToFirestore, 
   syncUpdateTaskToFirestore, 
-  syncDeleteTaskFromFirestore 
+  syncDeleteTaskFromFirestore,
+  syncCategoriesToFirestore 
 } from '../services/firebase';
 import { getTodayString, isOverdue, isToday, isThisWeek } from '../utils/date';
 import { sanitizeInput } from '../utils/sanitizer';
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
-  { id: 'cat-1', name: 'งานฟีเจอร์ (Feature)', color: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
-  { id: 'cat-2', name: 'แก้ไขบั๊ก (Bug)', color: 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
-  { id: 'cat-3', name: 'งานออกแบบ (Design)', color: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
-  { id: 'cat-4', name: 'งานระบบ (DevOps)', color: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
-  { id: 'cat-5', name: 'การตลาด (Marketing)', color: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' },
-  { id: 'cat-6', name: 'วิจัย/ศึกษา (Research)', color: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
-  { id: 'cat-7', name: 'เรื่องส่วนตัว (Personal)', color: 'bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800' },
-  { id: 'cat-8', name: 'ทั่วไป (Other)', color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
+  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
+  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
+  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
+  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
 ];
 
 export const COLOR_OPTIONS = [
-  { name: 'Indigo (น้ำเงินคราม)', class: 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
-  { name: 'Rose (แดงกุหลาบ)', class: 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
-  { name: 'Purple (ม่วง)', class: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
-  { name: 'Emerald (เขียวมรกต)', class: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
-  { name: 'Teal (เขียวอมฟ้า)', class: 'bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' },
-  { name: 'Amber (ส้มอำพัน)', class: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
-  { name: 'Sky (ฟ้าสดใส)', class: 'bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800' },
-  { name: 'Pink (ชมพู)', class: 'bg-pink-50 dark:bg-pink-950/50 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-800' },
-  { name: 'Slate (เทา)', class: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { name: 'Indigo (คราม)', class: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
+  { name: 'Rose (กุหลาบ)', class: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
+  { name: 'Purple (ม่วง)', class: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
+  { name: 'Emerald (เขียวมรกต)', class: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
+  { name: 'Teal (เขียวหัวเป็ด)', class: 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' },
+  { name: 'Amber (ส้มอำพัน)', class: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
+  { name: 'Sky (ฟ้าใส)', class: 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800' },
+  { name: 'Pink (ชมพู)', class: 'bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-800' },
+  { name: 'Slate (เทาคลาสสิก)', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
 ];
 
 interface TaskContextType {
   tasks: Task[];
-  categories: CategoryItem[];
   filteredTasks: Task[];
+  categories: CategoryItem[];
   activityLogs: ActivityLog[];
   filters: TaskFilterOptions;
+  isRealtimeSyncing: boolean;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilterOptions>>;
-  resetFilters: () => void;
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
   updateTask: (id: string, updates: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
-  updateTaskStatus: (id: string, status: TaskStatus) => Promise<void>;
-  updateTaskDate: (id: string, dueDate: string) => Promise<void>;
+  updateTaskStatus: (id: string, newStatus: TaskStatus) => Promise<void>;
+  updateTaskDueDate: (id: string, newDueDate: string) => Promise<void>;
   toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   addCategory: (name: string, color?: string) => void;
-  updateCategory: (id: string, name: string, color: string) => void;
+  updateCategory: (id: string, name: string, color?: string) => void;
   deleteCategory: (id: string) => void;
   resetToSampleData: () => void;
   clearAllTasks: () => void;
@@ -142,6 +141,8 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isFirebaseActive } = useAuth();
+  const [isRealtimeSyncing, setIsRealtimeSyncing] = useState(false);
+  const isSyncingFromCloudRef = useRef(false);
   
   const [tasks, setTasks] = useState<Task[]>(() => {
     const cached = localStorage.getItem('tm_tasks');
@@ -186,9 +187,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [filters, setFilters] = useState<TaskFilterOptions>(DEFAULT_FILTERS);
 
-  // Sync to localStorage
+  // Cache to localStorage
   useEffect(() => {
-    localStorage.setItem('tm_tasks', JSON.stringify(tasks));
+    if (!isSyncingFromCloudRef.current) {
+      localStorage.setItem('tm_tasks', JSON.stringify(tasks));
+    }
   }, [tasks]);
 
   useEffect(() => {
@@ -199,17 +202,66 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('tm_activity_logs', JSON.stringify(activityLogs));
   }, [activityLogs]);
 
-  // Firestore real-time synchronization if user is logged in via Firebase
+  // Realtime Cloud Synchronization with Firestore
   useEffect(() => {
-    if (!isFirebaseActive || !user || user.isDemo) return;
+    if (!isFirebaseActive || !user || user.isDemo) {
+      setIsRealtimeSyncing(false);
+      return;
+    }
 
-    const unsubscribe = subscribeToTasks(user.uid, (cloudTasks) => {
-      if (cloudTasks && cloudTasks.length > 0) {
+    setIsRealtimeSyncing(true);
+
+    // 1. Subscribe to User Tasks in Realtime
+    const unsubscribeTasks = subscribeToTasks(user.uid, async (cloudTasks, isFirstLoad) => {
+      isSyncingFromCloudRef.current = true;
+
+      if (isFirstLoad && cloudTasks.length === 0) {
+        // If Firestore is empty for this user on first login, upload local tasks to seed Firestore
+        const cached = localStorage.getItem('tm_tasks');
+        let initialTasksToUpload = tasks;
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              initialTasksToUpload = parsed;
+            }
+          } catch {}
+        }
+
+        // Upload local tasks to user's cloud account
+        for (const task of initialTasksToUpload) {
+          try {
+            await syncCreateTaskToFirestore({
+              ...task,
+              userId: user.uid,
+              createdAt: task.createdAt || new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            });
+          } catch (e) {
+            console.warn('Initial seeding error:', e);
+          }
+        }
+      } else {
+        // Real-time update from cloud (Desktop <-> Mobile)
         setTasks(cloudTasks);
+        localStorage.setItem('tm_tasks', JSON.stringify(cloudTasks));
+      }
+
+      isSyncingFromCloudRef.current = false;
+    });
+
+    // 2. Subscribe to User Categories in Realtime
+    const unsubscribeCategories = subscribeToCategories(user.uid, (cloudCategories) => {
+      if (cloudCategories && cloudCategories.length > 0) {
+        setCategories(cloudCategories);
+        localStorage.setItem('tm_categories', JSON.stringify(cloudCategories));
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeTasks();
+      unsubscribeCategories();
+    };
   }, [user, isFirebaseActive]);
 
   const addActivity = (taskId: string, taskTitle: string, action: ActivityLog['action'], details?: string) => {
@@ -304,53 +356,47 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateTaskStatus = async (id: string, status: TaskStatus) => {
-    const target = tasks.find((t) => t.id === id);
-    if (!target || target.status === status) return;
-
-    const readableStatus = {
-      todo: 'To Do (รอดำเนินการ)',
-      in_progress: 'In Progress (กำลังทำ)',
-      review: 'In Review (ตรวจทาน)',
-      completed: 'Completed (เสร็จสิ้น)',
-    }[status];
-
+  const updateTaskStatus = async (id: string, newStatus: TaskStatus) => {
+    const statusTitles: Record<TaskStatus, string> = {
+      todo: 'รอดำเนินการ (To Do)',
+      in_progress: 'กำลังทำ (In Progress)',
+      review: 'ตรวจทาน (Review)',
+      completed: 'เสร็จสิ้น (Completed)',
+    };
+    
     setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? { ...task, status, updatedAt: new Date().toISOString() }
-          : task
-      )
+      prev.map((task) => {
+        if (task.id === id) {
+          addActivity(id, task.title, 'status_changed', `ย้ายไปยัง ${statusTitles[newStatus]}`);
+          return { ...task, status: newStatus, updatedAt: new Date().toISOString() };
+        }
+        return task;
+      })
     );
-
-    addActivity(id, target.title, 'status_changed', `ย้ายไป: ${readableStatus}`);
 
     if (isFirebaseActive && user && !user.isDemo) {
       try {
-        await syncUpdateTaskToFirestore(id, { status, updatedAt: new Date().toISOString() });
+        await syncUpdateTaskToFirestore(id, { status: newStatus, updatedAt: new Date().toISOString() });
       } catch (err) {
         console.warn('Firestore status update failed:', err);
       }
     }
   };
 
-  const updateTaskDate = async (id: string, dueDate: string) => {
-    const target = tasks.find((t) => t.id === id);
-    if (!target || target.dueDate === dueDate) return;
-
+  const updateTaskDueDate = async (id: string, newDueDate: string) => {
     setTasks((prev) =>
-      prev.map((task) =>
-        task.id === id
-          ? { ...task, dueDate, updatedAt: new Date().toISOString() }
-          : task
-      )
+      prev.map((task) => {
+        if (task.id === id) {
+          addActivity(id, task.title, 'due_date_changed', `เลื่อนกำหนดส่งเป็น: ${newDueDate}`);
+          return { ...task, dueDate: newDueDate, updatedAt: new Date().toISOString() };
+        }
+        return task;
+      })
     );
-
-    addActivity(id, target.title, 'rescheduled', `เปลี่ยนกำหนดส่งเป็น ${dueDate}`);
 
     if (isFirebaseActive && user && !user.isDemo) {
       try {
-        await syncUpdateTaskToFirestore(id, { dueDate, updatedAt: new Date().toISOString() });
+        await syncUpdateTaskToFirestore(id, { dueDate: newDueDate, updatedAt: new Date().toISOString() });
       } catch (err) {
         console.warn('Firestore date update failed:', err);
       }
@@ -362,99 +408,117 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks((prev) =>
       prev.map((task) => {
         if (task.id === taskId) {
-          const subtasks = task.subtasks.map((st) =>
+          updatedSubtasks = task.subtasks.map((st) =>
             st.id === subtaskId ? { ...st, completed: !st.completed } : st
           );
-          updatedSubtasks = subtasks;
-          return { ...task, subtasks, updatedAt: new Date().toISOString() };
+          return {
+            ...task,
+            subtasks: updatedSubtasks,
+            updatedAt: new Date().toISOString(),
+          };
         }
         return task;
       })
     );
 
-    if (isFirebaseActive && user && !user.isDemo && updatedSubtasks.length > 0) {
+    if (isFirebaseActive && user && !user.isDemo) {
       try {
         await syncUpdateTaskToFirestore(taskId, {
           subtasks: updatedSubtasks,
           updatedAt: new Date().toISOString(),
         });
       } catch (err) {
-        console.warn('Firestore subtask update failed:', err);
+        console.warn('Firestore subtask toggle failed:', err);
       }
     }
   };
 
-  // Category Management Handlers
   const addCategory = (name: string, color?: string) => {
-    const sanitizedName = sanitizeInput(name);
-    if (!sanitizedName) return;
     const newCat: CategoryItem = {
       id: 'cat-' + Date.now(),
-      name: sanitizedName,
+      name: sanitizeInput(name),
       color: color || COLOR_OPTIONS[0].class,
     };
-    setCategories((prev) => [...prev, newCat]);
+    const updated = [...categories, newCat];
+    setCategories(updated);
+
+    if (isFirebaseActive && user && !user.isDemo) {
+      syncCategoriesToFirestore(user.uid, updated).catch((e) => console.warn('Cat sync error:', e));
+    }
   };
 
-  const updateCategory = (id: string, name: string, color: string) => {
-    const sanitizedName = sanitizeInput(name);
-    if (!sanitizedName) return;
+  const updateCategory = (id: string, newName: string, newColor?: string) => {
     const oldCat = categories.find((c) => c.id === id);
+    const sanitizedName = sanitizeInput(newName);
 
-    setCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, name: sanitizedName, color } : c))
+    const updatedCategories = categories.map((c) =>
+      c.id === id ? { ...c, name: sanitizedName, color: newColor || c.color } : c
     );
+    setCategories(updatedCategories);
 
-    // If name changed, update tasks under this category
     if (oldCat && oldCat.name !== sanitizedName) {
       setTasks((prev) =>
         prev.map((t) => (t.category === oldCat.name ? { ...t, category: sanitizedName } : t))
       );
     }
+
+    if (isFirebaseActive && user && !user.isDemo) {
+      syncCategoriesToFirestore(user.uid, updatedCategories).catch((e) => console.warn('Cat sync error:', e));
+    }
   };
 
   const deleteCategory = (id: string) => {
     const target = categories.find((c) => c.id === id);
-    if (!target) return;
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-    // Reassign tasks in this category to default 'Other'
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.category === target.name ? { ...t, category: 'ทั่วไป (Other)' } : t
-      )
-    );
+    const fallbackCategory = categories.find((c) => c.id !== id)?.name || 'ทั่วไป (General)';
+
+    const updatedCategories = categories.filter((c) => c.id !== id);
+    setCategories(updatedCategories);
+
+    if (target) {
+      setTasks((prev) =>
+        prev.map((t) => (t.category === target.name ? { ...t, category: fallbackCategory } : t))
+      );
+    }
+
+    if (isFirebaseActive && user && !user.isDemo) {
+      syncCategoriesToFirestore(user.uid, updatedCategories).catch((e) => console.warn('Cat sync error:', e));
+    }
   };
 
   const resetToSampleData = () => {
     setTasks(INITIAL_SAMPLE_TASKS);
     setCategories(DEFAULT_CATEGORIES);
-    localStorage.setItem('tm_tasks', JSON.stringify(INITIAL_SAMPLE_TASKS));
-    localStorage.setItem('tm_categories', JSON.stringify(DEFAULT_CATEGORIES));
+    setActivityLogs([]);
+    localStorage.removeItem('tm_tasks');
+    localStorage.removeItem('tm_categories');
+    localStorage.removeItem('tm_activity_logs');
   };
 
   const clearAllTasks = () => {
     setTasks([]);
-    localStorage.setItem('tm_tasks', JSON.stringify([]));
+    setActivityLogs([]);
+    localStorage.removeItem('tm_tasks');
+    localStorage.removeItem('tm_activity_logs');
   };
 
-  const exportTasksJson = () => {
-    return JSON.stringify({ tasks, categories }, null, 2);
+  const exportTasksJson = (): string => {
+    const exportData = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      tasks,
+      categories,
+      activityLogs,
+    };
+    return JSON.stringify(exportData, null, 2);
   };
 
   const importTasksJson = (jsonStr: string): boolean => {
     try {
-      const parsed = JSON.parse(jsonStr);
-      if (Array.isArray(parsed)) {
-        setTasks(parsed);
-        localStorage.setItem('tm_tasks', JSON.stringify(parsed));
-        return true;
-      } else if (parsed && Array.isArray(parsed.tasks)) {
-        setTasks(parsed.tasks);
-        localStorage.setItem('tm_tasks', JSON.stringify(parsed.tasks));
-        if (Array.isArray(parsed.categories)) {
-          setCategories(parsed.categories);
-          localStorage.setItem('tm_categories', JSON.stringify(parsed.categories));
-        }
+      const data = JSON.parse(jsonStr);
+      if (data && Array.isArray(data.tasks)) {
+        setTasks(data.tasks);
+        if (Array.isArray(data.categories)) setCategories(data.categories);
+        if (Array.isArray(data.activityLogs)) setActivityLogs(data.activityLogs);
         return true;
       }
       return false;
@@ -463,38 +527,45 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const resetFilters = () => {
-    setFilters(DEFAULT_FILTERS);
-  };
-
-  // Filter computation
+  // Filter Tasks
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
+      // 1. Search Query
       if (filters.searchQuery.trim()) {
         const query = filters.searchQuery.toLowerCase();
         const matchesTitle = task.title.toLowerCase().includes(query);
-        const matchesDesc = task.description.toLowerCase().includes(query);
-        const matchesCat = task.category.toLowerCase().includes(query);
-        const matchesTag = task.tags.some((tag) => tag.toLowerCase().includes(query));
-        if (!matchesTitle && !matchesDesc && !matchesTag && !matchesCat) return false;
+        const matchesDesc = task.description?.toLowerCase().includes(query) || false;
+        const matchesTags = task.tags?.some((t) => t.toLowerCase().includes(query)) || false;
+        const matchesCategory = task.category.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesDesc && !matchesTags && !matchesCategory) {
+          return false;
+        }
       }
 
-      if (filters.status && filters.status !== 'all' && task.status !== filters.status) {
+      // 2. Status Filter
+      if (filters.status !== 'all' && task.status !== filters.status) {
         return false;
       }
 
-      if (filters.priority && filters.priority !== 'all' && task.priority !== filters.priority) {
+      // 3. Priority Filter
+      if (filters.priority !== 'all' && task.priority !== filters.priority) {
         return false;
       }
 
-      if (filters.category && filters.category !== 'all' && task.category !== filters.category) {
+      // 4. Category Filter
+      if (filters.category !== 'all' && task.category !== filters.category) {
         return false;
       }
 
-      if (filters.dueDateRange && filters.dueDateRange !== 'all') {
-        if (filters.dueDateRange === 'today' && !isToday(task.dueDate)) return false;
-        if (filters.dueDateRange === 'this_week' && !isThisWeek(task.dueDate)) return false;
-        if (filters.dueDateRange === 'overdue' && !isOverdue(task.dueDate)) return false;
+      // 5. Due Date Filter
+      if (filters.dueDateRange === 'today' && !isToday(task.dueDate)) {
+        return false;
+      }
+      if (filters.dueDateRange === 'this_week' && !isThisWeek(task.dueDate)) {
+        return false;
+      }
+      if (filters.dueDateRange === 'overdue' && !isOverdue(task.dueDate)) {
+        return false;
       }
 
       return true;
@@ -505,17 +576,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <TaskContext.Provider
       value={{
         tasks,
-        categories,
         filteredTasks,
+        categories,
         activityLogs,
         filters,
+        isRealtimeSyncing,
         setFilters,
-        resetFilters,
         addTask,
         updateTask,
         deleteTask,
         updateTaskStatus,
-        updateTaskDate,
+        updateTaskDueDate,
         toggleSubtask,
         addCategory,
         updateCategory,

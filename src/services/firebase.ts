@@ -3,6 +3,8 @@ import {
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signOut as fbSignOut, 
   onAuthStateChanged,
   User as FirebaseUser,
@@ -12,17 +14,18 @@ import {
   getFirestore, 
   collection, 
   doc, 
+  setDoc,
   addDoc, 
   updateDoc, 
   deleteDoc, 
-  getDocs,
-  limit,
+  getDocs, 
+  limit, 
   onSnapshot, 
   query, 
   where,
   Firestore
 } from 'firebase/firestore';
-import { Task } from '../types/task';
+import { Task, CategoryItem } from '../types/task';
 
 // Read config from Vite env variables
 const firebaseConfig = {
@@ -66,6 +69,24 @@ export async function loginWithGoogle(): Promise<FirebaseUser | null> {
   }
   const result = await signInWithPopup(auth, googleProvider);
   return result.user;
+}
+
+export async function loginWithGoogleRedirect(): Promise<void> {
+  if (!auth || !googleProvider) {
+    throw new Error('Firebase Auth is not configured');
+  }
+  await signInWithRedirect(auth, googleProvider);
+}
+
+export async function checkRedirectAuth(): Promise<FirebaseUser | null> {
+  if (!auth) return null;
+  try {
+    const result = await getRedirectResult(auth);
+    return result?.user || null;
+  } catch (error) {
+    console.error('Redirect auth result error:', error);
+    throw error;
+  }
 }
 
 export async function logoutUser(): Promise<void> {
@@ -113,13 +134,14 @@ export async function testFirestoreConnection(): Promise<{ success: boolean; mes
 // Firestore Realtime Task Subscription
 export function subscribeToTasks(
   userId: string, 
-  onTasksUpdate: (tasks: Task[]) => void, 
+  onTasksUpdate: (tasks: Task[], isFirstLoad: boolean) => void, 
   onError?: (err: Error) => void
 ) {
   if (!db || !userId) {
     return () => {};
   }
 
+  let isFirst = true;
   const tasksRef = collection(db, 'tasks');
   const q = query(tasksRef, where('userId', '==', userId));
 
@@ -131,7 +153,12 @@ export function subscribeToTasks(
         ...docSnap.data()
       } as Task);
     });
-    onTasksUpdate(tasks);
+    
+    // Sort tasks by createdAt or priority
+    tasks.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    onTasksUpdate(tasks, isFirst);
+    isFirst = false;
   }, (err) => {
     console.error('Firestore snapshot error:', err);
     if (onError) onError(err);
@@ -154,4 +181,28 @@ export async function syncDeleteTaskFromFirestore(id: string): Promise<void> {
   if (!db) return;
   const docRef = doc(db, 'tasks', id);
   await deleteDoc(docRef);
+}
+
+// User Categories Realtime Sync
+export function subscribeToCategories(
+  userId: string,
+  onCategoriesUpdate: (categories: CategoryItem[]) => void
+) {
+  if (!db || !userId) return () => {};
+
+  const catDocRef = doc(db, 'user_settings', userId);
+  return onSnapshot(catDocRef, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data?.categories) && data.categories.length > 0) {
+        onCategoriesUpdate(data.categories);
+      }
+    }
+  });
+}
+
+export async function syncCategoriesToFirestore(userId: string, categories: CategoryItem[]): Promise<void> {
+  if (!db || !userId) return;
+  const catDocRef = doc(db, 'user_settings', userId);
+  await setDoc(catDocRef, { categories, updatedAt: new Date().toISOString() }, { merge: true });
 }

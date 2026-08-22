@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
               {user ? (
                 <button
                   onClick={() => setShowUserDropdown(!showUserDropdown)}
-                  className="shrink-0 p-0.5 rounded-full hover:ring-2 hover:ring-brand-500/40 transition-all focus:outline-none"
+                  className="shrink-0 p-0.5 rounded-full hover:ring-2 hover:ring-brand-500/40 transition-all focus:outline-none relative"
                   aria-label="User account menu"
                 >
                   <div className="w-8 h-8 min-w-[32px] min-h-[32px] max-w-[32px] max-h-[32px] aspect-square rounded-full overflow-hidden ring-2 ring-brand-500/40 shrink-0 bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
@@ -206,6 +206,12 @@ export const Header: React.FC<HeaderProps> = ({
                       </span>
                     )}
                   </div>
+                  {isFirebaseActive && !user.isDemo && (
+                    <span
+                      className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full ring-2 ring-white dark:ring-slate-900"
+                      title="ซิงก์ข้อมูลคลาวด์เรียลไทม์"
+                    />
+                  )}
                 </button>
               ) : (
                 <button
