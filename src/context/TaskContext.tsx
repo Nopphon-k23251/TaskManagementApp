@@ -18,21 +18,21 @@ import { getTodayString, addDaysToDate, isOverdue, isToday, isThisWeek } from '.
 import { sanitizeInput } from '../utils/sanitizer';
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
-  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-400/40 dark:border-rose-500/40' },
-  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-400/40 dark:border-cyan-500/40' },
-  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-400/40 dark:border-amber-500/40' },
-  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-400/40 dark:border-purple-500/40' },
-  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
+  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
+  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
+  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
+  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
 ];
 
 export const COLOR_OPTIONS = [
-  { name: 'Neon Cyan (ฟ้าไซเบอร์)', class: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-400/40 dark:border-cyan-500/40' },
-  { name: 'Laser Rose (กุหลาบเลเซอร์)', class: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-400/40 dark:border-rose-500/40' },
-  { name: 'Plasma Purple (ม่วงพลาสมา)', class: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-400/40 dark:border-purple-500/40' },
-  { name: 'Matrix Emerald (เขียวเมทริกซ์)', class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-400/40 dark:border-emerald-500/40' },
-  { name: 'Cyber Amber (ส้มอำพัน)', class: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-400/40 dark:border-amber-500/40' },
-  { name: 'Electric Indigo (คราม)', class: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-400/40 dark:border-indigo-500/40' },
-  { name: 'Steel Slate (เทาคลาสสิก)', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { name: 'Neon Cyan (ฟ้าไซเบอร์)', class: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
+  { name: 'Laser Rose (กุหลาบเลเซอร์)', class: 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
+  { name: 'Plasma Purple (ม่วงพลาสมา)', class: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
+  { name: 'Matrix Emerald (เขียวเมทริกซ์)', class: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/50' },
+  { name: 'Cyber Amber (ส้มอำพัน)', class: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
+  { name: 'Electric Indigo (คราม)', class: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/50' },
+  { name: 'Steel Slate (เทาคลาสสิก)', class: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
 ];
 
 interface TaskContextType {

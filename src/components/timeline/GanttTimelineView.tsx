@@ -407,33 +407,33 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
       )}
 
       {/* Main Sci-Fi Gantt Matrix Deck (Responsive Layout) */}
-      <div className="bg-slate-950 rounded-2xl border border-slate-800 dark:border-cyan-500/20 shadow-2xl overflow-hidden flex flex-col bg-cyber-grid">
+      <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl overflow-hidden flex flex-col bg-cyber-grid">
         <div className="flex flex-1 min-h-[460px] overflow-hidden relative">
           {/* Left Column: Task Control Deck (Sticky on Desktop, Collapsible/Compact on Mobile) */}
           {showMobileTaskDeck && (
-            <div className="w-36 sm:w-64 md:w-72 shrink-0 border-r border-slate-800 dark:border-cyan-500/20 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md flex flex-col z-20 transition-all">
+            <div className="w-36 sm:w-64 md:w-72 shrink-0 border-r border-slate-200 dark:border-cyan-500/20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md flex flex-col z-20 transition-all">
               {/* Left Header Deck */}
-              <div className="h-14 px-3 sm:px-4 flex items-center justify-between border-b border-slate-800 dark:border-cyan-500/20 bg-slate-900/95 dark:bg-[#070b14]/95 font-mono text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-cyan-400/90 uppercase tracking-wider">
+              <div className="h-14 px-3 sm:px-4 flex items-center justify-between border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100/95 dark:bg-[#070b14]/95 font-mono text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-cyan-400/90 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5 truncate">
-                  <Radio className="w-3 h-3 text-cyan-400 animate-pulse shrink-0" />
+                  <Radio className="w-3 h-3 text-cyan-600 dark:text-cyan-400 animate-pulse shrink-0" />
                   <span className="truncate">TASKS [{displayTasks.length}]</span>
                 </span>
                 <span className="hidden sm:inline">{t('taskDurationDays', { days: '' }).trim()}</span>
               </div>
 
               {/* Task Row Headers List */}
-              <div className="divide-y divide-slate-800/80 dark:divide-cyan-500/10 overflow-y-auto">
+              <div className="divide-y divide-slate-200 dark:divide-cyan-500/10 overflow-y-auto">
                 {displayTasks.map((task) => {
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
                   const duration = getDaysDifference(task.startDate || task.dueDate, task.dueDate);
                   const matchedCategory = categories.find((c) => c.name === task.category);
-                  const categoryClass = matchedCategory?.color || 'bg-slate-800 text-slate-300 border-slate-700';
+                  const categoryClass = matchedCategory?.color || 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
 
                   return (
                     <div
                       key={task.id}
                       onClick={() => onEditTask(task)}
-                      className="h-14 px-2.5 sm:px-3.5 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-400"
+                      className="h-14 px-2.5 sm:px-3.5 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-500"
                     >
                       <div className="overflow-hidden pr-1 sm:pr-2 flex-1">
                         <div className="flex items-center gap-1 mb-0.5">
@@ -442,25 +442,25 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                           </span>
 
                           {depStatus.isBlocked && (
-                            <span className="inline-flex items-center gap-0.5 font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-amber-950/80 text-amber-300 border border-amber-500/40 shrink-0">
+                            <span className="inline-flex items-center gap-0.5 font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 shrink-0">
                               <GitBranch className="w-2.5 h-2.5" />
                               {depStatus.blockedBy.length}
                             </span>
                           )}
 
                           {depStatus.hasWarning && (
-                            <span className="inline-flex items-center text-[8px] font-bold px-1 py-0.2 rounded bg-rose-950/80 text-rose-300 border border-rose-500/50 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.5)] shrink-0">
+                            <span className="inline-flex items-center text-[8px] font-bold px-1 py-0.2 rounded bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-500/50 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.5)] shrink-0">
                               ⚠️
                             </span>
                           )}
                         </div>
 
-                        <p className="font-semibold text-xs text-slate-200 truncate group-hover:text-cyan-300 transition-colors">
+                        <p className="font-semibold text-xs text-slate-800 dark:text-slate-200 truncate group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
                           {task.title}
                         </p>
                       </div>
 
-                      <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-400 dark:text-cyan-400/80 shrink-0">
+                      <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 shrink-0">
                         {duration}d
                       </span>
                     </div>
@@ -482,17 +482,17 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
               style={{ width: `${timelineDays.length * dayWidth}px` }}
             >
               {/* Sticky Timeline Date Header */}
-              <div className="h-14 sticky top-0 z-10 flex border-b border-slate-800 dark:border-cyan-500/20 bg-slate-900/95 dark:bg-[#070b14]/95 backdrop-blur-md">
+              <div className="h-14 sticky top-0 z-10 flex border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100/95 dark:bg-[#070b14]/95 backdrop-blur-md">
                 {timelineDays.map((day) => (
                   <div
                     key={day.dateStr}
                     style={{ width: `${dayWidth}px` }}
-                    className={`shrink-0 flex flex-col items-center justify-center border-r border-slate-800/80 dark:border-cyan-500/10 font-mono text-[10px] transition-colors ${
+                    className={`shrink-0 flex flex-col items-center justify-center border-r border-slate-200 dark:border-cyan-500/10 font-mono text-[10px] transition-colors ${
                       day.isToday
-                        ? 'bg-cyan-500/15 text-cyan-300 font-black shadow-[inset_0_0_12px_rgba(6,182,212,0.2)]'
+                        ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-black shadow-[inset_0_0_12px_rgba(6,182,212,0.2)]'
                         : day.isWeekend
-                        ? 'bg-slate-900/60 text-slate-500 font-medium'
-                        : 'text-slate-400 font-semibold'
+                        ? 'bg-slate-200/50 dark:bg-slate-900/60 text-slate-500 font-medium'
+                        : 'text-slate-600 dark:text-slate-400 font-semibold'
                     }`}
                   >
                     <span className="text-[9px] tracking-tighter opacity-80">{day.monthName} {day.dayNumber}</span>
@@ -507,11 +507,11 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   <div
                     key={'grid-' + day.dateStr}
                     style={{ width: `${dayWidth}px` }}
-                    className={`shrink-0 border-r border-slate-800/50 dark:border-cyan-500/5 ${
+                    className={`shrink-0 border-r border-slate-200/70 dark:border-cyan-500/5 ${
                       day.isToday
-                        ? 'bg-cyan-500/5 relative'
+                        ? 'bg-cyan-500/10 dark:bg-cyan-500/5 relative'
                         : day.isWeekend
-                        ? 'bg-slate-950/40'
+                        ? 'bg-slate-100/40 dark:bg-slate-950/40'
                         : ''
                     }`}
                   >
