@@ -32,6 +32,7 @@ export interface Task {
   dueDate: string;    // ISO date string (YYYY-MM-DD)
   dependencies?: string[]; // Array of task IDs that this task is blocked by (prerequisites)
   estimatedHours?: number;
+  order?: number; // Custom display sequence index
   subtasks: SubTask[];
   tags: string[];
   userId?: string;

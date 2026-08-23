@@ -208,8 +208,15 @@ export function subscribeToTasks(
       } as Task);
     });
     
-    // Sort tasks by createdAt desc
-    tasks.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    // Sort tasks by custom order (asc) if present, else fallback to createdAt desc
+    tasks.sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      if (a.order !== undefined) return -1;
+      if (b.order !== undefined) return 1;
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
     
     onTasksUpdate(tasks);
   }, (err) => {

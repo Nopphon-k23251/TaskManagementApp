@@ -192,6 +192,7 @@ export function validateJsonImportPayload(jsonStr: string): {
           }))
         : [],
       tags: Array.isArray(t.tags) ? t.tags.slice(0, 30).map((tag: any) => sanitizeInput(String(tag)).substring(0, 40)) : [],
+      order: typeof t.order === 'number' ? t.order : undefined,
       createdAt: t.createdAt ? String(t.createdAt).substring(0, 30) : new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });

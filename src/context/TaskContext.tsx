@@ -81,6 +81,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     startDate: addDaysToDate(getTodayString(), -3),
     dueDate: addDaysToDate(getTodayString(), 1),
     dependencies: [],
+    order: 0,
     subtasks: [
       { id: 'st-1', title: 'จัดทำระบบสองภาษา TH/EN', completed: true },
       { id: 'st-2', title: 'ปรับปรุง Responsive ให้ใช้งานง่ายบนมือถือ', completed: true },
@@ -100,6 +101,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     startDate: addDaysToDate(getTodayString(), -6),
     dueDate: addDaysToDate(getTodayString(), -2),
     dependencies: [],
+    order: 1,
     subtasks: [
       { id: 'st-4', title: 'บันทึก Config ในไฟล์ .env', completed: true },
       { id: 'st-5', title: 'ทดสอบการ Sign in ด้วย Google', completed: true }
@@ -118,6 +120,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     startDate: addDaysToDate(getTodayString(), 0),
     dueDate: addDaysToDate(getTodayString(), 4),
     dependencies: ['task-1'],
+    order: 2,
     subtasks: [
       { id: 'st-6', title: 'สร้าง Matrix ปฏิทินรายเดือน', completed: true },
       { id: 'st-7', title: 'พัฒนา Gantt Chart & Dependency Lines', completed: true },
@@ -137,6 +140,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     startDate: addDaysToDate(getTodayString(), 3),
     dueDate: addDaysToDate(getTodayString(), 8),
     dependencies: ['task-3'],
+    order: 3,
     subtasks: [
       { id: 'st-9', title: 'ทดสอบ Date Matrix Utils', completed: true },
       { id: 'st-10', title: 'ทดสอบ Circular Dependencies & XSS', completed: true }
@@ -305,12 +309,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: taskId,
       title: sanitizeInput(taskData.title),
       description: sanitizeInput(taskData.description),
+      order: 0,
       userId: user?.uid,
       createdAt: now,
       updatedAt: now,
     };
 
-    const nextTasks = [newTask, ...tasks];
+    const nextTasks = [newTask, ...tasks.map((t, idx) => ({ ...t, order: idx + 1 }))];
     setTasks(nextTasks);
     broadcastLocalUpdate(nextTasks);
     addActivity(taskId, newTask.title, 'created', `สร้างในหมวดหมู่: ${newTask.category}`);
@@ -517,9 +522,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetToSampleData = () => {
-    const seeded = INITIAL_SAMPLE_TASKS.map((t) => ({
+    const seeded = INITIAL_SAMPLE_TASKS.map((t, idx) => ({
       ...t,
       id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+      order: idx,
       userId: user?.uid,
     }));
     setTasks(seeded);
@@ -545,8 +551,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const reorderTasks = (newTasks: Task[]) => {
-    setTasks(newTasks);
-    broadcastLocalUpdate(newTasks, categories);
+    const tasksWithOrder = newTasks.map((t, idx) => ({
+      ...t,
+      order: idx,
+      updatedAt: new Date().toISOString(),
+    }));
+    setTasks(tasksWithOrder);
+    broadcastLocalUpdate(tasksWithOrder, categories);
+
+    if (isFirebaseActive && user && !user.isDemo) {
+      tasksWithOrder.forEach((task) => {
+        syncSaveTaskToFirestore({ ...task, userId: user.uid }).catch(() => {});
+      });
+    }
   };
 
   const exportTasksJson = (): string => {
