@@ -133,10 +133,10 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
       {/* Sci-Fi Filter Segmented Tabs */}
       <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 sm:p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
           <button
             onClick={() => setTodoTab('all')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
               todoTab === 'all'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
@@ -146,7 +146,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
           </button>
           <button
             onClick={() => setTodoTab('active')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
               todoTab === 'active'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
@@ -156,7 +156,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
           </button>
           <button
             onClick={() => setTodoTab('today')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
               todoTab === 'today'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
@@ -166,7 +166,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
           </button>
           <button
             onClick={() => setTodoTab('completed')}
-            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
               todoTab === 'completed'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
