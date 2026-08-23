@@ -20,6 +20,7 @@ import {
   generateTimelineDays
 } from '../../utils/date';
 import { getTaskDependencyStatus } from '../../utils/dependencies';
+import { getCategoryBadgeStyle } from '../../utils/category';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -426,8 +427,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 {displayTasks.map((task) => {
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
                   const duration = getDaysDifference(task.startDate || task.dueDate, task.dueDate);
-                  const matchedCategory = categories.find((c) => c.name === task.category);
-                  const categoryClass = matchedCategory?.color || 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+                  const categoryStyle = getCategoryBadgeStyle(task.category, categories);
 
                   return (
                     <div
@@ -437,7 +437,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                     >
                       <div className="overflow-hidden pr-1 sm:pr-2 flex-1">
                         <div className="flex items-center gap-1 mb-0.5">
-                          <span className={`font-mono text-[8px] sm:text-[9px] font-bold px-1 py-0.2 rounded border truncate max-w-[70px] sm:max-w-[90px] ${categoryClass}`}>
+                          <span
+                            style={categoryStyle.style}
+                            className={`text-[8px] sm:text-[9px] px-1 py-0.2 rounded border truncate max-w-[70px] sm:max-w-[90px] ${categoryStyle.className}`}
+                          >
                             {task.category}
                           </span>
 

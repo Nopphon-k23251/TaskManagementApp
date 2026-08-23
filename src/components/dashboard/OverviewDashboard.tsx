@@ -14,6 +14,7 @@ import {
 import { Task, ActiveTab } from '../../types/task';
 import { formatDate, isOverdue } from '../../utils/date';
 import { getTaskDependencyStatus } from '../../utils/dependencies';
+import { getCategoryBadgeStyle } from '../../utils/category';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -300,12 +301,12 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
             <div className="flex flex-wrap gap-2">
               {Object.entries(categoryCounts).map(([catName, count]) => {
-                const catObj = categories.find((c) => c.name === catName);
-                const colorClass = catObj?.color || 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700';
+                const badgeStyle = getCategoryBadgeStyle(catName, categories);
                 return (
                   <div
                     key={catName}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold border ${colorClass} shadow-xs`}
+                    style={badgeStyle.style}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs ${badgeStyle.className} shadow-xs`}
                   >
                     <span>{catName}</span>
                     <span className="px-1.5 py-0.2 rounded-full bg-black/10 dark:bg-black/40 text-[10px]">

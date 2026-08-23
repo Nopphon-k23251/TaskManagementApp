@@ -51,8 +51,8 @@ interface TaskContextType {
   updateTaskDate: (id: string, newDueDate: string) => Promise<void>;
   toggleSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   resetFilters: () => void;
-  addCategory: (name: string, color?: string) => void;
-  updateCategory: (id: string, name: string, color?: string) => void;
+  addCategory: (name: string, color?: string, customProps?: { customBg?: string; customText?: string; customBorder?: string }) => void;
+  updateCategory: (id: string, name: string, color?: string, customProps?: { customBg?: string; customText?: string; customBorder?: string }) => void;
   deleteCategory: (id: string) => void;
   resetToSampleData: () => void;
   clearAllTasks: () => void;
@@ -438,11 +438,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addCategory = (name: string, color?: string) => {
+  const addCategory = (
+    name: string, 
+    color?: string, 
+    customProps?: { customBg?: string; customText?: string; customBorder?: string }
+  ) => {
     const newCat: CategoryItem = {
       id: 'cat-' + Date.now(),
       name: sanitizeInput(name),
       color: color || COLOR_OPTIONS[0].class,
+      customBg: customProps?.customBg,
+      customText: customProps?.customText,
+      customBorder: customProps?.customBorder,
     };
     const updated = [...categories, newCat];
     setCategories(updated);
@@ -453,12 +460,26 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateCategory = (id: string, newName: string, newColor?: string) => {
+  const updateCategory = (
+    id: string, 
+    newName: string, 
+    newColor?: string, 
+    customProps?: { customBg?: string; customText?: string; customBorder?: string }
+  ) => {
     const oldCat = categories.find((c) => c.id === id);
     const sanitizedName = sanitizeInput(newName);
 
     const updatedCategories = categories.map((c) =>
-      c.id === id ? { ...c, name: sanitizedName, color: newColor || c.color } : c
+      c.id === id
+        ? {
+            ...c,
+            name: sanitizedName,
+            color: newColor || c.color,
+            customBg: customProps !== undefined ? customProps.customBg : c.customBg,
+            customText: customProps !== undefined ? customProps.customText : c.customText,
+            customBorder: customProps !== undefined ? customProps.customBorder : c.customBorder,
+          }
+        : c
     );
     setCategories(updatedCategories);
 

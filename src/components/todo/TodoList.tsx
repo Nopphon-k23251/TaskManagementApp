@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Task, TaskPriority } from '../../types/task';
 import { formatDate, getTodayString, isOverdue } from '../../utils/date';
+import { getCategoryBadgeStyle } from '../../utils/category';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -221,9 +222,17 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                        <span className="font-mono text-[9px] font-bold px-2 py-0.2 rounded border bg-slate-800 text-slate-300 border-slate-700">
-                          {task.category}
-                        </span>
+                        {(() => {
+                          const badgeStyle = getCategoryBadgeStyle(task.category, categories);
+                          return (
+                            <span
+                              style={badgeStyle.style}
+                              className={`text-[9px] px-2 py-0.5 rounded ${badgeStyle.className}`}
+                            >
+                              {task.category}
+                            </span>
+                          );
+                        })()}
                         <span
                           className={`font-mono text-[9px] font-bold px-2 py-0.2 rounded ${
                             task.priority === 'urgent'

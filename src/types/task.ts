@@ -8,6 +8,9 @@ export interface CategoryItem {
   id: string;
   name: string;
   color: string; // Tailwind color class or hex
+  customBg?: string;
+  customText?: string;
+  customBorder?: string;
 }
 
 export type TaskCategory = string;

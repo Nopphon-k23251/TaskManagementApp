@@ -15,6 +15,7 @@ import {
   getTodayString, 
   CalendarDay 
 } from '../../utils/date';
+import { getCategoryBadgeStyle } from '../../utils/category';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -27,7 +28,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   onOpenCreateModal,
   onEditTask,
 }) => {
-  const { filteredTasks, updateTaskDate } = useTasks();
+  const { filteredTasks, updateTaskDate, categories } = useTasks();
   const { language, t } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week' | 'agenda'>('agenda');
@@ -275,9 +276,17 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   >
                     <div className="space-y-1 min-w-0 pr-2">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded border bg-slate-800 text-slate-300 border-slate-700">
-                          {task.category}
-                        </span>
+                        {(() => {
+                          const badgeStyle = getCategoryBadgeStyle(task.category, categories);
+                          return (
+                            <span
+                              style={badgeStyle.style}
+                              className={`text-[9px] px-1.5 py-0.2 rounded border ${badgeStyle.className}`}
+                            >
+                              {task.category}
+                            </span>
+                          );
+                        })()}
                         <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded ${
                           task.priority === 'urgent' ? 'bg-rose-950 text-rose-300' : 'bg-cyan-950 text-cyan-300'
                         }`}>
