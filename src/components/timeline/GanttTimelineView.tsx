@@ -10,7 +10,12 @@ import {
   Radio,
   Eye,
   EyeOff,
-  Filter
+  Filter,
+  ChevronRight,
+  CheckSquare,
+  Square,
+  ListTree,
+  CornerDownRight
 } from 'lucide-react';
 import { Task, TaskStatus } from '../../types/task';
 import { 
@@ -35,7 +40,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   onOpenCreateModal,
   onEditTask,
 }) => {
-  const { filteredTasks, updateTask, categories } = useTasks();
+  const { filteredTasks, updateTask, toggleSubtask, categories } = useTasks();
   const { language, t } = useLanguage();
 
   const [zoom, setZoom] = useState<ZoomLevel>('day');
@@ -44,6 +49,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   const [showDependencyLines, setShowDependencyLines] = useState<boolean>(true);
   const [showMobileTaskDeck, setShowMobileTaskDeck] = useState<boolean>(true);
   const [showFiltersMobile, setShowFiltersMobile] = useState<boolean>(false);
+  const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [dragAction, setDragAction] = useState<'move' | 'resize-start' | 'resize-end' | null>(null);
   const [dragStartX, setDragStartX] = useState<number>(0);
@@ -133,6 +139,61 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
     return { blockedCount, delayedWarningCount, delayedTasksList };
   }, [displayTasks, filteredTasks]);
+
+  // Subtask Expansion Handlers
+  const toggleExpandTask = (taskId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setExpandedTaskIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(taskId)) {
+        next.delete(taskId);
+      } else {
+        next.add(taskId);
+      }
+      return next;
+    });
+  };
+
+  const hasSubtasksTasks = useMemo(() => {
+    return displayTasks.filter((t) => t.subtasks && t.subtasks.length > 0);
+  }, [displayTasks]);
+
+  const areAllExpanded = useMemo(() => {
+    if (hasSubtasksTasks.length === 0) return false;
+    return hasSubtasksTasks.every((t) => expandedTaskIds.has(t.id));
+  }, [hasSubtasksTasks, expandedTaskIds]);
+
+  const toggleAllSubtasks = () => {
+    if (areAllExpanded) {
+      setExpandedTaskIds(new Set());
+    } else {
+      setExpandedTaskIds(new Set(hasSubtasksTasks.map((t) => t.id)));
+    }
+  };
+
+  // Dynamic Row Offsets for pixel-perfect Gantt bar and SVG connector positioning
+  const taskOffsets = useMemo(() => {
+    const offsets: { top: number; centerY: number; height: number }[] = [];
+    let currentTop = 0;
+
+    displayTasks.forEach((task) => {
+      const isExpanded = expandedTaskIds.has(task.id) && task.subtasks && task.subtasks.length > 0;
+      const parentHeight = 56;
+      const subtaskHeight = 36;
+      const subtasksCount = isExpanded ? task.subtasks.length : 0;
+      const totalRowHeight = parentHeight + subtasksCount * subtaskHeight;
+
+      offsets.push({
+        top: currentTop,
+        centerY: currentTop + parentHeight / 2,
+        height: totalRowHeight,
+      });
+
+      currentTop += totalRowHeight;
+    });
+
+    return { offsets, totalHeight: currentTop };
+  }, [displayTasks, expandedTaskIds]);
 
   // Compute Task Bar geometry
   const getTaskBarGeometry = (task: Task) => {
@@ -338,6 +399,27 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 </select>
               </div>
 
+              {/* Toggle All Subtasks (if any tasks have subtasks) */}
+              {hasSubtasksTasks.length > 0 && (
+                <button
+                  onClick={toggleAllSubtasks}
+                  className={`px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-mono font-bold rounded-xl border transition-all flex items-center gap-1.5 ${
+                    areAllExpanded
+                      ? 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.25)]'
+                      : 'bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-cyan-500/30 hover:border-cyan-400'
+                  }`}
+                  title={areAllExpanded ? t('collapseAllSubtasks') : t('expandAllSubtasks')}
+                >
+                  <ListTree className="w-3.5 h-3.5 text-cyan-500 shrink-0" />
+                  <span className="hidden md:inline">
+                    {areAllExpanded ? t('collapseAllSubtasks') : t('expandAllSubtasks')}
+                  </span>
+                  <span className="md:hidden">
+                    {areAllExpanded ? 'ย่องานย่อย' : 'งานย่อย'}
+                  </span>
+                </button>
+              )}
+
               {/* Toggle Dependency Laser Connectors */}
               <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-cyan-300 select-none text-[11px] sm:text-xs font-mono font-semibold">
                 <input
@@ -428,44 +510,124 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
                   const duration = getDaysDifference(task.startDate || task.dueDate, task.dueDate);
                   const categoryStyle = getCategoryBadgeStyle(task.category, categories);
+                  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+                  const isExpanded = expandedTaskIds.has(task.id) && hasSubtasks;
+                  const completedSubtasks = (task.subtasks || []).filter((st) => st.completed).length;
+                  const totalSubtasks = (task.subtasks || []).length;
 
                   return (
-                    <div
-                      key={task.id}
-                      onClick={() => onEditTask(task)}
-                      className="h-14 px-2.5 sm:px-3.5 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-500"
-                    >
-                      <div className="overflow-hidden pr-1 sm:pr-2 flex-1">
-                        <div className="flex items-center gap-1 mb-0.5">
-                          <span
-                            style={categoryStyle.style}
-                            className={`text-[8px] sm:text-[9px] px-1 py-0.2 rounded border truncate max-w-[70px] sm:max-w-[90px] ${categoryStyle.className}`}
-                          >
-                            {task.category}
-                          </span>
-
-                          {depStatus.isBlocked && (
-                            <span className="inline-flex items-center gap-0.5 font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 shrink-0">
-                              <GitBranch className="w-2.5 h-2.5" />
-                              {depStatus.blockedBy.length}
-                            </span>
+                    <div key={task.id} className="flex flex-col">
+                      {/* Main Parent Task Row */}
+                      <div
+                        onClick={() => onEditTask(task)}
+                        className="h-14 px-2 sm:px-3 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-500"
+                      >
+                        <div className="flex items-center gap-1 overflow-hidden pr-1 flex-1">
+                          {/* Subtask Expand Toggle Chevron */}
+                          {hasSubtasks ? (
+                            <button
+                              onClick={(e) => toggleExpandTask(task.id, e)}
+                              className="p-1 rounded-md text-slate-500 dark:text-cyan-400 hover:bg-cyan-500/20 transition-transform shrink-0"
+                              title={isExpanded ? t('collapseAllSubtasks') : t('expandAllSubtasks')}
+                            >
+                              <ChevronRight
+                                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                                  isExpanded ? 'rotate-90 text-cyan-400' : ''
+                                }`}
+                              />
+                            </button>
+                          ) : (
+                            <div className="w-4 shrink-0" />
                           )}
 
-                          {depStatus.hasWarning && (
-                            <span className="inline-flex items-center text-[8px] font-bold px-1 py-0.2 rounded bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-500/50 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.5)] shrink-0">
-                              ⚠️
-                            </span>
-                          )}
+                          <div className="overflow-hidden flex-1">
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <span
+                                style={categoryStyle.style}
+                                className={`text-[8px] sm:text-[9px] px-1 py-0.2 rounded border truncate max-w-[60px] sm:max-w-[80px] ${categoryStyle.className}`}
+                              >
+                                {task.category}
+                              </span>
+
+                              {hasSubtasks && (
+                                <span className="inline-flex items-center font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-950/80 dark:text-cyan-300 dark:border-cyan-500/40 shrink-0">
+                                  ✓ {completedSubtasks}/{totalSubtasks}
+                                </span>
+                              )}
+
+                              {depStatus.isBlocked && (
+                                <span className="inline-flex items-center gap-0.5 font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 shrink-0">
+                                  <GitBranch className="w-2.5 h-2.5" />
+                                  {depStatus.blockedBy.length}
+                                </span>
+                              )}
+
+                              {depStatus.hasWarning && (
+                                <span className="inline-flex items-center text-[8px] font-bold px-1 py-0.2 rounded bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-500/50 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.5)] shrink-0">
+                                  ⚠️
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="font-semibold text-xs text-slate-800 dark:text-slate-200 truncate group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
+                              {task.title}
+                            </p>
+                          </div>
                         </div>
 
-                        <p className="font-semibold text-xs text-slate-800 dark:text-slate-200 truncate group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors">
-                          {task.title}
-                        </p>
+                        <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 shrink-0 ml-1">
+                          {duration}d
+                        </span>
                       </div>
 
-                      <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 shrink-0">
-                        {duration}d
-                      </span>
+                      {/* Expanded Subtask Rows */}
+                      {isExpanded && (
+                        <div className="bg-slate-100/70 dark:bg-slate-900/70 divide-y divide-slate-200/60 dark:divide-cyan-500/10 border-t border-slate-200/60 dark:border-cyan-500/10">
+                          {task.subtasks.map((st) => (
+                            <div
+                              key={st.id}
+                              onClick={() => toggleSubtask(task.id, st.id)}
+                              className="h-9 pl-4 sm:pl-6 pr-2 sm:pr-3 flex items-center justify-between hover:bg-cyan-500/10 transition-colors cursor-pointer group"
+                            >
+                              <div className="flex items-center gap-1.5 overflow-hidden flex-1">
+                                <CornerDownRight className="w-3 h-3 text-cyan-500/70 shrink-0" />
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSubtask(task.id, st.id);
+                                  }}
+                                  className="shrink-0 text-slate-400 hover:text-cyan-400 transition-colors"
+                                >
+                                  {st.completed ? (
+                                    <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
+                                  ) : (
+                                    <Square className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                                  )}
+                                </button>
+                                <span
+                                  className={`text-[11px] font-medium truncate ${
+                                    st.completed
+                                      ? 'line-through text-slate-400 dark:text-slate-500'
+                                      : 'text-slate-700 dark:text-slate-300 group-hover:text-cyan-400'
+                                  }`}
+                                >
+                                  {st.title}
+                                </span>
+                              </div>
+
+                              <span
+                                className={`text-[8px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 ml-1 ${
+                                  st.completed
+                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                    : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                }`}
+                              >
+                                {st.completed ? 'DONE' : 'TODO'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -582,14 +744,14 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   {displayTasks.map((task, childIdx) => {
                     if (!task.dependencies || task.dependencies.length === 0) return null;
                     const childGeom = getTaskBarGeometry(task);
-                    const childY = childIdx * 56 + 28; // row center
+                    const childY = taskOffsets.offsets[childIdx]?.centerY ?? (childIdx * 56 + 28);
 
                     return task.dependencies.map((depId) => {
                       const parentIdx = displayTasks.findIndex((t) => t.id === depId);
                       if (parentIdx === -1) return null;
                       const parentTask = displayTasks[parentIdx];
                       const parentGeom = getTaskBarGeometry(parentTask);
-                      const parentY = parentIdx * 56 + 28;
+                      const parentY = taskOffsets.offsets[parentIdx]?.centerY ?? (parentIdx * 56 + 28);
 
                       const startX = parentGeom.left + parentGeom.width;
                       const startY = parentY;
@@ -638,8 +800,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 {displayTasks.map((task) => {
                   const geom = getTaskBarGeometry(task);
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
-                  const completedSubtasks = task.subtasks.filter((st) => st.completed).length;
-                  const totalSubtasks = task.subtasks.length;
+                  const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+                  const isExpanded = expandedTaskIds.has(task.id) && hasSubtasks;
+                  const completedSubtasks = (task.subtasks || []).filter((st) => st.completed).length;
+                  const totalSubtasks = (task.subtasks || []).length;
                   const progress = task.status === 'completed' 
                     ? 100 
                     : totalSubtasks > 0 
@@ -649,74 +813,116 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   const isDraggingThis = draggingTaskId === task.id;
 
                   return (
-                    <div key={'row-' + task.id} className="h-14 relative flex items-center">
-                      {/* Sci-Fi Hologram Task Bar */}
-                      <div
-                        onMouseDown={(e) => handleBarMouseDown(e, task, 'move')}
-                        onClick={() => onEditTask(task)}
-                        style={{
-                          left: `${geom.left}px`,
-                          width: `${geom.width}px`,
-                        }}
-                        className={`absolute h-8.5 rounded-xl cursor-grab active:cursor-grabbing flex items-center justify-between px-2 sm:px-3 transition-all select-none ${
-                          isDraggingThis
-                            ? 'opacity-85 ring-2 ring-cyan-400 scale-[1.03] shadow-[0_0_25px_#00f5ff]'
-                            : ''
-                        } ${
-                          depStatus.hasWarning
-                            ? 'bg-gradient-to-r from-rose-600 via-amber-600 to-rose-600 text-white border border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)] animate-pulse'
-                            : depStatus.isBlocked
-                            ? 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-200 border border-slate-600 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                            : task.status === 'completed'
-                            ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white border border-emerald-400/60 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                            : 'bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-600 text-white border border-cyan-400/50 shadow-[0_0_18px_rgba(6,182,212,0.35)] hover:border-cyan-300'
-                        }`}
-                      >
-                        {/* Animated Energy Stripes Progress Fill */}
+                    <div key={'row-block-' + task.id} className="flex flex-col">
+                      {/* Main Parent Task Bar Row */}
+                      <div className="h-14 relative flex items-center">
+                        {/* Sci-Fi Hologram Task Bar */}
                         <div
-                          className="absolute inset-0 bg-white/20 energy-stripes pointer-events-none rounded-xl"
-                          style={{ width: `${progress}%` }}
-                        />
-
-                        {/* Left Resize Handle */}
-                        <div
-                          onMouseDown={(e) => handleBarMouseDown(e, task, 'resize-start')}
-                          className="absolute left-0 top-0 bottom-0 w-2.5 cursor-ew-resize hover:bg-white/30 rounded-l-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                          title="Drag to adjust start date"
+                          onMouseDown={(e) => handleBarMouseDown(e, task, 'move')}
+                          onClick={() => onEditTask(task)}
+                          style={{
+                            left: `${geom.left}px`,
+                            width: `${geom.width}px`,
+                          }}
+                          className={`absolute h-8.5 rounded-xl cursor-grab active:cursor-grabbing flex items-center justify-between px-2 sm:px-3 transition-all select-none ${
+                            isDraggingThis
+                              ? 'opacity-85 ring-2 ring-cyan-400 scale-[1.03] shadow-[0_0_25px_#00f5ff]'
+                              : ''
+                          } ${
+                            depStatus.hasWarning
+                              ? 'bg-gradient-to-r from-rose-600 via-amber-600 to-rose-600 text-white border border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)] animate-pulse'
+                              : depStatus.isBlocked
+                              ? 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-200 border border-slate-600 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
+                              : task.status === 'completed'
+                              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white border border-emerald-400/60 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                              : 'bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-600 text-white border border-cyan-400/50 shadow-[0_0_18px_rgba(6,182,212,0.35)] hover:border-cyan-300'
+                          }`}
                         >
-                          <span className="text-[8px] font-bold text-white">«</span>
-                        </div>
+                          {/* Animated Energy Stripes Progress Fill */}
+                          <div
+                            className="absolute inset-0 bg-white/20 energy-stripes pointer-events-none rounded-xl"
+                            style={{ width: `${progress}%` }}
+                          />
 
-                        {/* Bar Label Content */}
-                        <div className="relative z-10 flex items-center gap-1 overflow-hidden pr-1">
-                          {depStatus.hasWarning && (
-                            <span className="text-xs font-bold shrink-0 animate-bounce">⚠️</span>
-                          )}
-                          {depStatus.isBlocked && !depStatus.hasWarning && (
-                            <span className="text-xs font-bold shrink-0">🔒</span>
-                          )}
-                          {task.status === 'completed' && (
-                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-200" />
-                          )}
-                          <span className="text-xs font-bold truncate drop-shadow-sm">
-                            {task.title}
+                          {/* Left Resize Handle */}
+                          <div
+                            onMouseDown={(e) => handleBarMouseDown(e, task, 'resize-start')}
+                            className="absolute left-0 top-0 bottom-0 w-2.5 cursor-ew-resize hover:bg-white/30 rounded-l-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                            title="Drag to adjust start date"
+                          >
+                            <span className="text-[8px] font-bold text-white">«</span>
+                          </div>
+
+                          {/* Bar Label Content */}
+                          <div className="relative z-10 flex items-center gap-1 overflow-hidden pr-1">
+                            {depStatus.hasWarning && (
+                              <span className="text-xs font-bold shrink-0 animate-bounce">⚠️</span>
+                            )}
+                            {depStatus.isBlocked && !depStatus.hasWarning && (
+                              <span className="text-xs font-bold shrink-0">🔒</span>
+                            )}
+                            {task.status === 'completed' && (
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-200" />
+                            )}
+                            <span className="text-xs font-bold truncate drop-shadow-sm">
+                              {task.title}
+                            </span>
+                          </div>
+
+                          {/* Monospace Progress Pill */}
+                          <span className="relative z-10 font-mono text-[9px] sm:text-[10px] font-black shrink-0 bg-black/40 backdrop-blur-xs px-1.5 py-0.5 rounded-md border border-white/20">
+                            {progress}%
                           </span>
-                        </div>
 
-                        {/* Monospace Progress Pill */}
-                        <span className="relative z-10 font-mono text-[9px] sm:text-[10px] font-black shrink-0 bg-black/40 backdrop-blur-xs px-1.5 py-0.5 rounded-md border border-white/20">
-                          {progress}%
-                        </span>
-
-                        {/* Right Resize Handle */}
-                        <div
-                          onMouseDown={(e) => handleBarMouseDown(e, task, 'resize-end')}
-                          className="absolute right-0 top-0 bottom-0 w-2.5 cursor-ew-resize hover:bg-white/30 rounded-r-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                          title="Drag to adjust due date"
-                        >
-                          <span className="text-[8px] font-bold text-white">»</span>
+                          {/* Right Resize Handle */}
+                          <div
+                            onMouseDown={(e) => handleBarMouseDown(e, task, 'resize-end')}
+                            className="absolute right-0 top-0 bottom-0 w-2.5 cursor-ew-resize hover:bg-white/30 rounded-r-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                            title="Drag to adjust due date"
+                          >
+                            <span className="text-[8px] font-bold text-white">»</span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Expanded Subtask Timeline Bars */}
+                      {isExpanded && (
+                        <div className="bg-slate-900/20 dark:bg-slate-950/40 divide-y divide-slate-800/40 dark:divide-cyan-500/5 border-t border-slate-800/40 dark:border-cyan-500/5">
+                          {task.subtasks.map((st) => (
+                            <div key={st.id} className="h-9 relative flex items-center">
+                              {/* Hologram Subtask Mini Bar */}
+                              <div
+                                onClick={() => toggleSubtask(task.id, st.id)}
+                                style={{
+                                  left: `${geom.left}px`,
+                                  width: `${geom.width}px`,
+                                }}
+                                className={`absolute h-6 rounded-lg cursor-pointer flex items-center justify-between px-2 transition-all select-none ${
+                                  st.completed
+                                    ? 'bg-gradient-to-r from-emerald-600/80 to-teal-600/80 text-white border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:brightness-110'
+                                    : 'bg-slate-800/80 dark:bg-slate-900/90 text-cyan-200 border border-cyan-500/30 hover:border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:bg-cyan-950/60'
+                                }`}
+                                title={`Click to mark ${st.completed ? 'incomplete' : 'complete'}`}
+                              >
+                                <div className="flex items-center gap-1.5 overflow-hidden pr-1">
+                                  {st.completed ? (
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-200 shrink-0" />
+                                  ) : (
+                                    <CornerDownRight className="w-3 h-3 text-cyan-400 shrink-0" />
+                                  )}
+                                  <span className={`text-[10px] font-bold truncate ${st.completed ? 'line-through opacity-85' : ''}`}>
+                                    {st.title}
+                                  </span>
+                                </div>
+
+                                <span className="font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-black/40 border border-white/10 shrink-0">
+                                  {st.completed ? 'DONE' : 'TODO'}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
