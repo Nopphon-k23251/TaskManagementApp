@@ -155,8 +155,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className={`text-2xl sm:text-3xl font-mono font-black ${overdueCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}`}>
             {overdueCount}
           </div>
-          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
-            {overdueCount > 0 ? '[ HAZARD // DELAYED ]' : '[ STATUS // OPTIMAL ]'}
+          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
+            {overdueCount > 0 ? '⚠️ HAZARD // DELAYED' : '✓ STATUS // OPTIMAL'}
           </div>
         </div>
 
@@ -169,8 +169,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="text-2xl sm:text-3xl font-mono font-black text-amber-600 dark:text-amber-300">
             {blockedTasks.length}
           </div>
-          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
-            {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} NODES DELAYED` : '[ QUEUED // ORDERED ]'}
+          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
+            {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} DELAYED` : '✓ QUEUED // ORDERED'}
           </div>
         </div>
       </div>

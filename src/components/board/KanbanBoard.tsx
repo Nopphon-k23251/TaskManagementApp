@@ -210,7 +210,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-cyan-500/20'
           }`}
         >
-          [ ALL NODES ({filteredTasks.length}) ]
+          {t('allColumns')} ({filteredTasks.length})
         </button>
         {columns.map((col) => {
           const count = filteredTasks.filter((t) => t.status === col.id).length;

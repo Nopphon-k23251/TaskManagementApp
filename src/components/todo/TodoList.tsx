@@ -132,47 +132,47 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
       </div>
 
       {/* Sci-Fi Filter Segmented Tabs */}
-      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-0.5 sm:p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="inline-flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30 shrink-0">
           <button
             onClick={() => setTodoTab('all')}
-            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'all'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
             }`}
           >
-            [ {t('allTab')} ({filteredTasks.length}) ]
+            {t('allTab')} ({filteredTasks.length})
           </button>
           <button
             onClick={() => setTodoTab('active')}
-            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'active'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
             }`}
           >
-            [ {t('activeTab')} ({activeCount}) ]
+            {t('activeTab')} ({activeCount})
           </button>
           <button
             onClick={() => setTodoTab('today')}
-            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'today'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
             }`}
           >
-            [ {t('todayTab')} ]
+            {t('todayTab')}
           </button>
           <button
             onClick={() => setTodoTab('completed')}
-            className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'completed'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
                 : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
             }`}
           >
-            [ {t('completedTab')} ({completedCount}) ]
+            {t('completedTab')} ({completedCount})
           </button>
         </div>
       </div>

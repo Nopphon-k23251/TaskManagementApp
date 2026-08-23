@@ -240,8 +240,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   <Clock className="w-4 h-4 text-cyan-400" />
                   <span>{t('tasksOnDate', { date: formatDate(selectedAgendaDate) })}</span>
                 </h3>
-                <span className="font-mono text-xs text-slate-500 dark:text-cyan-400/80">
-                  [{agendaTasks.length} SCHEDULED NODES]
+                <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-cyan-400/80 truncate block">
+                  {agendaTasks.length} {t('tasksCount', { count: agendaTasks.length })}
                 </span>
               </div>
 
