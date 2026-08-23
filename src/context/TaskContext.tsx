@@ -57,6 +57,7 @@ interface TaskContextType {
   deleteCategory: (id: string) => void;
   resetToSampleData: () => void;
   clearAllTasks: () => void;
+  reorderTasks: (newTasks: Task[]) => void;
   exportTasksJson: () => string;
   importTasksJson: (jsonStr: string) => boolean;
 }
@@ -543,6 +544,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     broadcastLocalUpdate([]);
   };
 
+  const reorderTasks = (newTasks: Task[]) => {
+    setTasks(newTasks);
+    broadcastLocalUpdate(newTasks, categories);
+  };
+
   const exportTasksJson = (): string => {
     const exportData = {
       version: '1.0',
@@ -664,6 +670,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteCategory,
         resetToSampleData,
         clearAllTasks,
+        reorderTasks,
         exportTasksJson,
         importTasksJson,
       }}

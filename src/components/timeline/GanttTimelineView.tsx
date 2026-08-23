@@ -15,7 +15,8 @@ import {
   CheckSquare,
   Square,
   ListTree,
-  CornerDownRight
+  CornerDownRight,
+  GripVertical
 } from 'lucide-react';
 import { Task, TaskStatus } from '../../types/task';
 import { 
@@ -40,7 +41,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   onOpenCreateModal,
   onEditTask,
 }) => {
-  const { filteredTasks, updateTask, toggleSubtask, categories } = useTasks();
+  const { tasks, filteredTasks, updateTask, toggleSubtask, reorderTasks, categories } = useTasks();
   const { language, t } = useLanguage();
 
   const [zoom, setZoom] = useState<ZoomLevel>('day');
@@ -50,6 +51,9 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   const [showMobileTaskDeck, setShowMobileTaskDeck] = useState<boolean>(true);
   const [showFiltersMobile, setShowFiltersMobile] = useState<boolean>(false);
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set());
+  const [draggedRowTaskId, setDraggedRowTaskId] = useState<string | null>(null);
+  const [dragOverRowTaskId, setDragOverRowTaskId] = useState<string | null>(null);
+  const [dragOverRowPosition, setDragOverRowPosition] = useState<'top' | 'bottom' | null>(null);
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [dragAction, setDragAction] = useState<'move' | 'resize-start' | 'resize-end' | null>(null);
   const [dragStartX, setDragStartX] = useState<number>(0);
@@ -194,6 +198,71 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
     return { offsets, totalHeight: currentTop };
   }, [displayTasks, expandedTaskIds]);
+
+  // Task Row Drag & Drop Reordering Handlers
+  const handleRowDragStart = (e: React.DragEvent, taskId: string) => {
+    e.dataTransfer.setData('text/plain', taskId);
+    e.dataTransfer.effectAllowed = 'move';
+    setDraggedRowTaskId(taskId);
+  };
+
+  const handleRowDragOver = (e: React.DragEvent, taskId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+
+    if (draggedRowTaskId === taskId) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relativeY = e.clientY - rect.top;
+    const position = relativeY < rect.height / 2 ? 'top' : 'bottom';
+
+    setDragOverRowTaskId(taskId);
+    setDragOverRowPosition(position);
+  };
+
+  const handleRowDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    const related = e.relatedTarget as HTMLElement;
+    if (!related || !e.currentTarget.contains(related)) {
+      setDragOverRowTaskId(null);
+      setDragOverRowPosition(null);
+    }
+  };
+
+  const handleRowDrop = (e: React.DragEvent, targetTaskId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!draggedRowTaskId || draggedRowTaskId === targetTaskId) {
+      setDraggedRowTaskId(null);
+      setDragOverRowTaskId(null);
+      setDragOverRowPosition(null);
+      return;
+    }
+
+    const currentTasks = [...tasks];
+    const srcIndex = currentTasks.findIndex((t) => t.id === draggedRowTaskId);
+    const destIndex = currentTasks.findIndex((t) => t.id === targetTaskId);
+
+    if (srcIndex !== -1 && destIndex !== -1) {
+      const [movedTask] = currentTasks.splice(srcIndex, 1);
+      const newDestIndex = currentTasks.findIndex((t) => t.id === targetTaskId);
+      const insertIndex = dragOverRowPosition === 'bottom' ? newDestIndex + 1 : newDestIndex;
+      currentTasks.splice(Math.max(0, insertIndex), 0, movedTask);
+      reorderTasks(currentTasks);
+    }
+
+    setDraggedRowTaskId(null);
+    setDragOverRowTaskId(null);
+    setDragOverRowPosition(null);
+  };
+
+  const handleRowDragEnd = () => {
+    setDraggedRowTaskId(null);
+    setDragOverRowTaskId(null);
+    setDragOverRowPosition(null);
+  };
 
   // Compute Task Bar geometry
   const getTaskBarGeometry = (task: Task) => {
@@ -516,12 +585,40 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   const totalSubtasks = (task.subtasks || []).length;
 
                   return (
-                    <div key={task.id} className="flex flex-col">
+                    <div
+                      key={task.id}
+                      onDragOver={(e) => handleRowDragOver(e, task.id)}
+                      onDragLeave={handleRowDragLeave}
+                      onDrop={(e) => handleRowDrop(e, task.id)}
+                      className={`flex flex-col transition-all relative ${
+                        draggedRowTaskId === task.id ? 'opacity-35 bg-cyan-500/10' : ''
+                      } ${
+                        dragOverRowTaskId === task.id && dragOverRowPosition === 'top'
+                          ? 'border-t-2 border-cyan-400 bg-cyan-500/10 shadow-[0_-3px_10px_rgba(6,182,212,0.5)]'
+                          : ''
+                      } ${
+                        dragOverRowTaskId === task.id && dragOverRowPosition === 'bottom'
+                          ? 'border-b-2 border-cyan-400 bg-cyan-500/10 shadow-[0_3px_10px_rgba(6,182,212,0.5)]'
+                          : ''
+                      }`}
+                    >
                       {/* Main Parent Task Row */}
                       <div
                         onClick={() => onEditTask(task)}
-                        className="h-14 px-2 sm:px-3 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-500"
+                        className="h-14 px-1.5 sm:px-2.5 flex items-center justify-between hover:bg-cyan-500/5 dark:hover:bg-cyan-500/10 transition-colors cursor-pointer group border-l-2 border-transparent hover:border-cyan-500"
                       >
+                        {/* Drag Handle Grip */}
+                        <div
+                          draggable={true}
+                          onDragStart={(e) => handleRowDragStart(e, task.id)}
+                          onDragEnd={handleRowDragEnd}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 text-slate-400 hover:text-cyan-400 cursor-grab active:cursor-grabbing opacity-30 hover:opacity-100 group-hover:opacity-80 transition-opacity shrink-0 flex items-center"
+                          title={t('dragToReorder')}
+                        >
+                          <GripVertical className="w-3.5 h-3.5" />
+                        </div>
+
                         <div className="flex items-center gap-1 overflow-hidden pr-1 flex-1">
                           {/* Subtask Expand Toggle Chevron */}
                           {hasSubtasks ? (
@@ -537,14 +634,14 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                               />
                             </button>
                           ) : (
-                            <div className="w-4 shrink-0" />
+                            <div className="w-3 shrink-0" />
                           )}
 
                           <div className="overflow-hidden flex-1">
                             <div className="flex items-center gap-1 mb-0.5">
                               <span
                                 style={categoryStyle.style}
-                                className={`text-[8px] sm:text-[9px] px-1 py-0.2 rounded border truncate max-w-[60px] sm:max-w-[80px] ${categoryStyle.className}`}
+                                className={`text-[8px] sm:text-[9px] px-1 py-0.2 rounded border truncate max-w-[55px] sm:max-w-[75px] ${categoryStyle.className}`}
                               >
                                 {task.category}
                               </span>

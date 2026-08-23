@@ -79,6 +79,7 @@ export const translations = {
     expandAllSubtasks: 'ขยายงานย่อยทั้งหมด',
     collapseAllSubtasks: 'ย่องานย่อยทั้งหมด',
     dragToReschedule: 'คลิกลากเพื่อย้ายช่วงเวลาทำงาน',
+    dragToReorder: 'ลากเพื่อจัดลำดับงาน',
     blockedTasksOverview: 'งานที่ติดบล็อกรอเริ่ม',
     dependenciesCount: '{count} เงื่อนไข',
 
@@ -245,6 +246,7 @@ export const translations = {
     expandAllSubtasks: 'Expand All Subtasks',
     collapseAllSubtasks: 'Collapse All Subtasks',
     dragToReschedule: 'Click and drag to reschedule time span',
+    dragToReorder: 'Drag to reorder tasks',
     blockedTasksOverview: 'Tasks Blocked Waiting to Start',
     dependenciesCount: '{count} dependencies',
 
