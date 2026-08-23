@@ -339,7 +339,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 setStartDate(e.target.value);
                 if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
               }}
-              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
+              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-cyan-100 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
                 errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-cyan-500/30'
               }`}
             />
@@ -363,7 +363,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 setDueDate(e.target.value);
                 if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
               }}
-              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
+              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-cyan-100 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
                 errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-cyan-500/30'
               }`}
             />

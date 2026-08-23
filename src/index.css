@@ -131,3 +131,35 @@
 .safe-area-bottom {
   padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
 }
+
+/* Make HTML5 Date Picker Indicator visible & glowing in Dark and Light mode */
+input[type="date"] {
+  color-scheme: light;
+}
+
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.85;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85) sepia(1) saturate(5) hue-rotate(145deg) drop-shadow(0 0 6px rgba(0, 245, 255, 0.8));
+  opacity: 0.95;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) drop-shadow(0 0 10px #00f5ff);
+  opacity: 1;
+}
