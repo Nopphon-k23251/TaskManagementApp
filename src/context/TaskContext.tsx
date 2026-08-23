@@ -15,7 +15,8 @@ import {
   syncCategoriesToFirestore 
 } from '../services/firebase';
 import { getTodayString, addDaysToDate, isOverdue, isToday, isThisWeek } from '../utils/date';
-import { sanitizeInput } from '../utils/sanitizer';
+import { sanitizeInput, validateJsonImportPayload } from '../utils/sanitizer';
+import { appRateLimiter } from '../utils/security';
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
   { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
@@ -554,24 +555,42 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const importTasksJson = (jsonStr: string): boolean => {
-    try {
-      const data = JSON.parse(jsonStr);
-      if (data && Array.isArray(data.tasks)) {
-        const importedTasks = data.tasks.map((t: Task) => ({
-          ...t,
-          userId: user?.uid,
-        }));
-        setTasks(importedTasks);
-        if (Array.isArray(data.categories)) setCategories(data.categories);
-        if (Array.isArray(data.activityLogs)) setActivityLogs(data.activityLogs);
-        broadcastLocalUpdate(importedTasks, data.categories);
-
-        if (isFirebaseActive && user && !user.isDemo) {
-          importedTasks.forEach((t: Task) => syncSaveTaskToFirestore(t).catch(() => {}));
-        }
-        return true;
-      }
+    // 1. Rate limiting on bulk imports
+    const rateCheck = appRateLimiter.isAllowed('import_tasks_' + (user?.uid || 'anon'), {
+      maxRequests: 5,
+      windowMs: 60000,
+    });
+    if (!rateCheck.allowed) {
+      console.warn('Import rate limit exceeded. Please wait a moment.');
       return false;
+    }
+
+    // 2. Validate & Sanitize JSON payload with schema & size guards
+    const validation = validateJsonImportPayload(jsonStr);
+    if (!validation.isValid || !validation.tasks) {
+      console.warn('Import validation failed:', validation.error);
+      return false;
+    }
+
+    try {
+      const importedTasks = validation.tasks.map((t: Task) => ({
+        ...t,
+        userId: user?.uid,
+      }));
+      setTasks(importedTasks);
+
+      if (validation.categories && validation.categories.length > 0) {
+        setCategories(validation.categories);
+      }
+      broadcastLocalUpdate(importedTasks, validation.categories || categories);
+
+      if (isFirebaseActive && user && !user.isDemo) {
+        importedTasks.forEach((t: Task) => syncSaveTaskToFirestore(t).catch(() => {}));
+        if (validation.categories) {
+          syncCategoriesToFirestore(user.uid, validation.categories).catch(() => {});
+        }
+      }
+      return true;
     } catch {
       return false;
     }

@@ -8,6 +8,7 @@ import {
   subscribeToAuthChanges, 
   isFirebaseConfigured 
 } from '../services/firebase';
+import { loginAttemptTracker, appRateLimiter } from '../utils/security';
 
 interface AuthContextType {
   user: AppUser | null;
@@ -136,6 +137,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async () => {
     setError(null);
     setErrorCode(null);
+
+    // 1. Check for Brute-force / Credential Stuffing Lockout
+    const lockout = loginAttemptTracker.checkLockout('google_auth');
+    if (lockout.isLocked) {
+      const msg = `ระบบระงับการเข้าสู่ระบบชั่วคราวเนื่องจากมีความพยายามบ่อยเกินไป กรุณารออีก ${lockout.remainingSec} วินาที`;
+      setError(msg);
+      setErrorCode('auth/too-many-requests');
+      return;
+    }
+
+    // 2. Sliding window rate limit
+    const rate = appRateLimiter.isAllowed('login_google', { maxRequests: 5, windowMs: 60000 });
+    if (!rate.allowed) {
+      setError('คุณส่งคำขอล็อกอินเร็วเกินไป กรุณารอสักครู่');
+      setErrorCode('auth/rate-limited');
+      return;
+    }
+
     setLoading(true);
     try {
       if (!isFirebaseConfigured) {
@@ -143,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const fbUser = await fbLoginWithGoogle();
       if (fbUser) {
+        loginAttemptTracker.recordSuccess('google_auth');
         const appUser: AppUser = {
           uid: fbUser.uid,
           displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
@@ -155,6 +175,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err: any) {
       console.error('Google login failed:', err);
+      // Record failed attempt
+      loginAttemptTracker.recordFailedAttempt('google_auth');
       const parsed = mapAuthError(err);
       setError(parsed.message);
       setErrorCode(parsed.code);
@@ -167,9 +189,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithRedirect = async () => {
     setError(null);
     setErrorCode(null);
+
+    const lockout = loginAttemptTracker.checkLockout('google_auth');
+    if (lockout.isLocked) {
+      setError(`ระงับการเข้าสู่ระบบชั่วคราว กรุณารอ ${lockout.remainingSec} วินาที`);
+      setErrorCode('auth/too-many-requests');
+      return;
+    }
+
     try {
       await fbLoginWithGoogleRedirect();
     } catch (err: any) {
+      loginAttemptTracker.recordFailedAttempt('google_auth');
       const parsed = mapAuthError(err);
       setError(parsed.message);
       setErrorCode(parsed.code);

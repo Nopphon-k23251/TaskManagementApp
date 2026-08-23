@@ -2,19 +2,50 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Tasks collection: Users can only read and modify their own tasks
+
+    // Helper functions for security assertions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidTaskPayload() {
+      let data = request.resource.data;
+      return data.userId == request.auth.uid
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 150
+        && (!('description' in data) || (data.description is string && data.description.size() <= 5000))
+        && data.status is string && data.status in ['todo', 'in_progress', 'review', 'completed']
+        && data.priority is string && data.priority in ['low', 'medium', 'high', 'urgent']
+        && data.dueDate is string && data.dueDate.size() <= 30
+        && (!('subtasks' in data) || (data.subtasks is list && data.subtasks.size() <= 100))
+        && (!('tags' in data) || (data.tags is list && data.tags.size() <= 30))
+        && (!('dependencies' in data) || (data.dependencies is list && data.dependencies.size() <= 50));
+    }
+
+    function isValidUserSettings() {
+      let data = request.resource.data;
+      return !('categories' in data) || (data.categories is list && data.categories.size() <= 100);
+    }
+
+    // Tasks collection: Strict Ownership, Type-Safety, and Resource Exhaustion Bounds
     match /tasks/{taskId} {
-      allow read, delete: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid;
+      allow read, delete: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isValidTaskPayload();
+      allow update: if isOwner(resource.data.userId) 
+        && request.resource.data.userId == resource.data.userId 
+        && isValidTaskPayload();
     }
 
-    // User settings & custom categories: Isolated by User ID
+    // User settings & custom categories: Isolated by authenticated User ID
     match /user_settings/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserSettings();
     }
 
-    // Default deny for all other collections
+    // Explicit Default Deny for any unlisted collections
     match /{document=**} {
       allow read, write: if false;
     }
