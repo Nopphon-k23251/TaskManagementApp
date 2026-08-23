@@ -6,7 +6,8 @@ import {
   GitBranch,
   X,
   AlertTriangle,
-  Zap
+  Zap,
+  Calendar
 } from 'lucide-react';
 import { Task, TaskPriority, TaskStatus, SubTask } from '../../types/task';
 import { Modal } from '../common/Modal';
@@ -326,23 +327,28 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
         </div>
 
         {/* Timeline Dates: Start Date & Due Date */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
-            <label htmlFor="task-start-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+            <label htmlFor="task-start-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5 truncate">
               {t('startDateLabel')}
             </label>
-            <input
-              id="task-start-date"
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value);
-                if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
-              }}
-              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-cyan-100 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
-                errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-cyan-500/30'
-              }`}
-            />
+            <div className="relative group">
+              <input
+                id="task-start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+                }}
+                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
+                  errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
+                }`}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
+                <Calendar className="w-4 h-4 drop-shadow-[0_0_6px_rgba(0,245,255,0.6)]" />
+              </div>
+            </div>
             {errors.startDate && (
               <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
                 <AlertCircle className="w-3.5 h-3.5" />
@@ -352,21 +358,26 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           </div>
 
           <div>
-            <label htmlFor="task-due-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+            <label htmlFor="task-due-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5 truncate">
               {t('dueDateLabel')} <span className="text-rose-500">*</span>
             </label>
-            <input
-              id="task-due-date"
-              type="date"
-              value={dueDate}
-              onChange={(e) => {
-                setDueDate(e.target.value);
-                if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
-              }}
-              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-cyan-100 border rounded-xl focus:border-cyan-400 outline-none font-mono ${
-                errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-cyan-500/30'
-              }`}
-            />
+            <div className="relative group">
+              <input
+                id="task-due-date"
+                type="date"
+                value={dueDate}
+                onChange={(e) => {
+                  setDueDate(e.target.value);
+                  if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
+                }}
+                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
+                  errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
+                }`}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
+                <Calendar className="w-4 h-4 drop-shadow-[0_0_6px_rgba(0,245,255,0.6)]" />
+              </div>
+            </div>
             {errors.dueDate && (
               <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
                 <AlertCircle className="w-3.5 h-3.5" />
@@ -376,21 +387,21 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           </div>
         </div>
 
-        {/* Task Dependencies (Blocked by / Prerequisites) */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/20 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 flex items-center gap-1.5">
-              <GitBranch className="w-4 h-4 text-cyan-400" />
-              <span>{t('dependenciesLabel')}</span>
+        {/* Task Dependencies (Prerequisites) */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/20 space-y-2.5 max-w-full overflow-hidden">
+          <div className="flex items-center justify-between gap-2">
+            <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 flex items-center gap-1.5 truncate">
+              <GitBranch className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span className="truncate">{t('dependenciesLabel')}</span>
             </label>
             {dependencies.length > 0 && (
-              <span className="font-mono text-[11px] font-bold text-cyan-400">
+              <span className="font-mono text-[10px] font-bold text-cyan-400 shrink-0">
                 {t('dependenciesCount', { count: dependencies.length })}
               </span>
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="w-full max-w-full overflow-hidden">
             <select
               value={selectedDepId}
               onChange={(e) => {
@@ -399,7 +410,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                   handleAddDependency(e.target.value);
                 }
               }}
-              className="flex-1 px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none"
+              className="w-full max-w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none truncate"
             >
               <option value="">{t('dependenciesPlaceholder')}</option>
               {availableDependencyCandidates.map((cand) => (
