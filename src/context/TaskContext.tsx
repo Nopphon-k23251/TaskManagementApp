@@ -18,23 +18,21 @@ import { getTodayString, addDaysToDate, isOverdue, isToday, isThisWeek } from '.
 import { sanitizeInput } from '../utils/sanitizer';
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
-  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
-  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
-  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
-  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
-  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-400/40 dark:border-rose-500/40' },
+  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-400/40 dark:border-cyan-500/40' },
+  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-400/40 dark:border-amber-500/40' },
+  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-400/40 dark:border-purple-500/40' },
+  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
 ];
 
 export const COLOR_OPTIONS = [
-  { name: 'Indigo (คราม)', class: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
-  { name: 'Rose (กุหลาบ)', class: 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-800' },
-  { name: 'Purple (ม่วง)', class: 'bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
-  { name: 'Emerald (เขียวมรกต)', class: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' },
-  { name: 'Teal (เขียวหัวเป็ด)', class: 'bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border-teal-200 dark:border-teal-800' },
-  { name: 'Amber (ส้มอำพัน)', class: 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
-  { name: 'Sky (ฟ้าใส)', class: 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border-sky-200 dark:border-sky-800' },
-  { name: 'Pink (ชมพู)', class: 'bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-800' },
-  { name: 'Slate (เทาคลาสสิก)', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
+  { name: 'Neon Cyan (ฟ้าไซเบอร์)', class: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-400/40 dark:border-cyan-500/40' },
+  { name: 'Laser Rose (กุหลาบเลเซอร์)', class: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-400/40 dark:border-rose-500/40' },
+  { name: 'Plasma Purple (ม่วงพลาสมา)', class: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-400/40 dark:border-purple-500/40' },
+  { name: 'Matrix Emerald (เขียวเมทริกซ์)', class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-400/40 dark:border-emerald-500/40' },
+  { name: 'Cyber Amber (ส้มอำพัน)', class: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-400/40 dark:border-amber-500/40' },
+  { name: 'Electric Indigo (คราม)', class: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-400/40 dark:border-indigo-500/40' },
+  { name: 'Steel Slate (เทาคลาสสิก)', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700' },
 ];
 
 interface TaskContextType {
