@@ -8,7 +8,8 @@ import {
   Calendar, 
   CheckCircle2, 
   ChevronDown, 
-  ChevronUp 
+  ChevronUp,
+  Terminal
 } from 'lucide-react';
 import { Task, TaskPriority } from '../../types/task';
 import { formatDate, getTodayString, isOverdue } from '../../utils/date';
@@ -65,35 +66,44 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
   const completedCount = filteredTasks.filter((t) => t.status === 'completed').length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in pb-16 sm:pb-0">
-      {/* Quick Add Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in pb-16 sm:pb-0 font-sans">
+      {/* Sci-Fi Quick Add Terminal Console */}
+      <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_25px_rgba(6,182,212,0.06)]">
+        <div className="flex items-center gap-2 mb-3">
+          <Terminal className="w-4 h-4 text-cyan-400" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-600 dark:text-cyan-400 font-bold">
+            [ QUICK TASK DISPATCH // TERMINAL ]
+          </span>
+        </div>
+
         <form onSubmit={handleQuickAdd} className="space-y-3">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <input
-              type="text"
-              value={quickTitle}
-              onChange={(e) => setQuickTitle(e.target.value)}
-              placeholder={t('quickTodoPlaceholder')}
-              className="flex-1 px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:border-brand-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none transition-all"
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={quickTitle}
+                onChange={(e) => setQuickTitle(e.target.value)}
+                placeholder={t('quickTodoPlaceholder')}
+                className="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 dark:focus:border-cyan-400 text-slate-800 dark:text-cyan-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all shadow-inner"
+              />
+            </div>
             <button
               type="submit"
               disabled={!quickTitle.trim()}
-              className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-500 disabled:opacity-50 rounded-xl shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 disabled:opacity-40 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.3)] active:scale-95 transition-all"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 stroke-[3]" />
               <span>{t('addTodoBtn')}</span>
             </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-1.5 flex-1 sm:flex-none">
-              <span>{t('priorityLabel')}</span>
+              <span className="font-mono text-[10px] text-cyan-400/80 uppercase font-bold">{t('priorityLabel')}</span>
               <select
                 value={quickPriority}
                 onChange={(e) => setQuickPriority(e.target.value as TaskPriority)}
-                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium focus:outline-none"
+                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-slate-300 font-mono text-xs focus:outline-none"
               >
                 <option value="low">{t('low')}</option>
                 <option value="medium">{t('medium')}</option>
@@ -103,11 +113,11 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             </div>
 
             <div className="flex items-center gap-1.5 flex-1 sm:flex-none">
-              <span>{t('categoryLabel')}</span>
+              <span className="font-mono text-[10px] text-cyan-400/80 uppercase font-bold">{t('categoryLabel')}</span>
               <select
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium focus:outline-none"
+                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-slate-300 font-mono text-xs focus:outline-none"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.name}>
@@ -120,59 +130,61 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
         </form>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        <button
-          onClick={() => setTodoTab('all')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
-            todoTab === 'all'
-              ? 'bg-brand-500 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-          }`}
-        >
-          {t('allTab')} ({filteredTasks.length})
-        </button>
-        <button
-          onClick={() => setTodoTab('active')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
-            todoTab === 'active'
-              ? 'bg-brand-500 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-          }`}
-        >
-          {t('activeTab')} ({activeCount})
-        </button>
-        <button
-          onClick={() => setTodoTab('today')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
-            todoTab === 'today'
-              ? 'bg-brand-500 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-          }`}
-        >
-          {t('todayTab')}
-        </button>
-        <button
-          onClick={() => setTodoTab('completed')}
-          className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
-            todoTab === 'completed'
-              ? 'bg-brand-500 text-white shadow-xs'
-              : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
-          }`}
-        >
-          {t('completedTab')} ({completedCount})
-        </button>
+      {/* Sci-Fi Filter Segmented Tabs */}
+      <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
+          <button
+            onClick={() => setTodoTab('all')}
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+              todoTab === 'all'
+                ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            [ {t('allTab')} ({filteredTasks.length}) ]
+          </button>
+          <button
+            onClick={() => setTodoTab('active')}
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+              todoTab === 'active'
+                ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            [ {t('activeTab')} ({activeCount}) ]
+          </button>
+          <button
+            onClick={() => setTodoTab('today')}
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+              todoTab === 'today'
+                ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            [ {t('todayTab')} ]
+          </button>
+          <button
+            onClick={() => setTodoTab('completed')}
+            className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all ${
+              todoTab === 'completed'
+                ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            [ {t('completedTab')} ({completedCount}) ]
+          </button>
+        </div>
       </div>
 
-      {/* Todo Checklist Items */}
+      {/* Task Checklist Items Stack */}
       <div className="space-y-2.5">
         {displayedTasks.length === 0 ? (
-          <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-            <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2 opacity-80" />
-            <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-10 text-center border border-slate-200 dark:border-cyan-500/20 shadow-xs">
+            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-pulse" />
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
               {t('allCaughtUp')}
             </h3>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+            <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
               {t('noTasksInTab')}
             </p>
           </div>
@@ -181,124 +193,123 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             const isCompleted = task.status === 'completed';
             const isExpanded = expandedTaskId === task.id;
             const overdue = isOverdue(task.dueDate) && !isCompleted;
-            const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-            const completedSubCount = task.subtasks.filter((st) => st.completed).length;
 
             return (
               <div
                 key={task.id}
-                className={`group bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4 border transition-all ${
+                className={`bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border transition-all duration-200 p-3.5 sm:p-4 shadow-sm hover:border-cyan-400/40 ${
                   isCompleted
-                    ? 'border-slate-200 dark:border-slate-800/60 opacity-60 bg-slate-50/50 dark:bg-slate-900/40'
+                    ? 'border-slate-200 dark:border-slate-800 opacity-70'
                     : overdue
-                    ? 'border-rose-200 dark:border-rose-900/60 shadow-xs'
-                    : 'border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-brand-300 dark:hover:border-brand-700'
+                    ? 'border-rose-300 dark:border-rose-800/80 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
+                    : 'border-slate-200 dark:border-cyan-500/20'
                 }`}
               >
-                <div className="flex items-start justify-between gap-2.5 sm:gap-3">
-                  {/* Left: Checkbox and Title */}
-                  <div className="flex items-start gap-2.5 sm:gap-3 flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    {/* Toggle Check Trigger */}
                     <button
-                      onClick={() =>
-                        updateTaskStatus(task.id, isCompleted ? 'todo' : 'completed')
-                      }
-                      className="mt-0.5 p-0.5 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors focus:outline-none"
-                      aria-label={isCompleted ? 'Mark incomplete' : 'Mark complete'}
+                      onClick={() => updateTaskStatus(task.id, isCompleted ? 'todo' : 'completed')}
+                      className="mt-0.5 text-slate-400 hover:text-cyan-400 transition-colors shrink-0 focus:outline-none"
                     >
                       {isCompleted ? (
-                        <CheckSquare className="w-5 h-5 text-emerald-500" />
+                        <CheckSquare className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_6px_#10b981]" />
                       ) : (
-                        <Square className="w-5 h-5" />
+                        <Square className="w-5 h-5 text-slate-400 hover:text-cyan-400" />
                       )}
                     </button>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                        <span
-                          className={`font-semibold text-sm ${
-                            isCompleted
-                              ? 'line-through text-slate-400 dark:text-slate-500'
-                              : 'text-slate-800 dark:text-slate-100'
-                          }`}
-                        >
-                          {task.title}
-                        </span>
-
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        <span className="font-mono text-[9px] font-bold px-2 py-0.2 rounded border bg-slate-800 text-slate-300 border-slate-700">
                           {task.category}
                         </span>
+                        <span
+                          className={`font-mono text-[9px] font-bold px-2 py-0.2 rounded ${
+                            task.priority === 'urgent'
+                              ? 'bg-rose-950 text-rose-300'
+                              : task.priority === 'high'
+                              ? 'bg-amber-950 text-amber-300'
+                              : 'bg-cyan-950 text-cyan-300'
+                          }`}
+                        >
+                          {task.priority.toUpperCase()}
+                        </span>
+                        <span
+                          className={`font-mono text-[10px] font-semibold flex items-center gap-1 ${
+                            overdue ? 'text-rose-500 font-bold' : 'text-slate-400 dark:text-cyan-400/70'
+                          }`}
+                        >
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(task.dueDate)}
+                        </span>
                       </div>
+
+                      <h4
+                        onClick={() => onEditTask(task)}
+                        className={`font-bold text-sm text-slate-900 dark:text-slate-100 cursor-pointer hover:text-cyan-400 transition-colors ${
+                          isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : ''
+                        }`}
+                      >
+                        {task.title}
+                      </h4>
 
                       {task.description && (
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
                           {task.description}
                         </p>
                       )}
-
-                      {/* Meta badges */}
-                      <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 dark:text-slate-500">
-                        <span
-                          className={`flex items-center gap-1 font-medium ${
-                            overdue ? 'text-rose-500 font-semibold' : ''
-                          }`}
-                        >
-                          <Calendar className="w-3.5 h-3.5" />
-                          {formatDate(task.dueDate)}
-                        </span>
-
-                        {hasSubtasks && (
-                          <button
-                            onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
-                            className="flex items-center gap-1 font-semibold text-brand-600 dark:text-brand-400 hover:underline"
-                          >
-                            <span>
-                              {completedSubCount}/{task.subtasks.length} {t('subtasksLabel')}
-                            </span>
-                            {isExpanded ? (
-                              <ChevronUp className="w-3 h-3" />
-                            ) : (
-                              <ChevronDown className="w-3 h-3" />
-                            )}
-                          </button>
-                        )}
-                      </div>
                     </div>
                   </div>
 
-                  {/* Right Actions */}
-                  <div className="flex items-center gap-1">
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => onEditTask(task)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      title={t('editTaskModalTitle')}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors"
+                      title="Edit task"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => deleteTask(task.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      title={t('clearAllTasks').split(' ')[0]}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-rose-950/50 transition-colors"
+                      title="Delete task"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                    {task.subtasks.length > 0 && (
+                      <button
+                        onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      >
+                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {/* Expanded Subtasks List */}
-                {isExpanded && hasSubtasks && (
-                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 pl-6 sm:pl-8 space-y-2">
+                {/* Expanded Subtasks Checklist */}
+                {isExpanded && task.subtasks.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-cyan-500/15 space-y-2 pl-8">
                     {task.subtasks.map((st) => (
                       <div
                         key={st.id}
                         onClick={() => toggleSubtask(task.id, st.id)}
-                        className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer select-none hover:text-brand-600"
+                        className="flex items-center gap-2 text-xs cursor-pointer group"
                       >
                         {st.completed ? (
-                          <CheckSquare className="w-4 h-4 text-emerald-500" />
+                          <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-400" />
+                          <Square className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 shrink-0" />
                         )}
-                        <span className={st.completed ? 'line-through text-slate-400' : ''}>
+                        <span
+                          className={`font-mono text-xs ${
+                            st.completed
+                              ? 'line-through text-slate-400 dark:text-slate-500'
+                              : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
                           {st.title}
                         </span>
                       </div>

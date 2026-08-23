@@ -53,7 +53,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in font-sans"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -63,21 +63,22 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`w-full ${maxWidthClass} bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-slide-up flex flex-col max-h-[88vh] sm:max-h-[90vh]`}
+        className={`w-full ${maxWidthClass} bg-white/95 dark:bg-[#090e1e]/95 backdrop-blur-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-slate-200 dark:border-cyan-500/30 dark:shadow-[0_0_40px_rgba(6,182,212,0.15)] overflow-hidden transform transition-all animate-slide-up flex flex-col max-h-[88vh] sm:max-h-[90vh] bg-cyber-grid`}
       >
         {/* Mobile Pull Handle Indicator */}
         <div className="sm:hidden flex justify-center pt-3 pb-1">
-          <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full" />
+          <div className="w-12 h-1.5 bg-slate-300 dark:bg-cyan-500/40 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800">
-          <h2 id="modal-title" className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">
-            {title}
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-cyan-500/20">
+          <h2 id="modal-title" className="text-base sm:text-lg font-black text-slate-800 dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f5ff] animate-pulse" />
+            <span>{title}</span>
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
