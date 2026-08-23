@@ -2,12 +2,12 @@ import React from 'react';
 import { 
   LayoutDashboard, 
   Kanban, 
+  Clock, 
   CalendarDays, 
   CheckSquare, 
   Settings, 
   Flame, 
   CheckCircle2, 
-  Clock,
   Layers,
   FolderTree
 } from 'lucide-react';
@@ -52,6 +52,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: t('board'),
       icon: Kanban,
       badge: inProgressCount > 0 ? inProgressCount : null,
+    },
+    {
+      id: 'timeline' as ActiveTab,
+      label: t('timeline'),
+      icon: Clock,
+      badge: null,
     },
     {
       id: 'calendar' as ActiveTab,

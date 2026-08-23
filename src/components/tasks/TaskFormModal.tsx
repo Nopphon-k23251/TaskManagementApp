@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { 
   Trash2, 
   AlertCircle,
-  FolderTree
+  FolderTree,
+  GitBranch,
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import { Task, TaskPriority, TaskStatus, SubTask } from '../../types/task';
 import { Modal } from '../common/Modal';
 import { validateTaskForm } from '../../utils/sanitizer';
 import { getTodayString } from '../../utils/date';
+import { detectCircularDependency } from '../../utils/dependencies';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -28,7 +32,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   defaultDate,
   onOpenCategories,
 }) => {
-  const { addTask, updateTask, categories } = useTasks();
+  const { tasks, addTask, updateTask, categories } = useTasks();
   const { t } = useLanguage();
 
   const [title, setTitle] = useState('');
@@ -36,12 +40,16 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const [status, setStatus] = useState<TaskStatus>(defaultStatus);
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [category, setCategory] = useState<string>(categories[0]?.name || 'General');
+  const [startDate, setStartDate] = useState(getTodayString());
   const [dueDate, setDueDate] = useState(defaultDate || getTodayString());
+  const [dependencies, setDependencies] = useState<string[]>([]);
+  const [selectedDepId, setSelectedDepId] = useState<string>('');
   const [subtasks, setSubtasks] = useState<SubTask[]>([]);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTagInput, setNewTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [depError, setDepError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const priorities: { value: TaskPriority; label: string }[] = [
@@ -51,6 +59,11 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     { value: 'urgent', label: t('urgent') },
   ];
 
+  // Candidates for dependencies (exclude self and already selected)
+  const availableDependencyCandidates = tasks.filter(
+    (t) => (!taskToEdit || t.id !== taskToEdit.id) && !dependencies.includes(t.id)
+  );
+
   useEffect(() => {
     if (taskToEdit) {
       setTitle(taskToEdit.title);
@@ -58,7 +71,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setStatus(taskToEdit.status);
       setPriority(taskToEdit.priority);
       setCategory(taskToEdit.category);
+      setStartDate(taskToEdit.startDate || taskToEdit.dueDate);
       setDueDate(taskToEdit.dueDate);
+      setDependencies(taskToEdit.dependencies || []);
       setSubtasks(taskToEdit.subtasks || []);
       setTags(taskToEdit.tags || []);
     } else {
@@ -67,12 +82,36 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setStatus(defaultStatus);
       setPriority('medium');
       setCategory(categories[0]?.name || 'General');
+      setStartDate(defaultDate || getTodayString());
       setDueDate(defaultDate || getTodayString());
+      setDependencies([]);
       setSubtasks([]);
       setTags([]);
     }
     setErrors({});
+    setDepError(null);
   }, [taskToEdit, defaultStatus, defaultDate, isOpen, categories]);
+
+  const handleAddDependency = (depId: string) => {
+    if (!depId) return;
+
+    if (taskToEdit) {
+      const isCircular = detectCircularDependency(taskToEdit.id, depId, tasks);
+      if (isCircular) {
+        setDepError(t('circularDependencyError'));
+        return;
+      }
+    }
+
+    setDependencies([...dependencies, depId]);
+    setSelectedDepId('');
+    setDepError(null);
+  };
+
+  const handleRemoveDependency = (depId: string) => {
+    setDependencies(dependencies.filter((id) => id !== depId));
+    setDepError(null);
+  };
 
   const handleAddSubtask = () => {
     if (!newSubtaskTitle.trim()) return;
@@ -110,7 +149,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       status,
       priority,
       category,
+      startDate,
       dueDate,
+      dependencies,
     });
 
     if (!validation.isValid) {
@@ -127,7 +168,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           status,
           priority,
           category,
+          startDate,
           dueDate,
+          dependencies,
           subtasks,
           tags,
         });
@@ -138,7 +181,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           status,
           priority,
           category,
+          startDate,
           dueDate,
+          dependencies,
           subtasks,
           tags,
         });
@@ -196,11 +241,11 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           </label>
           <textarea
             id="task-desc"
-            rows={3}
+            rows={2}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={t('taskDescPlaceholder')}
-            className="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none"
+            className="w-full px-4 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none"
           />
         </div>
 
@@ -248,36 +293,61 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           </div>
         </div>
 
-        {/* Dynamic Category & Due Date */}
+        {/* Dynamic Category Selection */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label htmlFor="task-category" className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              {t('categoryLabel')}
+            </label>
+            {onOpenCategories && (
+              <button
+                type="button"
+                onClick={onOpenCategories}
+                className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1"
+              >
+                <FolderTree className="w-3 h-3" />
+                <span>{t('manageCategories')}</span>
+              </button>
+            )}
+          </div>
+          <select
+            id="task-category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-brand-500 outline-none font-medium"
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Timeline Dates: Start Date & Due Date */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="task-category" className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                {t('categoryLabel')}
-              </label>
-              {onOpenCategories && (
-                <button
-                  type="button"
-                  onClick={onOpenCategories}
-                  className="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1"
-                >
-                  <FolderTree className="w-3 h-3" />
-                  <span>{t('manageCategories')}</span>
-                </button>
-              )}
-            </div>
-            <select
-              id="task-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-brand-500 outline-none font-medium"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <label htmlFor="task-start-date" className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+              {t('startDateLabel')}
+            </label>
+            <input
+              id="task-start-date"
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+              }}
+              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:border-brand-500 outline-none font-medium ${
+                errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-slate-700'
+              }`}
+            />
+            {errors.startDate && (
+              <p className="flex items-center gap-1 mt-1 text-xs text-rose-500">
+                <AlertCircle className="w-3.5 h-3.5" />
+                {errors.startDate}
+              </p>
+            )}
           </div>
 
           <div>
@@ -292,7 +362,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 setDueDate(e.target.value);
                 if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
               }}
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-brand-500 outline-none font-medium"
+              className={`w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl focus:border-brand-500 outline-none font-medium ${
+                errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-200 dark:border-slate-700'
+              }`}
             />
             {errors.dueDate && (
               <p className="flex items-center gap-1 mt-1 text-xs text-rose-500">
@@ -301,6 +373,80 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               </p>
             )}
           </div>
+        </div>
+
+        {/* Task Dependencies (Blocked by / Prerequisites) */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <GitBranch className="w-4 h-4 text-brand-500" />
+              <span>{t('dependenciesLabel')}</span>
+            </label>
+            {dependencies.length > 0 && (
+              <span className="text-[11px] font-semibold text-brand-600 dark:text-brand-400">
+                {t('dependenciesCount', { count: dependencies.length })}
+              </span>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <select
+              value={selectedDepId}
+              onChange={(e) => {
+                setSelectedDepId(e.target.value);
+                if (e.target.value) {
+                  handleAddDependency(e.target.value);
+                }
+              }}
+              className="flex-1 px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-brand-500 outline-none"
+            >
+              <option value="">{t('dependenciesPlaceholder')}</option>
+              {availableDependencyCandidates.map((cand) => (
+                <option key={cand.id} value={cand.id}>
+                  {cand.title} ({cand.status === 'completed' ? '✓ ' + t('completedCol') : t('toDoCol')})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {depError && (
+            <p className="flex items-center gap-1 text-xs text-rose-500 font-medium">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span>{depError}</span>
+            </p>
+          )}
+
+          {dependencies.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {dependencies.map((depId) => {
+                const parent = tasks.find((t) => t.id === depId);
+                if (!parent) return null;
+                const isParentDone = parent.status === 'completed';
+                return (
+                  <span
+                    key={depId}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg border transition-all ${
+                      isParentDone
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                    }`}
+                  >
+                    <span>
+                      {isParentDone ? '✓' : '🔒'} {parent.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveDependency(depId)}
+                      className="hover:text-rose-500 ml-1"
+                      title="Remove dependency"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Subtasks Section */}
@@ -331,7 +477,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             </button>
           </div>
 
-          <div className="space-y-1.5 max-h-32 overflow-y-auto">
+          <div className="space-y-1.5 max-h-28 overflow-y-auto">
             {subtasks.map((st) => (
               <div
                 key={st.id}

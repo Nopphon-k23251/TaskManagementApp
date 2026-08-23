@@ -31,7 +31,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     clearAllTasks, 
     exportTasksJson, 
     importTasksJson,
-    syncStatus 
+    isRealtimeSyncing 
   } = useTasks();
   const { language, setLanguage, t } = useLanguage();
 
@@ -142,24 +142,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <div className="flex items-center gap-1.5">
               <span
                 className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                  syncStatus === 'synced'
+                  isRealtimeSyncing
                     ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
-                    : syncStatus === 'syncing'
-                    ? 'bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 animate-pulse'
-                    : syncStatus === 'error'
-                    ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300'
-                    : syncStatus === 'demo'
+                    : user?.isDemo
                     ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300'
                     : 'bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300'
                 }`}
               >
-                {syncStatus === 'synced'
+                {isRealtimeSyncing
                   ? 'Cloud Synced'
-                  : syncStatus === 'syncing'
-                  ? 'Syncing...'
-                  : syncStatus === 'error'
-                  ? 'Sync Error'
-                  : syncStatus === 'demo'
+                  : user?.isDemo
                   ? 'Demo Mode'
                   : t('offline')}
               </span>

@@ -7,10 +7,12 @@ import {
   Sparkles,
   Activity,
   AlertTriangle,
-  Flame
+  Clock,
+  GitBranch
 } from 'lucide-react';
 import { Task, ActiveTab } from '../../types/task';
 import { formatDate, isOverdue } from '../../utils/date';
+import { getTaskDependencyStatus } from '../../utils/dependencies';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -33,9 +35,12 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
   const inProgress = tasks.filter((t) => t.status === 'in_progress').length;
   const todo = tasks.filter((t) => t.status === 'todo').length;
   const overdueCount = tasks.filter((t) => isOverdue(t.dueDate) && t.status !== 'completed').length;
-  const urgentCount = tasks.filter((t) => t.priority === 'urgent' && t.status !== 'completed').length;
 
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  // Blocked & delayed dependencies check
+  const blockedTasks = tasks.filter((t) => getTaskDependencyStatus(t, tasks).isBlocked);
+  const delayedWarningTasks = tasks.filter((t) => getTaskDependencyStatus(t, tasks).hasWarning);
 
   // Priority breakdown
   const priorityStats = {
@@ -80,8 +85,15 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               {t('createTaskBtn')}
             </button>
             <button
+              onClick={() => onNavigateTab('timeline')}
+              className="px-3.5 py-2 text-xs font-bold text-white bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-md transition-all flex items-center gap-1.5"
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>{t('viewTimelineBtn')}</span>
+            </button>
+            <button
               onClick={() => onNavigateTab('board')}
-              className="px-3.5 py-2 text-xs font-bold text-white bg-white/20 hover:bg-white/30 rounded-xl backdrop-blur-md transition-all"
+              className="px-3.5 py-2 text-xs font-bold text-white bg-white/10 hover:bg-white/20 rounded-xl backdrop-blur-md transition-all"
             >
               {t('viewBoardBtn')}
             </button>
@@ -138,17 +150,17 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </div>
         </div>
 
-        {/* Urgent Attention */}
+        {/* Blocked Dependencies & Urgent */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1.5 sm:mb-2">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">{t('urgentActive')}</span>
-            <Flame className="w-4 h-4 text-amber-500" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">{t('blockedTasksOverview')}</span>
+            <GitBranch className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400">
-            {urgentCount}
+            {blockedTasks.length}
           </div>
           <div className="mt-1.5 text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
-            {t('urgent')}
+            {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} งานต้นทางล่าช้า` : 'รอเริ่มตามลำดับ'}
           </div>
         </div>
       </div>
@@ -183,6 +195,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               ) : (
                 upcomingTasks.map((task) => {
                   const overdue = isOverdue(task.dueDate);
+                  const depStatus = getTaskDependencyStatus(task, tasks);
                   return (
                     <div
                       key={task.id}
@@ -200,9 +213,16 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                           }`}
                         />
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                            {task.title}
-                          </p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                              {task.title}
+                            </p>
+                            {depStatus.isBlocked && (
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold shrink-0">
+                                {depStatus.hasWarning ? '⚠️' : '🔒'}
+                              </span>
+                            )}
+                          </div>
                           <span className="text-[10px] text-slate-400 font-medium">
                             {task.category}
                           </span>
@@ -228,25 +248,26 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3 sm:mb-4">
               {t('priorityDistribution')}
             </h3>
-            <div className="space-y-2.5">
+
+            <div className="space-y-3">
               {[
-                { label: t('urgent'), count: priorityStats.urgent, color: 'bg-rose-500', text: 'text-rose-600 dark:text-rose-400' },
-                { label: t('high'), count: priorityStats.high, color: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400' },
-                { label: t('medium'), count: priorityStats.medium, color: 'bg-blue-500', text: 'text-blue-600 dark:text-blue-400' },
-                { label: t('low'), count: priorityStats.low, color: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-400' },
-              ].map((p) => {
-                const percent = total > 0 ? Math.round((p.count / total) * 100) : 0;
+                { label: t('urgent'), count: priorityStats.urgent, color: 'bg-rose-500', text: 'text-rose-500' },
+                { label: t('high'), count: priorityStats.high, color: 'bg-amber-500', text: 'text-amber-500' },
+                { label: t('medium'), count: priorityStats.medium, color: 'bg-brand-500', text: 'text-brand-500' },
+                { label: t('low'), count: priorityStats.low, color: 'bg-slate-400', text: 'text-slate-400' },
+              ].map((item) => {
+                const percent = total > 0 ? Math.round((item.count / total) * 100) : 0;
                 return (
-                  <div key={p.label}>
-                    <div className="flex items-center justify-between text-xs font-semibold mb-1">
-                      <span className={p.text}>{p.label}</span>
+                  <div key={item.label} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs font-semibold">
+                      <span className={item.text}>{item.label}</span>
                       <span className="text-slate-500 dark:text-slate-400">
-                        {t('tasksCount', { count: p.count })} ({percent}%)
+                        {item.count} งาน ({percent}%)
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${p.color} transition-all duration-300`}
+                        className={`h-full ${item.color} rounded-full transition-all duration-500`}
                         style={{ width: `${percent}%` }}
                       />
                     </div>
@@ -257,25 +278,25 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </div>
         </div>
 
-        {/* Right Col: Category Distribution & Activity Stream */}
+        {/* Right 1 Col: Categories & Activity Stream */}
         <div className="space-y-4 sm:space-y-6">
-          {/* Categories */}
+          {/* Categories Pill Cloud */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
             <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3">
               {t('taskCategories')}
             </h3>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {Object.entries(categoryCounts).map(([cat, count]) => {
-                const matched = categories.find((c) => c.name === cat);
+
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(categoryCounts).map(([catName, count]) => {
+                const catObj = categories.find((c) => c.name === catName);
+                const colorClass = catObj?.color || 'bg-slate-100 text-slate-700';
                 return (
                   <div
-                    key={cat}
-                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-semibold ${
-                      matched?.color || 'bg-slate-50 dark:bg-slate-800 border-slate-200'
-                    }`}
+                    key={catName}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${colorClass}`}
                   >
-                    <span>{cat}</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-white dark:bg-slate-700 text-[10px] font-bold text-brand-600 dark:text-brand-400">
+                    <span>{catName}</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-black/10 text-[10px]">
                       {count}
                     </span>
                   </div>
@@ -284,7 +305,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             </div>
           </div>
 
-          {/* Activity Logs */}
+          {/* Activity Feed */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <Activity className="w-4 h-4 text-brand-500" />
@@ -293,13 +314,16 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
               </h3>
             </div>
 
-            <div className="space-y-2.5 max-h-[250px] sm:max-h-[300px] overflow-y-auto pr-1">
+            <div className="space-y-3">
               {activityLogs.length === 0 ? (
-                <p className="text-xs text-slate-400 text-center py-4">{t('noActivity')}</p>
+                <div className="p-4 text-center text-xs text-slate-400">
+                  {t('noActivity')}
+                </div>
               ) : (
-                activityLogs.slice(0, 6).map((log) => (
-                  <div key={log.id} className="text-xs space-y-0.5 border-l-2 border-brand-500/50 pl-3 py-0.5">
-                    <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                activityLogs.slice(0, 5).map((log) => (
+                  <div key={log.id} className="relative pl-4 border-l-2 border-slate-200 dark:border-slate-800 text-xs">
+                    <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-brand-500" />
+                    <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
                       {log.taskTitle}
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400">

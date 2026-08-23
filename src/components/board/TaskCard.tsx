@@ -9,10 +9,12 @@ import {
   ArrowRight, 
   ArrowLeft, 
   GripVertical, 
-  CheckSquare 
+  CheckSquare,
+  GitBranch
 } from 'lucide-react';
 import { Task, TaskStatus } from '../../types/task';
-import { formatDate, isOverdue } from '../../utils/date';
+import { formatDate, formatShortDate, isOverdue } from '../../utils/date';
+import { getTaskDependencyStatus } from '../../utils/dependencies';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -23,7 +25,7 @@ interface TaskCardProps {
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = false }) => {
-  const { deleteTask, updateTaskStatus, categories } = useTasks();
+  const { tasks, deleteTask, updateTaskStatus, categories } = useTasks();
   const { t } = useLanguage();
   const [showMenu, setShowMenu] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -31,6 +33,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
   const completedSubtasks = task.subtasks.filter((st) => st.completed).length;
   const totalSubtasks = task.subtasks.length;
   const overdue = isOverdue(task.dueDate) && task.status !== 'completed';
+  const depStatus = getTaskDependencyStatus(task, tasks);
 
   const handleDragStart = (e: React.DragEvent) => {
     setIsDragging(true);
@@ -89,6 +92,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
       className={`group relative bg-white dark:bg-slate-800/90 rounded-2xl p-4 border transition-all duration-200 cursor-grab active:cursor-grabbing hover:shadow-lg ${
         isDragging
           ? 'opacity-40 scale-95 border-brand-500 shadow-2xl'
+          : depStatus.hasWarning
+          ? 'border-rose-400 dark:border-rose-800 shadow-sm ring-1 ring-rose-400/40'
           : overdue
           ? 'border-rose-300 dark:border-rose-800/80 shadow-xs'
           : 'border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:border-brand-300 dark:hover:border-brand-700'
@@ -109,6 +114,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
           >
             {priorityLabels[task.priority].label}
           </span>
+
+          {/* Dependency Blocked Badge */}
+          {depStatus.isBlocked && (
+            <span 
+              className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                depStatus.hasWarning
+                  ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-300 animate-pulse'
+                  : 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-300'
+              }`}
+              title={
+                depStatus.hasWarning
+                  ? `งานต้นทาง (${depStatus.delayedBy.map((p) => p.title).join(', ')}) ล่าช้า!`
+                  : `ต้องรองาน (${depStatus.blockedBy.map((p) => p.title).join(', ')}) เสร็จก่อน`
+              }
+            >
+              <GitBranch className="w-3 h-3" />
+              <span>{depStatus.hasWarning ? '⚠️ ' : '🔒 '}{depStatus.blockedBy.length}</span>
+            </span>
+          )}
         </div>
 
         {/* Drag handle & Actions */}
@@ -238,21 +262,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
         </div>
       )}
 
-      {/* Footer: Due Date & Mobile Action */}
+      {/* Footer: Date Range (Start -> Due) & Mobile Action */}
       <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs">
         <div
           className={`flex items-center gap-1.5 font-medium ${
-            overdue
+            overdue || depStatus.hasWarning
               ? 'text-rose-600 dark:text-rose-400 font-semibold'
               : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          {overdue ? (
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+          {depStatus.hasWarning || overdue ? (
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
           ) : (
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           )}
-          <span>{formatDate(task.dueDate)}</span>
+          <span>
+            {task.startDate && task.startDate !== task.dueDate
+              ? `${formatShortDate(task.startDate)} - ${formatShortDate(task.dueDate)}`
+              : formatDate(task.dueDate)}
+          </span>
         </div>
 
         {/* Mobile Quick Move Pill */}

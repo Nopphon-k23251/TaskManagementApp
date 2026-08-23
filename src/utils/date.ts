@@ -53,6 +53,86 @@ export function isThisWeek(dateStr: string): boolean {
   return target >= startOfWeek && target <= endOfWeek;
 }
 
+/**
+ * Calculates number of calendar days between two date strings (YYYY-MM-DD).
+ * Inclusive of start and end day if requested.
+ */
+export function getDaysDifference(startDateStr: string, endDateStr: string): number {
+  if (!startDateStr || !endDateStr) return 1;
+  const [sy, sm, sd] = startDateStr.split('-').map(Number);
+  const [ey, em, ed] = endDateStr.split('-').map(Number);
+  const start = new Date(sy, sm - 1, sd);
+  const end = new Date(ey, em - 1, ed);
+  const diffTime = end.getTime() - start.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(1, diffDays + 1); // at least 1 day duration
+}
+
+/**
+ * Adds N days to an ISO date string (YYYY-MM-DD).
+ */
+export function addDaysToDate(dateStr: string, days: number): string {
+  if (!dateStr) return getTodayString();
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const target = new Date(y, m - 1, d);
+  target.setDate(target.getDate() + days);
+  const resYear = target.getFullYear();
+  const resMonth = String(target.getMonth() + 1).padStart(2, '0');
+  const resDay = String(target.getDate()).padStart(2, '0');
+  return `${resYear}-${resMonth}-${resDay}`;
+}
+
+export interface TimelineDay {
+  dateStr: string;
+  dayNumber: number;
+  monthName: string;
+  weekdayName: string;
+  isToday: boolean;
+  isWeekend: boolean;
+  isFirstOfMonth: boolean;
+}
+
+/**
+ * Generates an array of continuous days for the Gantt timeline header and grid.
+ */
+export function generateTimelineDays(
+  startDateStr: string,
+  totalDays: number,
+  language: 'th' | 'en' = 'th'
+): TimelineDay[] {
+  const days: TimelineDay[] = [];
+  const todayStr = getTodayString();
+  const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  const englishMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const thaiWeekdays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
+  const englishWeekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+  const [sy, sm, sd] = startDateStr.split('-').map(Number);
+  const current = new Date(sy, sm - 1, sd);
+
+  for (let i = 0; i < totalDays; i++) {
+    const y = current.getFullYear();
+    const m = current.getMonth();
+    const d = current.getDate();
+    const dayOfWeek = current.getDay();
+    const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+    days.push({
+      dateStr,
+      dayNumber: d,
+      monthName: language === 'th' ? thaiMonths[m] : englishMonths[m],
+      weekdayName: language === 'th' ? thaiWeekdays[dayOfWeek] : englishWeekdays[dayOfWeek],
+      isToday: dateStr === todayStr,
+      isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+      isFirstOfMonth: d === 1,
+    });
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  return days;
+}
+
 export interface CalendarDay {
   dateString: string; // YYYY-MM-DD
   dayNumber: number;

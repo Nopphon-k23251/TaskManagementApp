@@ -9,6 +9,7 @@ import { Sidebar } from './components/common/Sidebar';
 import { BottomNav } from './components/common/BottomNav';
 import { OverviewDashboard } from './components/dashboard/OverviewDashboard';
 import { KanbanBoard } from './components/board/KanbanBoard';
+import { GanttTimelineView } from './components/timeline/GanttTimelineView';
 import { CalendarView } from './components/calendar/CalendarView';
 import { TodoList } from './components/todo/TodoList';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
@@ -70,6 +71,13 @@ const AppContent: React.FC = () => {
 
           {activeTab === 'board' && (
             <KanbanBoard
+              onOpenCreateModal={handleOpenCreateModal}
+              onEditTask={handleEditTask}
+            />
+          )}
+
+          {activeTab === 'timeline' && (
+            <GanttTimelineView
               onOpenCreateModal={handleOpenCreateModal}
               onEditTask={handleEditTask}
             />

@@ -25,8 +25,9 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   category: TaskCategory;
-  dueDate: string; // ISO date string (YYYY-MM-DD)
-  startDate?: string;
+  startDate?: string; // ISO date string (YYYY-MM-DD)
+  dueDate: string;    // ISO date string (YYYY-MM-DD)
+  dependencies?: string[]; // Array of task IDs that this task is blocked by (prerequisites)
   estimatedHours?: number;
   subtasks: SubTask[];
   tags: string[];
@@ -52,7 +53,7 @@ export interface AppUser {
   isDemo?: boolean;
 }
 
-export type ActiveTab = 'overview' | 'board' | 'calendar' | 'todo';
+export type ActiveTab = 'overview' | 'board' | 'timeline' | 'calendar' | 'todo';
 
 export interface TaskFilterOptions {
   searchQuery: string;

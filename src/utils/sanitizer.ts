@@ -22,7 +22,9 @@ export interface TaskFormData {
   status: string;
   priority: string;
   category: string;
+  startDate?: string;
   dueDate: string;
+  dependencies?: string[];
   tags: string[];
 }
 
@@ -48,6 +50,16 @@ export function validateTaskForm(data: Partial<TaskFormData>): ValidationResult 
     const parsed = new Date(data.dueDate);
     if (isNaN(parsed.getTime())) {
       errors.dueDate = 'Invalid date format (รูปแบบวันที่ไม่ถูกต้อง)';
+    }
+  }
+
+  // Start Date validation (must not be after dueDate)
+  if (data.startDate && data.startDate.trim() !== '') {
+    const parsedStart = new Date(data.startDate);
+    if (isNaN(parsedStart.getTime())) {
+      errors.startDate = 'Invalid start date format (รูปแบบวันเริ่มต้นไม่ถูกต้อง)';
+    } else if (data.dueDate && data.startDate > data.dueDate) {
+      errors.startDate = 'Start date cannot be after due date (วันเริ่มต้นต้องไม่เกินวันกำหนดส่ง)';
     }
   }
 
