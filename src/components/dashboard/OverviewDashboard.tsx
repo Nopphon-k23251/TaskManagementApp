@@ -137,10 +137,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="text-2xl sm:text-3xl font-mono font-black text-slate-900 dark:text-emerald-300">
             {completionRate}%
           </div>
-          <div className="w-full bg-slate-100 dark:bg-slate-800/80 h-2 rounded-full mt-2.5 overflow-hidden border border-slate-200 dark:border-slate-700/50">
+          <div className="w-full bg-slate-200 dark:bg-slate-950 h-3 rounded-full mt-2.5 overflow-hidden border border-slate-300 dark:border-cyan-500/40 p-[1px] shadow-inner">
             <div
-              className="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full transition-all duration-500 energy-stripes shadow-[0_0_10px_#10b981]"
-              style={{ width: `${completionRate}%` }}
+              className="h-full rounded-full transition-all duration-500 progress-neon-emerald"
+              style={{ width: `${Math.max(completionRate > 0 ? 4 : 0, completionRate)}%` }}
             />
           </div>
         </div>
@@ -262,10 +262,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
             <div className="space-y-3">
               {[
-                { label: t('urgent'), count: priorityStats.urgent, color: 'bg-rose-500 shadow-[0_0_8px_#f43f5e]', text: 'text-rose-700 dark:text-rose-400' },
-                { label: t('high'), count: priorityStats.high, color: 'bg-amber-500 shadow-[0_0_8px_#f59e0b]', text: 'text-amber-700 dark:text-amber-400' },
-                { label: t('medium'), count: priorityStats.medium, color: 'bg-cyan-500 shadow-[0_0_8px_#00f5ff]', text: 'text-cyan-700 dark:text-cyan-400' },
-                { label: t('low'), count: priorityStats.low, color: 'bg-slate-500', text: 'text-slate-700 dark:text-slate-400' },
+                { label: t('urgent'), count: priorityStats.urgent, progressClass: 'progress-neon-rose', text: 'text-rose-700 dark:text-rose-400' },
+                { label: t('high'), count: priorityStats.high, progressClass: 'progress-neon-amber', text: 'text-amber-700 dark:text-amber-400' },
+                { label: t('medium'), count: priorityStats.medium, progressClass: 'progress-neon-cyan', text: 'text-cyan-700 dark:text-cyan-400' },
+                { label: t('low'), count: priorityStats.low, progressClass: 'bg-slate-400 dark:bg-slate-500', text: 'text-slate-700 dark:text-slate-400' },
               ].map((item) => {
                 const percent = total > 0 ? Math.round((item.count / total) * 100) : 0;
                 return (
@@ -276,10 +276,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                         {item.count} NODES ({percent}%)
                       </span>
                     </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <div className="w-full bg-slate-200 dark:bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800 p-[1px]">
                       <div
-                        className={`h-full ${item.color} rounded-full transition-all duration-500`}
-                        style={{ width: `${percent}%` }}
+                        className={`h-full ${item.progressClass} rounded-full transition-all duration-500`}
+                        style={{ width: `${Math.max(item.count > 0 ? 4 : 0, percent)}%` }}
                       />
                     </div>
                   </div>

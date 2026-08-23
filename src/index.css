@@ -43,19 +43,49 @@
   100% { background-position: 40px 0; }
 }
 
+/* Vivid Sci-Fi Neon Progress Bar Styles */
+.progress-neon-emerald {
+  background: linear-gradient(90deg, #10b981 0%, #00f5ff 100%) !important;
+  box-shadow: 0 0 14px rgba(0, 245, 255, 0.8), 0 0 6px #10b981 !important;
+}
+
+.progress-neon-cyan {
+  background: linear-gradient(90deg, #0284c7 0%, #00f5ff 100%) !important;
+  box-shadow: 0 0 14px rgba(0, 245, 255, 0.8) !important;
+}
+
+.progress-neon-rose {
+  background: linear-gradient(90deg, #e11d48 0%, #f43f5e 100%) !important;
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.8) !important;
+}
+
+.progress-neon-amber {
+  background: linear-gradient(90deg, #d97706 0%, #fbbf24 100%) !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.8) !important;
+}
+
 .energy-stripes {
+  position: relative;
+  overflow: hidden;
+}
+
+.energy-stripes::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background-image: linear-gradient(
     45deg,
-    rgba(255, 255, 255, 0.15) 25%,
+    rgba(255, 255, 255, 0.25) 25%,
     transparent 25%,
     transparent 50%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.15) 75%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.25) 75%,
     transparent 75%,
     transparent
   );
   background-size: 20px 20px;
   animation: energyFlow 1.5s linear infinite;
+  pointer-events: none;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
