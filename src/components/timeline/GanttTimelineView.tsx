@@ -255,10 +255,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 <span>{t('todayMarker')}</span>
               </button>
 
-              {/* Create Task Button */}
+              {/* Create Task Button (Desktop Only, Mobile uses FAB) */}
               <button
                 onClick={() => onOpenCreateModal('todo')}
-                className="px-3 sm:px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 via-brand-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.35)] active:scale-95 transition-all flex items-center gap-1.5"
+                className="hidden sm:flex px-3 sm:px-4 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-cyan-500 via-brand-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.35)] active:scale-95 transition-all items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
                 <span>{t('createTaskBtn')}</span>

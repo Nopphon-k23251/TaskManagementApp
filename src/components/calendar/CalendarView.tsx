@@ -247,7 +247,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
               <button
                 onClick={() => onOpenCreateModal('todo', selectedAgendaDate)}
-                className="px-3 py-1.5 text-xs font-mono font-bold text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 rounded-xl shadow-[0_0_12px_rgba(6,182,212,0.3)] flex items-center gap-1.5"
+                className="hidden sm:flex px-3 py-1.5 text-xs font-mono font-bold text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 rounded-xl shadow-[0_0_12px_rgba(6,182,212,0.3)] items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3]" />
                 <span>{t('addTaskOnDate')}</span>
