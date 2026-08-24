@@ -354,7 +354,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
                 </span>
                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-cyan-600 dark:text-cyan-400 font-bold">
-                  [ TIMELINE MATRIX // PRO ]
+                  {t('timeline')}
                 </span>
               </div>
 

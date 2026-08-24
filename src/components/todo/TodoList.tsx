@@ -72,8 +72,8 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
       <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_25px_rgba(6,182,212,0.06)]">
         <div className="flex items-center gap-2 mb-3">
           <Terminal className="w-4 h-4 text-cyan-400" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-cyan-600 dark:text-cyan-400 font-bold">
-            [ QUICK TASK DISPATCH // TERMINAL ]
+          <span className="font-mono text-xs uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-bold">
+            {t('addTodoBtn')}
           </span>
         </div>
 

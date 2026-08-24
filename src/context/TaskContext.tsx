@@ -19,21 +19,21 @@ import { sanitizeInput, validateJsonImportPayload } from '../utils/sanitizer';
 import { appRateLimiter } from '../utils/security';
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
-  { id: 'cat-1', name: 'งานออกแบบ (Design)', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
-  { id: 'cat-2', name: 'งานระบบ (DevOps)', color: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
-  { id: 'cat-3', name: 'งานฟีเจอร์ (Feature)', color: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
-  { id: 'cat-4', name: 'งานวิจัย (Research)', color: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
-  { id: 'cat-5', name: 'ทั่วไป (General)', color: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
+  { id: 'cat-1', name: 'งานออกแบบ', color: 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
+  { id: 'cat-2', name: 'งานระบบ', color: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
+  { id: 'cat-3', name: 'งานฟีเจอร์', color: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
+  { id: 'cat-4', name: 'งานวิจัย', color: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
+  { id: 'cat-5', name: 'ทั่วไป', color: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
 ];
 
 export const COLOR_OPTIONS = [
-  { name: 'Neon Cyan (ฟ้าไซเบอร์)', class: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
-  { name: 'Laser Rose (กุหลาบเลเซอร์)', class: 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
-  { name: 'Plasma Purple (ม่วงพลาสมา)', class: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
-  { name: 'Matrix Emerald (เขียวเมทริกซ์)', class: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/50' },
-  { name: 'Cyber Amber (ส้มอำพัน)', class: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
-  { name: 'Electric Indigo (คราม)', class: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/50' },
-  { name: 'Steel Slate (เทาคลาสสิก)', class: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
+  { name: 'ฟ้าไซเบอร์', class: 'bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/50' },
+  { name: 'กุหลาบเลเซอร์', class: 'bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/50' },
+  { name: 'ม่วงพลาสมา', class: 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/50' },
+  { name: 'เขียวเมทริกซ์', class: 'bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/50' },
+  { name: 'ส้มอำพัน', class: 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/50' },
+  { name: 'คราม', class: 'bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/50' },
+  { name: 'เทาคลาสสิก', class: 'bg-slate-200 text-slate-900 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700' },
 ];
 
 interface TaskContextType {
@@ -77,7 +77,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     description: 'พัฒนาระบบรองรับทั้งมือถือและคอมพิวเตอร์ รองรับ Dark/Light Mode และจัดการหมวดหมู่ได้เอง',
     status: 'in_progress',
     priority: 'urgent',
-    category: 'งานออกแบบ (Design)',
+    category: 'งานออกแบบ',
     startDate: addDaysToDate(getTodayString(), -3),
     dueDate: addDaysToDate(getTodayString(), 1),
     dependencies: [],
@@ -97,7 +97,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     description: 'ตั้งค่าการซิงก์ข้อมูลงานกับ Firebase แบบเรียลไทม์ และรองรับ Offline Local Storage',
     status: 'completed',
     priority: 'high',
-    category: 'งานระบบ (DevOps)',
+    category: 'งานระบบ',
     startDate: addDaysToDate(getTodayString(), -6),
     dueDate: addDaysToDate(getTodayString(), -2),
     dependencies: [],
@@ -116,7 +116,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     description: 'สามารถลากการ์ดงานวางลงในช่องวันที่เพื่อเลื่อนกำหนดส่ง และดูไทม์ไลน์โปรเจกต์พร้อม Visual Warning',
     status: 'in_progress',
     priority: 'high',
-    category: 'งานฟีเจอร์ (Feature)',
+    category: 'งานฟีเจอร์',
     startDate: addDaysToDate(getTodayString(), 0),
     dueDate: addDaysToDate(getTodayString(), 4),
     dependencies: ['task-1'],
@@ -136,7 +136,7 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
     description: 'ตรวจสอบ Input Sanitization ป้องกัน Script Injection และตรวจเช็ก Form Validation ครบทุกฟิลด์',
     status: 'todo',
     priority: 'medium',
-    category: 'งานระบบ (DevOps)',
+    category: 'งานระบบ',
     startDate: addDaysToDate(getTodayString(), 3),
     dueDate: addDaysToDate(getTodayString(), 8),
     dependencies: ['task-3'],

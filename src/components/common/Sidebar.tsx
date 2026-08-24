@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="text-cyan-500 dark:text-cyan-400 font-mono text-xs">PRO</span>
             </h1>
             <p className="text-[10px] font-mono font-medium text-slate-400 dark:text-cyan-400/70 uppercase tracking-widest">
-              [ {t('workspace')} ]
+              {t('workspace')}
             </p>
           </div>
         </div>

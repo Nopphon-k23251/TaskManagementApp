@@ -75,7 +75,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 text-cyan-300 text-[10px] sm:text-xs font-mono font-bold backdrop-blur-md mb-2 sm:mb-3 border border-cyan-500/40 shadow-[0_0_12px_rgba(0,245,255,0.2)]">
             <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>[ SYSTEM TELEMETRY // LIVE COMMAND ]</span>
+            <span>{t('prodSummary')}</span>
           </div>
 
           <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-white via-cyan-200 to-indigo-300 bg-clip-text text-transparent">
@@ -113,9 +113,9 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </div>
       </div>
 
-      {/* Cyber KPI Telemetry Cards Grid */}
+      {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Total Tasks Node */}
+        {/* Total Tasks */}
         <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-sm dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] relative overflow-hidden group hover:border-cyan-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-cyan-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider">{t('totalTasks')}</span>
@@ -124,12 +124,12 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="text-2xl sm:text-3xl font-mono font-black text-slate-900 dark:text-cyan-300">
             {total}
           </div>
-          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400">
-            {todo} TODO · {inProgress} ACTIVE
+          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 truncate">
+            {todo} {t('toDoCol')} · {inProgress} {t('inProgressCol')}
           </div>
         </div>
 
-        {/* Completion Rate Node */}
+        {/* Completion Rate */}
         <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-sm dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] relative overflow-hidden group hover:border-emerald-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-emerald-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider">{t('completionRate')}</span>
@@ -146,7 +146,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           </div>
         </div>
 
-        {/* Overdue Alert Node */}
+        {/* Overdue Alert */}
         <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-rose-500/20 shadow-sm dark:shadow-[0_0_20px_rgba(244,63,94,0.06)] relative overflow-hidden group hover:border-rose-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-rose-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider">{t('overdue')}</span>
@@ -156,11 +156,11 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             {overdueCount}
           </div>
           <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
-            {overdueCount > 0 ? '⚠️ HAZARD // DELAYED' : '✓ STATUS // OPTIMAL'}
+            {overdueCount > 0 ? `⚠️ ${t('overdueTasks')}` : `✓ ${t('done')}`}
           </div>
         </div>
 
-        {/* Blocked Dependencies Node */}
+        {/* Blocked Dependencies */}
         <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-amber-500/20 shadow-sm dark:shadow-[0_0_20px_rgba(245,158,11,0.06)] relative overflow-hidden group hover:border-amber-500/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-amber-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider">{t('blockedTasksOverview')}</span>
@@ -170,7 +170,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             {blockedTasks.length}
           </div>
           <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
-            {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} DELAYED` : '✓ QUEUED // ORDERED'}
+            {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} ${t('delayedWarningTitle')}` : `✓ ${t('unblockAllPrereqs').split(' ')[0]}`}
           </div>
         </div>
       </div>
@@ -184,9 +184,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                  <span>{t('upcomingDeadlines')}</span>
-                  <span className="font-mono text-[10px] text-cyan-600 dark:text-cyan-400/80">[QUEUE]</span>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                  {t('upcomingDeadlines')}
                 </h3>
               </div>
               <button
@@ -235,7 +234,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                             )}
                           </div>
                           <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-medium">
-                            // {task.category}
+                            {task.category}
                           </span>
                         </div>
                       </div>
@@ -256,9 +255,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
           {/* Priority Distribution Widget */}
           <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-sm">
-            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3 sm:mb-4 flex items-center gap-1.5">
-              <span>{t('priorityDistribution')}</span>
-              <span className="font-mono text-[10px] text-cyan-600 dark:text-cyan-400/80">[SPECTRUM]</span>
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3 sm:mb-4">
+              {t('priorityDistribution')}
             </h3>
 
             <div className="space-y-3">
@@ -274,7 +272,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     <div className="flex items-center justify-between text-xs font-mono font-bold">
                       <span className={item.text}>{item.label}</span>
                       <span className="text-slate-600 dark:text-slate-400">
-                        {item.count} NODES ({percent}%)
+                        {item.count} ({percent}%)
                       </span>
                     </div>
                     <div className="w-full bg-slate-200 dark:bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800 p-[1px]">
@@ -294,9 +292,8 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         <div className="space-y-4 sm:space-y-6">
           {/* Categories Pill Cloud */}
           <div className="bg-white dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-sm">
-            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-1.5">
-              <span>{t('taskCategories')}</span>
-              <span className="font-mono text-[10px] text-cyan-600 dark:text-cyan-400/80">[TAGS]</span>
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 mb-3">
+              {t('taskCategories')}
             </h3>
 
             <div className="flex flex-wrap gap-2">

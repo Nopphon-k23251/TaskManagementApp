@@ -408,7 +408,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             {hasConflict && (
                               <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse flex items-center gap-0.5">
                                 <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
-                                <span>{t('timeConflictWarning')}</span>
+                                <span>{language === 'th' ? 'เวลาทับซ้อน' : 'Time Conflict'}</span>
                               </span>
                             )}
 
@@ -424,13 +424,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded ${
                               task.priority === 'urgent' ? 'bg-rose-950 text-rose-300' : 'bg-cyan-950 text-cyan-300'
                             }`}>
-                              {task.priority.toUpperCase()}
+                              {t(task.priority)}
                             </span>
 
                             {/* Multi-day schedule indicator */}
                             {isMultiDay && (
                               <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-500/30">
-                                {isDueToday ? '🚩 ' + t('dueOnThisDay') : isStartDay ? '🚀 เริ่มวันนี้' : '🔄 วันที่ ' + currentDayNum + '/' + totalDays}
+                                {isDueToday ? '🚩 ' + t('dueOnThisDay') : isStartDay ? (language === 'th' ? '🚀 เริ่มวันนี้' : '🚀 Starts Today') : (language === 'th' ? `🔄 วันที่ ${currentDayNum}/${totalDays}` : `🔄 Day ${currentDayNum}/${totalDays}`)}
                               </span>
                             )}
                           </div>

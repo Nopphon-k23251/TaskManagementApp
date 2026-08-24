@@ -257,7 +257,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                       newPresetColor === c.class ? 'ring-2 ring-cyan-400 scale-105 shadow-xs' : 'opacity-80 hover:opacity-100'
                     }`}
                   >
-                    {c.name.split(' ')[0]}
+                    {c.name}
                   </button>
                 ))}
               </div>
@@ -266,7 +266,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
             {/* Proportional Live Badge Preview */}
             <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-100/70 dark:bg-slate-950/70 border border-slate-200 dark:border-cyan-500/10">
               <span className="text-[9px] font-mono font-bold uppercase text-slate-400 dark:text-cyan-400/70">
-                PREVIEW
+                ตัวอย่าง
               </span>
               <div
                 style={previewStyle}
@@ -313,7 +313,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                             className="px-2 py-1 text-xs font-mono font-bold bg-emerald-600 text-white rounded hover:bg-emerald-500 transition-colors flex items-center gap-1"
                           >
                             <Check className="w-3 h-3" />
-                            <span>บันทึก</span>
+                            <span>{t('saveBtn')}</span>
                           </button>
                           <button
                             onClick={() => setEditingId(null)}

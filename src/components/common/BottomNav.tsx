@@ -31,29 +31,29 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   const navItems = [
     {
       id: 'overview' as ActiveTab,
-      label: t('overview').split(' ')[0],
+      label: t('overview').replace('งาน', ''),
       icon: LayoutDashboard,
     },
     {
       id: 'board' as ActiveTab,
-      label: t('board').split(' ')[0],
+      label: t('board').replace('งาน', ''),
       icon: Kanban,
       badge: inProgressCount > 0 ? inProgressCount : undefined,
       badgeColor: 'bg-amber-500 text-slate-950',
     },
     {
       id: 'timeline' as ActiveTab,
-      label: 'GANTT',
+      label: t('timeline'),
       icon: Clock,
     },
     {
       id: 'calendar' as ActiveTab,
-      label: t('calendar').split(' ')[0],
+      label: t('calendar').replace('งาน', ''),
       icon: CalendarDays,
     },
     {
       id: 'todo' as ActiveTab,
-      label: t('todo').split(' ')[0],
+      label: t('todo').replace('สิ่งที่ต้องทำ', 'สิ่งที่ทำ'),
       icon: CheckSquare,
       badge: pendingCount > 0 ? pendingCount : undefined,
       badgeColor: 'bg-cyan-400 text-slate-950 shadow-[0_0_8px_#00f5ff]',
