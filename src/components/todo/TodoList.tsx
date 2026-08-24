@@ -98,13 +98,16 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-1.5 flex-1 sm:flex-none">
-              <span className="font-mono text-[10px] text-cyan-400/80 uppercase font-bold">{t('priorityLabel')}</span>
+          <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
+            <div>
+              <label htmlFor="quick-priority" className="block font-mono text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase mb-1">
+                {t('priorityLevelLabel')}
+              </label>
               <select
+                id="quick-priority"
                 value={quickPriority}
                 onChange={(e) => setQuickPriority(e.target.value as TaskPriority)}
-                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-slate-300 font-mono text-xs focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-cyan-100 font-mono text-xs focus:border-cyan-400 focus:outline-none"
               >
                 <option value="low">{t('low')}</option>
                 <option value="medium">{t('medium')}</option>
@@ -113,12 +116,15 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5 flex-1 sm:flex-none">
-              <span className="font-mono text-[10px] text-cyan-400/80 uppercase font-bold">{t('categoryLabel')}</span>
+            <div>
+              <label htmlFor="quick-category" className="block font-mono text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase mb-1">
+                {t('taskCategories')}
+              </label>
               <select
+                id="quick-category"
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="w-full sm:w-auto px-2.5 py-1 bg-slate-100 dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-slate-300 font-mono text-xs focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-cyan-100 font-mono text-xs focus:border-cyan-400 focus:outline-none truncate"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.name}>
