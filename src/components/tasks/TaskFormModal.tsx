@@ -7,7 +7,8 @@ import {
   X,
   AlertTriangle,
   Zap,
-  Calendar
+  Calendar,
+  Clock
 } from 'lucide-react';
 import { Task, TaskPriority, TaskStatus, SubTask } from '../../types/task';
 import { Modal } from '../common/Modal';
@@ -44,6 +45,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const [category, setCategory] = useState<string>(categories[0]?.name || 'General');
   const [startDate, setStartDate] = useState(getTodayString());
   const [dueDate, setDueDate] = useState(defaultDate || getTodayString());
+  const [startTime, setStartTime] = useState<string>('');
+  const [dueTime, setDueTime] = useState<string>('');
+  const [isAllDay, setIsAllDay] = useState<boolean>(true);
   const [dependencies, setDependencies] = useState<string[]>([]);
   const [selectedDepId, setSelectedDepId] = useState<string>('');
   const [subtasks, setSubtasks] = useState<SubTask[]>([]);
@@ -75,6 +79,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setCategory(taskToEdit.category);
       setStartDate(taskToEdit.startDate || taskToEdit.dueDate);
       setDueDate(taskToEdit.dueDate);
+      setStartTime(taskToEdit.startTime || '');
+      setDueTime(taskToEdit.dueTime || '');
+      setIsAllDay(!taskToEdit.startTime && !taskToEdit.dueTime);
       setDependencies(taskToEdit.dependencies || []);
       setSubtasks(taskToEdit.subtasks || []);
       setTags(taskToEdit.tags || []);
@@ -86,6 +93,9 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setCategory(categories[0]?.name || 'General');
       setStartDate(defaultDate || getTodayString());
       setDueDate(defaultDate || getTodayString());
+      setStartTime('');
+      setDueTime('');
+      setIsAllDay(true);
       setDependencies([]);
       setSubtasks([]);
       setTags([]);
@@ -153,6 +163,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       category,
       startDate,
       dueDate,
+      startTime: isAllDay ? undefined : (startTime || undefined),
+      dueTime: isAllDay ? undefined : (dueTime || undefined),
       dependencies,
     });
 
@@ -172,6 +184,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           category,
           startDate,
           dueDate,
+          startTime: isAllDay ? undefined : (startTime || undefined),
+          dueTime: isAllDay ? undefined : (dueTime || undefined),
           dependencies,
           subtasks,
           tags,
@@ -185,6 +199,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           category,
           startDate,
           dueDate,
+          startTime: isAllDay ? undefined : (startTime || undefined),
+          dueTime: isAllDay ? undefined : (dueTime || undefined),
           dependencies,
           subtasks,
           tags,
@@ -385,6 +401,147 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               </p>
             )}
           </div>
+        </div>
+
+        {/* Time Management: Start Time & Due Time */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/20 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>{t('timeSlot')}</span>
+            </label>
+            
+            {/* All Day Toggle */}
+            <button
+              type="button"
+              onClick={() => {
+                const next = !isAllDay;
+                setIsAllDay(next);
+                if (next) {
+                  setStartTime('');
+                  setDueTime('');
+                  if (errors.startTime) setErrors((prev) => ({ ...prev, startTime: '' }));
+                  if (errors.dueTime) setErrors((prev) => ({ ...prev, dueTime: '' }));
+                } else if (!startTime && !dueTime) {
+                  setStartTime('09:00');
+                  setDueTime('18:00');
+                }
+              }}
+              className={`px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
+                isAllDay
+                  ? 'bg-cyan-500/20 text-cyan-400 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-transparent hover:text-cyan-400'
+              }`}
+            >
+              <Zap className="w-3 h-3" />
+              <span>{t('allDayTask')}</span>
+            </button>
+          </div>
+
+          {/* Quick Presets */}
+          {!isAllDay && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mr-1">
+                {t('timePresetsLabel')}:
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setStartTime('09:00');
+                  setDueTime('12:00');
+                  if (errors.startTime || errors.dueTime) setErrors((prev) => ({ ...prev, startTime: '', dueTime: '' }));
+                }}
+                className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 hover:border-cyan-400 transition-colors"
+              >
+                {t('presetMorning')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStartTime('13:00');
+                  setDueTime('17:00');
+                  if (errors.startTime || errors.dueTime) setErrors((prev) => ({ ...prev, startTime: '', dueTime: '' }));
+                }}
+                className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 hover:border-cyan-400 transition-colors"
+              >
+                {t('presetAfternoon')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStartTime('');
+                  setDueTime('18:00');
+                  if (errors.startTime || errors.dueTime) setErrors((prev) => ({ ...prev, startTime: '', dueTime: '' }));
+                }}
+                className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 hover:border-cyan-400 transition-colors"
+              >
+                {t('presetEveningDue')}
+              </button>
+            </div>
+          )}
+
+          {/* Time Input Fields */}
+          {!isAllDay && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+              <div>
+                <label htmlFor="task-start-time" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1">
+                  {t('startTimeLabel')}
+                </label>
+                <div className="relative group">
+                  <input
+                    id="task-start-time"
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => {
+                      setStartTime(e.target.value);
+                      if (errors.startTime) setErrors((prev) => ({ ...prev, startTime: '' }));
+                    }}
+                    className={`w-full pl-3.5 pr-9 py-2 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none transition-all shadow-inner ${
+                      errors.startTime ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
+                    }`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400">
+                    <Clock className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                {errors.startTime && (
+                  <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {errors.startTime}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="task-due-time" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1">
+                  {t('dueTimeLabel')}
+                </label>
+                <div className="relative group">
+                  <input
+                    id="task-due-time"
+                    type="time"
+                    value={dueTime}
+                    onChange={(e) => {
+                      setDueTime(e.target.value);
+                      if (errors.dueTime) setErrors((prev) => ({ ...prev, dueTime: '' }));
+                    }}
+                    className={`w-full pl-3.5 pr-9 py-2 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none transition-all shadow-inner ${
+                      errors.dueTime ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
+                    }`}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400">
+                    <Clock className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                {errors.dueTime && (
+                  <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {errors.dueTime}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Task Dependencies (Prerequisites) */}

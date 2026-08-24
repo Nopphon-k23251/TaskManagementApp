@@ -30,6 +30,8 @@ export interface Task {
   category: TaskCategory;
   startDate?: string; // ISO date string (YYYY-MM-DD)
   dueDate: string;    // ISO date string (YYYY-MM-DD)
+  startTime?: string; // HH:mm format (e.g. "09:00")
+  dueTime?: string;   // HH:mm format (e.g. "17:30")
   dependencies?: string[]; // Array of task IDs that this task is blocked by (prerequisites)
   estimatedHours?: number;
   order?: number; // Custom display sequence index

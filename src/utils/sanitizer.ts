@@ -46,6 +46,8 @@ export interface TaskFormData {
   category: string;
   startDate?: string;
   dueDate: string;
+  startTime?: string;
+  dueTime?: string;
   dependencies?: string[];
   tags: string[];
 }
@@ -82,6 +84,28 @@ export function validateTaskForm(data: Partial<TaskFormData>): ValidationResult 
       errors.startDate = 'Invalid start date format (รูปแบบวันเริ่มต้นไม่ถูกต้อง)';
     } else if (data.dueDate && data.startDate > data.dueDate) {
       errors.startDate = 'Start date cannot be after due date (วันเริ่มต้นต้องไม่เกินวันกำหนดส่ง)';
+    }
+  }
+
+  // Start Time & Due Time validation
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (data.startTime && typeof data.startTime === 'string' && data.startTime.trim() !== '') {
+    if (!timeRegex.test(data.startTime.trim())) {
+      errors.startTime = 'Invalid start time format HH:mm (รูปแบบเวลาเริ่มไม่ถูกต้อง)';
+    }
+  }
+
+  if (data.dueTime && typeof data.dueTime === 'string' && data.dueTime.trim() !== '') {
+    if (!timeRegex.test(data.dueTime.trim())) {
+      errors.dueTime = 'Invalid due time format HH:mm (รูปแบบเวลาสิ้นสุดไม่ถูกต้อง)';
+    }
+  }
+
+  // If on the same date and both times are provided
+  const isSameDate = !data.startDate || data.startDate === data.dueDate;
+  if (isSameDate && data.startTime && data.dueTime && timeRegex.test(data.startTime) && timeRegex.test(data.dueTime)) {
+    if (data.startTime > data.dueTime) {
+      errors.dueTime = 'End time must be after start time (เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่มต้น)';
     }
   }
 
@@ -183,6 +207,8 @@ export function validateJsonImportPayload(jsonStr: string): {
       category: sanitizeInput(String(t.category || 'ทั่วไป (General)')).substring(0, 50),
       startDate: t.startDate ? String(t.startDate).substring(0, 20) : undefined,
       dueDate: String(t.dueDate).substring(0, 20),
+      startTime: t.startTime ? String(t.startTime).substring(0, 10) : undefined,
+      dueTime: t.dueTime ? String(t.dueTime).substring(0, 10) : undefined,
       dependencies: Array.isArray(t.dependencies) ? t.dependencies.slice(0, 50).map((d: any) => String(d).substring(0, 64)) : [],
       subtasks: Array.isArray(t.subtasks)
         ? t.subtasks.slice(0, 100).map((st: any) => ({

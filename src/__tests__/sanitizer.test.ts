@@ -58,4 +58,27 @@ describe('Task Form Validation', () => {
     expect(result.isValid).toBe(true);
     expect(Object.keys(result.errors).length).toBe(0);
   });
+
+  it('should fail if startTime is after dueTime on the same date', () => {
+    const result = validateTaskForm({
+      title: 'Interview Session',
+      startDate: '2026-08-24',
+      dueDate: '2026-08-24',
+      startTime: '16:00',
+      dueTime: '10:00',
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.errors.dueTime).toBeDefined();
+  });
+
+  it('should pass with valid startTime and dueTime', () => {
+    const result = validateTaskForm({
+      title: 'FE 1 INTERVIEW PREPARE',
+      startDate: '2026-08-24',
+      dueDate: '2026-08-24',
+      startTime: '09:00',
+      dueTime: '12:00',
+    });
+    expect(result.isValid).toBe(true);
+  });
 });

@@ -23,7 +23,9 @@ service cloud.firestore {
         && (!('subtasks' in data) || (data.subtasks is list && data.subtasks.size() <= 100))
         && (!('tags' in data) || (data.tags is list && data.tags.size() <= 30))
         && (!('dependencies' in data) || (data.dependencies is list && data.dependencies.size() <= 50))
-        && (!('order' in data) || (data.order is int || data.order is number));
+        && (!('order' in data) || (data.order is int || data.order is number))
+        && (!('startTime' in data) || (data.startTime is string && data.startTime.size() <= 10))
+        && (!('dueTime' in data) || (data.dueTime is string && data.dueTime.size() <= 10));
     }
 
     function isValidUserSettings() {
