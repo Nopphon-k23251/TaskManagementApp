@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatDate, getTodayString, isOverdue, getMonthDays, getWeekDays } from '../utils/date';
+import { formatDate, formatDateLocale, getTodayString, isOverdue, getMonthDays, getWeekDays } from '../utils/date';
 
 describe('Date Utilities & Calendar Matrix', () => {
   it('should format date strings properly', () => {
@@ -7,6 +7,13 @@ describe('Date Utilities & Calendar Matrix', () => {
     expect(formatted).toContain('Aug');
     expect(formatted).toContain('25');
     expect(formatted).toContain('2026');
+  });
+
+  it('should format localized date strings for Thai and English', () => {
+    const thDate = formatDateLocale('2026-08-25', 'th');
+    const enDate = formatDateLocale('2026-08-25', 'en');
+    expect(thDate).toBe('25 ส.ค. 2569');
+    expect(enDate).toBe('25 Aug 2026');
   });
 
   it('should get current today date in YYYY-MM-DD format', () => {

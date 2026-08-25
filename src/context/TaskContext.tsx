@@ -57,6 +57,7 @@ interface TaskContextType {
   deleteCategory: (id: string) => void;
   resetToSampleData: () => void;
   clearAllTasks: () => void;
+  clearCompletedTasks: () => void;
   reorderTasks: (newTasks: Task[]) => void;
   exportTasksJson: () => string;
   importTasksJson: (jsonStr: string) => boolean;
@@ -550,6 +551,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     broadcastLocalUpdate([]);
   };
 
+  const clearCompletedTasks = () => {
+    const completedTasks = tasks.filter((t) => t.status === 'completed');
+    if (isFirebaseActive && user && !user.isDemo) {
+      completedTasks.forEach((t) => {
+        syncDeleteTaskFromFirestore(t.id).catch(() => {});
+      });
+    }
+    const remaining = tasks.filter((t) => t.status !== 'completed');
+    setTasks(remaining);
+    broadcastLocalUpdate(remaining, categories);
+    addActivity('all', 'Completed Tasks', 'deleted', `ล้างงานที่เสร็จสิ้นแล้วทั้งหมด (${completedTasks.length} งาน)`);
+  };
+
   const reorderTasks = (newTasks: Task[]) => {
     const tasksWithOrder = newTasks.map((t, idx) => ({
       ...t,
@@ -687,6 +701,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteCategory,
         resetToSampleData,
         clearAllTasks,
+        clearCompletedTasks,
         reorderTasks,
         exportTasksJson,
         importTasksJson,

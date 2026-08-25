@@ -28,9 +28,10 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
     updateTaskStatus, 
     toggleSubtask, 
     deleteTask,
+    clearCompletedTasks,
     categories 
   } = useTasks();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const [quickTitle, setQuickTitle] = useState('');
   const [quickPriority, setQuickPriority] = useState<TaskPriority>('medium');
@@ -181,6 +182,21 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             {t('completedTab')} ({completedCount})
           </button>
         </div>
+
+        {/* Clear Completed Tasks Button (when on completed tab and has completed tasks) */}
+        {todoTab === 'completed' && completedCount > 0 && (
+          <button
+            onClick={() => {
+              if (window.confirm(language === 'th' ? 'คุณต้องการล้างรายการงานที่เสร็จสิ้นแล้วทั้งหมดใช่หรือไม่?' : 'Are you sure you want to clear all completed tasks?')) {
+                clearCompletedTasks();
+              }
+            }}
+            className="px-3 py-1 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800/60 rounded-xl transition-all flex items-center gap-1 shrink-0 ml-auto"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>{language === 'th' ? 'ล้างงานที่เสร็จแล้ว' : 'Clear Done'}</span>
+          </button>
+        )}
       </div>
 
       {/* Task Checklist Items Stack */}
@@ -248,7 +264,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                               : 'bg-cyan-950 text-cyan-300'
                           }`}
                         >
-                          {task.priority.toUpperCase()}
+                          {t(task.priority)}
                         </span>
                         <span
                           className={`font-mono text-[10px] font-semibold flex items-center gap-1 ${

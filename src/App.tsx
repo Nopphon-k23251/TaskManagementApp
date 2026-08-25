@@ -13,6 +13,7 @@ import { GanttTimelineView } from './components/timeline/GanttTimelineView';
 import { CalendarView } from './components/calendar/CalendarView';
 import { TodoList } from './components/todo/TodoList';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
+import { TaskDetailModal } from './components/tasks/TaskDetailModal';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { CategoryManagerModal } from './components/common/CategoryManagerModal';
 import { AuthErrorModal } from './components/common/AuthErrorModal';
@@ -23,18 +24,25 @@ const AppContent: React.FC = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [taskToView, setTaskToView] = useState<Task | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [defaultTaskStatus, setDefaultTaskStatus] = useState<TaskStatus>('todo');
   const [defaultTaskDate, setDefaultTaskDate] = useState<string | undefined>(undefined);
 
   const handleOpenCreateModal = (status: TaskStatus = 'todo', date?: string) => {
     setTaskToEdit(null);
+    setTaskToView(null);
     setDefaultTaskStatus(status);
     setDefaultTaskDate(date);
     setIsTaskModalOpen(true);
   };
 
-  const handleEditTask = (task: Task) => {
+  const handleViewTask = (task: Task) => {
+    setTaskToView(task);
+  };
+
+  const handleOpenEditModal = (task: Task) => {
+    setTaskToView(null);
     setTaskToEdit(task);
     setIsTaskModalOpen(true);
   };
@@ -64,7 +72,7 @@ const AppContent: React.FC = () => {
           {activeTab === 'overview' && (
             <OverviewDashboard
               onNavigateTab={(tab) => setActiveTab(tab)}
-              onEditTask={handleEditTask}
+              onEditTask={handleViewTask}
               onOpenCreateModal={() => handleOpenCreateModal()}
             />
           )}
@@ -72,26 +80,26 @@ const AppContent: React.FC = () => {
           {activeTab === 'board' && (
             <KanbanBoard
               onOpenCreateModal={handleOpenCreateModal}
-              onEditTask={handleEditTask}
+              onEditTask={handleViewTask}
             />
           )}
 
           {activeTab === 'timeline' && (
             <GanttTimelineView
               onOpenCreateModal={handleOpenCreateModal}
-              onEditTask={handleEditTask}
+              onEditTask={handleViewTask}
             />
           )}
 
           {activeTab === 'calendar' && (
             <CalendarView
               onOpenCreateModal={handleOpenCreateModal}
-              onEditTask={handleEditTask}
+              onEditTask={handleViewTask}
             />
           )}
 
           {activeTab === 'todo' && (
-            <TodoList onEditTask={handleEditTask} />
+            <TodoList onEditTask={handleViewTask} />
           )}
         </main>
       </div>
@@ -101,6 +109,14 @@ const AppContent: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenCreateModal={() => handleOpenCreateModal()}
+      />
+
+      {/* Task Information & Details Modal */}
+      <TaskDetailModal
+        isOpen={!!taskToView}
+        onClose={() => setTaskToView(null)}
+        task={taskToView}
+        onEdit={handleOpenEditModal}
       />
 
       {/* Task Create / Edit Modal */}

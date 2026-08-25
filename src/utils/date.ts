@@ -18,6 +18,17 @@ export function formatShortDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+export function formatDateLocale(dateStr: string, language: 'th' | 'en' = 'th'): string {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-').map(Number);
+  if (!year || !month || !day) return dateStr;
+  const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+  const englishMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthName = language === 'th' ? thaiMonths[month - 1] : englishMonths[month - 1];
+  const yearDisplay = language === 'th' ? year + 543 : year;
+  return `${day} ${monthName} ${yearDisplay}`;
+}
+
 export function getTodayString(): string {
   const now = new Date();
   const year = now.getFullYear();

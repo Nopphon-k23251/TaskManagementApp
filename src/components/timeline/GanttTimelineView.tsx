@@ -45,6 +45,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   const { language, t } = useLanguage();
 
   const [zoom, setZoom] = useState<ZoomLevel>('day');
+  const [hideCompleted, setHideCompleted] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedPriority, setSelectedPriority] = useState<string>('all');
   const [showDependencyLines, setShowDependencyLines] = useState<boolean>(true);
@@ -61,14 +62,15 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
   const timelineContainerRef = useRef<HTMLDivElement>(null);
 
-  // Filter tasks for Gantt
+  // Filter tasks for Gantt (automatically filters out completed tasks by default to prevent clutter)
   const displayTasks = useMemo(() => {
     return filteredTasks.filter((t) => {
+      if (hideCompleted && t.status === 'completed') return false;
       if (selectedCategory !== 'all' && t.category !== selectedCategory) return false;
       if (selectedPriority !== 'all' && t.priority !== selectedPriority) return false;
       return true;
     });
-  }, [filteredTasks, selectedCategory, selectedPriority]);
+  }, [filteredTasks, hideCompleted, selectedCategory, selectedPriority]);
 
   // Determine timeline boundary
   const timelineRange = useMemo(() => {
@@ -88,7 +90,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
     // Buffer range for cyber timeline
     const startRange = addDaysToDate(minDate, -4);
     const endRange = addDaysToDate(maxDate, zoom === 'month' ? 45 : zoom === 'week' ? 21 : 14);
-    const totalDays = Math.max(20, getDaysDifference(startRange, endRange));
+    const totalDays = Math.min(365, Math.max(20, getDaysDifference(startRange, endRange)));
 
     return {
       startDate: startRange,
@@ -275,6 +277,53 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
     const width = Math.max(dayWidth * 0.85, durationDays * dayWidth);
 
     return { left, width, startStr, dueStr, durationDays };
+  };
+
+  // Status/State-based timeline bar coloring
+  const getStatusBarTheme = (task: Task, hasWarning: boolean, isBlocked: boolean) => {
+    if (hasWarning) {
+      return {
+        gradient: 'bg-gradient-to-r from-rose-600 via-amber-600 to-rose-600 text-white border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)] animate-pulse',
+        badge: 'bg-rose-950/80 text-rose-300 border-rose-500/50',
+      };
+    }
+    if (isBlocked) {
+      return {
+        gradient: 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-200 border-slate-600 shadow-[0_0_10px_rgba(0,0,0,0.5)]',
+        badge: 'bg-slate-950/80 text-slate-400 border-slate-700',
+      };
+    }
+    switch (task.status) {
+      case 'todo':
+        // Slate / Navy Blue (รอดำเนินการ)
+        return {
+          gradient: 'bg-gradient-to-r from-slate-700 via-slate-800 to-blue-950 text-slate-100 border-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:border-blue-300',
+          badge: 'bg-slate-900/80 text-blue-300 border-blue-500/40',
+        };
+      case 'in_progress':
+        // Vibrant Cyber Cyan / Blue (กำลังทำ)
+        return {
+          gradient: 'bg-gradient-to-r from-cyan-600 via-brand-600 to-blue-600 text-white border-cyan-300/80 shadow-[0_0_20px_rgba(6,182,212,0.45)] hover:border-cyan-200',
+          badge: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/50',
+        };
+      case 'review':
+        // Violet / Purple / Indigo (ตรวจทาน)
+        return {
+          gradient: 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white border-purple-400/70 shadow-[0_0_20px_rgba(168,85,247,0.45)] hover:border-purple-300',
+          badge: 'bg-purple-950/80 text-purple-300 border-purple-500/50',
+        };
+      case 'completed':
+        // Emerald / Mint / Green (เสร็จสิ้น)
+        return {
+          gradient: 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 text-white border-emerald-400/80 shadow-[0_0_18px_rgba(16,185,129,0.45)] hover:border-emerald-300',
+          badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50',
+        };
+      default:
+        return {
+          gradient: 'bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-600 text-white border-cyan-400/50 shadow-[0_0_18px_rgba(6,182,212,0.35)]',
+          badge: 'bg-slate-900/80 text-cyan-300 border-cyan-500/40',
+        };
+    }
   };
 
   // Drag to Reschedule Handlers
@@ -489,6 +538,19 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 </button>
               )}
 
+              {/* Toggle Hide Completed Tasks */}
+              <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-cyan-300 select-none text-[11px] sm:text-xs font-mono font-semibold">
+                <input
+                  type="checkbox"
+                  checked={hideCompleted}
+                  onChange={(e) => setHideCompleted(e.target.checked)}
+                  className="rounded border-slate-300 dark:border-cyan-500/40 text-cyan-500 focus:ring-cyan-400 w-3.5 h-3.5 bg-slate-900"
+                />
+                <CheckCircle2 className={`w-3.5 h-3.5 ${hideCompleted ? 'text-emerald-400' : 'text-slate-400'}`} />
+                <span className="hidden sm:inline">{t('hideCompletedTasks')}</span>
+                <span className="sm:hidden">{language === 'th' ? 'ซ่อนงานเสร็จ' : 'Hide Done'}</span>
+              </label>
+
               {/* Toggle Dependency Laser Connectors */}
               <label className="flex items-center gap-1.5 cursor-pointer text-slate-700 dark:text-cyan-300 select-none text-[11px] sm:text-xs font-mono font-semibold">
                 <input
@@ -570,7 +632,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   <Radio className="w-3 h-3 text-cyan-600 dark:text-cyan-400 animate-pulse shrink-0" />
                   <span className="truncate">TASKS [{displayTasks.length}]</span>
                 </span>
-                <span className="hidden sm:inline">{t('taskDurationDays', { days: '' }).trim()}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span>%</span>
+                  <span className="hidden sm:inline">{t('taskDurationDays', { days: '' }).trim()}</span>
+                </div>
               </div>
 
               {/* Task Row Headers List */}
@@ -583,6 +648,11 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   const isExpanded = expandedTaskIds.has(task.id) && hasSubtasks;
                   const completedSubtasks = (task.subtasks || []).filter((st) => st.completed).length;
                   const totalSubtasks = (task.subtasks || []).length;
+                  const progress = task.status === 'completed' 
+                    ? 100 
+                    : totalSubtasks > 0 
+                    ? Math.round((completedSubtasks / totalSubtasks) * 100) 
+                    : task.status === 'in_progress' ? 50 : 0;
 
                   return (
                     <div
@@ -672,9 +742,15 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                           </div>
                         </div>
 
-                        <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 shrink-0 ml-1">
-                          {duration}d
-                        </span>
+                        {/* Progress Percent & Duration in Left Deck */}
+                        <div className="flex items-center gap-1.5 shrink-0 ml-1">
+                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-200/90 dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 shadow-xs">
+                            {progress}%
+                          </span>
+                          <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 min-w-[20px] text-right">
+                            {duration}d
+                          </span>
+                        </div>
                       </div>
 
                       {/* Expanded Subtask Rows */}
@@ -897,6 +973,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 {displayTasks.map((task) => {
                   const geom = getTaskBarGeometry(task);
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
+                  const barTheme = getStatusBarTheme(task, depStatus.hasWarning, depStatus.isBlocked);
                   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
                   const isExpanded = expandedTaskIds.has(task.id) && hasSubtasks;
                   const completedSubtasks = (task.subtasks || []).filter((st) => st.completed).length;
@@ -925,15 +1002,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                             isDraggingThis
                               ? 'opacity-85 ring-2 ring-cyan-400 scale-[1.03] shadow-[0_0_25px_#00f5ff]'
                               : ''
-                          } ${
-                            depStatus.hasWarning
-                              ? 'bg-gradient-to-r from-rose-600 via-amber-600 to-rose-600 text-white border border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.6)] animate-pulse'
-                              : depStatus.isBlocked
-                              ? 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-200 border border-slate-600 shadow-[0_0_10px_rgba(0,0,0,0.5)]'
-                              : task.status === 'completed'
-                              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white border border-emerald-400/60 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                              : 'bg-gradient-to-r from-brand-600 via-indigo-600 to-cyan-600 text-white border border-cyan-400/50 shadow-[0_0_18px_rgba(6,182,212,0.35)] hover:border-cyan-300'
-                          }`}
+                          } ${barTheme.gradient}`}
                         >
                           {/* Animated Energy Stripes Progress Fill */}
                           <div
@@ -951,7 +1020,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                           </div>
 
                           {/* Bar Label Content */}
-                          <div className="relative z-10 flex items-center gap-1 overflow-hidden pr-1">
+                          <div className="relative z-10 flex items-center gap-1 overflow-hidden px-1">
                             {depStatus.hasWarning && (
                               <span className="text-xs font-bold shrink-0 animate-bounce">⚠️</span>
                             )}
@@ -965,11 +1034,6 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                               {task.title}
                             </span>
                           </div>
-
-                          {/* Monospace Progress Pill */}
-                          <span className="relative z-10 font-mono text-[9px] sm:text-[10px] font-black shrink-0 bg-black/40 backdrop-blur-xs px-1.5 py-0.5 rounded-md border border-white/20">
-                            {progress}%
-                          </span>
 
                           {/* Right Resize Handle */}
                           <div

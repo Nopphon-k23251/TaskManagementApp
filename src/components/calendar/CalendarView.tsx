@@ -555,7 +555,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     ))}
                     {dayTasks.length > 3 && (
                       <span className="font-mono text-[9px] text-cyan-400 font-bold px-1 block">
-                        +{dayTasks.length - 3} MORE
+                        +{dayTasks.length - 3} {language === 'th' ? 'งาน' : 'more'}
                       </span>
                     )}
                   </div>

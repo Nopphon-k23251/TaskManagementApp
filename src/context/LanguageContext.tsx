@@ -82,6 +82,8 @@ export const translations = {
     dragToReorder: 'ลากเพื่อจัดลำดับงาน',
     blockedTasksOverview: 'งานที่ติดบล็อกรอเริ่ม',
     dependenciesCount: '{count} เงื่อนไข',
+    hideCompletedTasks: 'ซ่อนงานที่เสร็จแล้ว',
+    showCompletedTasks: 'แสดงงานที่เสร็จแล้ว',
 
     // Kanban Board
     taskFilters: 'ตัวกรองงาน',
@@ -139,8 +141,14 @@ export const translations = {
     subtasksLabel: 'รายการย่อย',
 
     // Task Modal
+    taskDetailsModalTitle: 'รายละเอียดงาน',
     createTaskModalTitle: 'สร้างงานใหม่',
     editTaskModalTitle: 'แก้ไขรายละเอียดงาน',
+    editTaskBtn: 'แก้ไขงาน',
+    closeBtn: 'ปิด',
+    noDescription: 'ไม่มีคำอธิบายเพิ่มเติม',
+    durationLabel: 'ระยะเวลา',
+    timeSlotLabel: 'เวลาทำงาน',
     taskTitleLabel: 'ชื่องาน',
     taskTitlePlaceholder: 'เช่น พัฒนาระบบ Login ด้วย Google และตั้งค่าโปรไฟล์',
     taskDescLabel: 'รายละเอียดงาน',
@@ -263,6 +271,8 @@ export const translations = {
     dragToReorder: 'Drag to reorder tasks',
     blockedTasksOverview: 'Tasks Blocked Waiting to Start',
     dependenciesCount: '{count} dependencies',
+    hideCompletedTasks: 'Hide Completed',
+    showCompletedTasks: 'Show Completed',
 
     // Kanban Board
     taskFilters: 'Task Filters',
@@ -320,8 +330,14 @@ export const translations = {
     subtasksLabel: 'Subtasks',
 
     // Task Modal
+    taskDetailsModalTitle: 'Task Information',
     createTaskModalTitle: 'Create New Task',
     editTaskModalTitle: 'Edit Task Details',
+    editTaskBtn: 'Edit Task',
+    closeBtn: 'Close',
+    noDescription: 'No description provided',
+    durationLabel: 'Duration',
+    timeSlotLabel: 'Time Slot',
     taskTitleLabel: 'Task Title',
     taskTitlePlaceholder: 'e.g. Design Google Auth Flow and User Settings',
     taskDescLabel: 'Description',
