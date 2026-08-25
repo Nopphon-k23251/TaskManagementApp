@@ -14,6 +14,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { Modal } from '../common/Modal';
+import { ConfirmModal } from '../common/ConfirmModal';
 import { useAuth } from '../../context/AuthContext';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -39,6 +40,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [isTestingDb, setIsTestingDb] = useState(false);
   const [dbTestResult, setDbTestResult] = useState<{ success: boolean; message: string; latencyMs?: number } | null>(null);
+  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
+  const [isConfirmClearAllOpen, setIsConfirmClearAllOpen] = useState(false);
 
   const handleTestDatabase = async () => {
     setIsTestingDb(true);
@@ -76,7 +79,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('settingsModalTitle')} maxWidth="md">
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} title={t('settingsModalTitle')} maxWidth="md">
       <div className="space-y-3.5 text-xs text-slate-800 dark:text-slate-200 font-sans">
         
         {/* 1. Language Selection (Compact Horizontal Bar) */}
@@ -265,12 +269,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         {/* 4. Reset & Wipe Options (Slim Bottom Strip) */}
         <div className="pt-2 flex items-center justify-between gap-2">
           <button
-            onClick={async () => {
-              if (window.confirm(t('confirmReset'))) {
-                await resetToSampleData();
-                onClose();
-              }
-            }}
+            type="button"
+            onClick={() => setIsConfirmResetOpen(true)}
             className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg transition-colors"
           >
             <RotateCcw className="w-3 h-3 text-cyan-500" />
@@ -278,12 +278,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </button>
 
           <button
-            onClick={async () => {
-              if (window.confirm(t('confirmClear'))) {
-                await clearAllTasks();
-                onClose();
-              }
-            }}
+            type="button"
+            onClick={() => setIsConfirmClearAllOpen(true)}
             className="flex items-center gap-1 px-3 py-1.5 text-[11px] font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 border border-rose-200 dark:border-rose-900/40 rounded-lg transition-colors"
           >
             <Trash2 className="w-3 h-3" />
@@ -293,5 +289,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
       </div>
     </Modal>
+
+    {/* Custom Reload Sample Data Confirmation Modal */}
+    <ConfirmModal
+      isOpen={isConfirmResetOpen}
+      onClose={() => setIsConfirmResetOpen(false)}
+      onConfirm={async () => {
+        await resetToSampleData();
+        setIsConfirmResetOpen(false);
+        onClose();
+      }}
+      title={language === 'th' ? 'ยืนยันการรีเซ็ตข้อมูลตัวอย่าง' : 'Confirm Reset Sample Data'}
+      message={t('confirmReset')}
+      confirmText={language === 'th' ? 'รีเซ็ตข้อมูล' : 'Reset'}
+      cancelText={t('cancelBtn')}
+      variant="warning"
+    />
+
+    {/* Custom Clear All Tasks Confirmation Modal */}
+    <ConfirmModal
+      isOpen={isConfirmClearAllOpen}
+      onClose={() => setIsConfirmClearAllOpen(false)}
+      onConfirm={async () => {
+        await clearAllTasks();
+        setIsConfirmClearAllOpen(false);
+        onClose();
+      }}
+      title={language === 'th' ? 'ยืนยันการล้างข้อมูลงานทั้งหมด' : 'Confirm Clear All Tasks'}
+      message={t('confirmClear')}
+      confirmText={language === 'th' ? 'ล้างงานทั้งหมด' : 'Clear All'}
+      cancelText={t('cancelBtn')}
+      variant="danger"
+    />
+    </>
   );
 };

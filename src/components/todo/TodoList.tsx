@@ -14,6 +14,7 @@ import {
 import { Task, TaskPriority } from '../../types/task';
 import { formatDate, getTodayString, isOverdue } from '../../utils/date';
 import { getCategoryBadgeStyle } from '../../utils/category';
+import { ConfirmModal } from '../common/ConfirmModal';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -38,6 +39,8 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
   const [quickCategory, setQuickCategory] = useState<string>(categories[0]?.name || 'General');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [todoTab, setTodoTab] = useState<'all' | 'active' | 'completed' | 'today'>('all');
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [isConfirmClearOpen, setIsConfirmClearOpen] = useState(false);
 
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,11 +189,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
         {/* Clear Completed Tasks Button (when on completed tab and has completed tasks) */}
         {todoTab === 'completed' && completedCount > 0 && (
           <button
-            onClick={() => {
-              if (window.confirm(language === 'th' ? 'คุณต้องการล้างรายการงานที่เสร็จสิ้นแล้วทั้งหมดใช่หรือไม่?' : 'Are you sure you want to clear all completed tasks?')) {
-                clearCompletedTasks();
-              }
-            }}
+            onClick={() => setIsConfirmClearOpen(true)}
             className="px-3 py-1 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800/60 rounded-xl transition-all flex items-center gap-1 shrink-0 ml-auto"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -303,9 +302,9 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => deleteTask(task.id)}
+                      onClick={() => setTaskToDelete(task)}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-rose-950/50 transition-colors"
-                      title="Delete task"
+                      title={language === 'th' ? 'ลบงานนี้' : 'Delete task'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -352,6 +351,48 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
           })
         )}
       </div>
+
+      {/* Custom Delete Single Task Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!taskToDelete}
+        onClose={() => setTaskToDelete(null)}
+        onConfirm={() => {
+          if (taskToDelete) {
+            deleteTask(taskToDelete.id);
+            setTaskToDelete(null);
+          }
+        }}
+        title={language === 'th' ? 'ยืนยันการลบงาน' : 'Confirm Delete Task'}
+        message={
+          taskToDelete
+            ? language === 'th'
+              ? `คุณต้องการลบงาน "${taskToDelete.title}" ใช่หรือไม่?`
+              : `Are you sure you want to delete "${taskToDelete.title}"?`
+            : ''
+        }
+        confirmText={language === 'th' ? 'ลบงาน' : 'Delete'}
+        cancelText={t('cancelBtn')}
+        variant="danger"
+      />
+
+      {/* Custom Clear Completed Tasks Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isConfirmClearOpen}
+        onClose={() => setIsConfirmClearOpen(false)}
+        onConfirm={() => {
+          clearCompletedTasks();
+          setIsConfirmClearOpen(false);
+        }}
+        title={language === 'th' ? 'ยืนยันการล้างงานที่เสร็จแล้ว' : 'Confirm Clear Completed Tasks'}
+        message={
+          language === 'th'
+            ? `คุณต้องการล้างรายการงานที่เสร็จสิ้นแล้วทั้งหมด (${completedCount} งาน) ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`
+            : `Are you sure you want to delete all (${completedCount}) completed tasks? This action cannot be undone.`
+        }
+        confirmText={language === 'th' ? 'ล้างงานทั้งหมด' : 'Clear All Done'}
+        cancelText={t('cancelBtn')}
+        variant="danger"
+      />
     </div>
   );
 };

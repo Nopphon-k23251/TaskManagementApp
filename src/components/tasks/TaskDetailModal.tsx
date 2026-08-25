@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Calendar, 
   Clock, 
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Task, TaskPriority, TaskStatus } from '../../types/task';
 import { Modal } from '../common/Modal';
+import { ConfirmModal } from '../common/ConfirmModal';
 import { getCategoryBadgeStyle } from '../../utils/category';
 import { getDaysDifference, formatDateLocale } from '../../utils/date';
 import { useTasks } from '../../context/TaskContext';
@@ -32,6 +33,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
 }) => {
   const { tasks, categories, toggleSubtask, deleteTask } = useTasks();
   const { language, t } = useLanguage();
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   if (!task) return null;
 
@@ -111,10 +113,12 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const prerequisiteTasks = tasks.filter((t) => currentTask.dependencies?.includes(t.id));
 
   const handleDelete = () => {
-    if (window.confirm(language === 'th' ? `คุณต้องการลบงาน "${currentTask.title}" ใช่หรือไม่?` : `Are you sure you want to delete "${currentTask.title}"?`)) {
-      deleteTask(currentTask.id);
-      onClose();
-    }
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteTask(currentTask.id);
+    onClose();
   };
 
   // Helper to format text with clickable links
@@ -142,10 +146,11 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('taskDetailsModalTitle')}
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={t('taskDetailsModalTitle')}
       maxWidth="lg"
     >
       <div className="space-y-4 text-slate-800 dark:text-slate-200">
@@ -386,5 +391,22 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
         </div>
       </div>
     </Modal>
+
+    {/* Custom Delete Confirmation Modal */}
+    <ConfirmModal
+      isOpen={isConfirmDeleteOpen}
+      onClose={() => setIsConfirmDeleteOpen(false)}
+      onConfirm={handleConfirmDelete}
+      title={language === 'th' ? 'ยืนยันการลบงาน' : 'Confirm Delete Task'}
+      message={
+        language === 'th'
+          ? `คุณต้องการลบงาน "${currentTask.title}" ใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`
+          : `Are you sure you want to delete "${currentTask.title}"? This action cannot be undone.`
+      }
+      confirmText={language === 'th' ? 'ลบงานนี้' : 'Delete Task'}
+      cancelText={t('cancelBtn')}
+      variant="danger"
+    />
+    </>
   );
 };

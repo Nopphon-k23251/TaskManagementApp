@@ -10,6 +10,7 @@ import {
   Sliders
 } from 'lucide-react';
 import { Modal } from './Modal';
+import { ConfirmModal } from './ConfirmModal';
 import { useTasks, COLOR_OPTIONS } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCategoryBadgeStyle } from '../../utils/category';
@@ -24,10 +25,11 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   onClose,
 }) => {
   const { categories, addCategory, updateCategory, deleteCategory } = useTasks();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   const [newName, setNewName] = useState('');
   const [colorMode, setColorMode] = useState<'custom' | 'preset'>('custom');
+  const [catToDelete, setCatToDelete] = useState<{ id: string; name: string } | null>(null);
   
   // Preset mode state
   const [newPresetColor, setNewPresetColor] = useState(COLOR_OPTIONS[0].class);
@@ -111,10 +113,11 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
     : {};
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('categoryModalTitle')}
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={t('categoryModalTitle')}
       maxWidth="md"
     >
       <div className="space-y-4 text-slate-800 dark:text-slate-200 font-sans">
@@ -372,13 +375,9 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                             <Edit2 className="w-3 h-3" />
                           </button>
                           <button
-                            onClick={() => {
-                              if (window.confirm(t('confirmDeleteCategory'))) {
-                                deleteCategory(cat.id);
-                              }
-                            }}
+                            onClick={() => setCatToDelete({ id: cat.id, name: cat.name })}
                             className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-colors"
-                            title="Delete category"
+                            title={language === 'th' ? 'ลบหมวดหมู่นี้' : 'Delete category'}
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -404,5 +403,29 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
         </div>
       </div>
     </Modal>
+
+    {/* Custom Delete Category Confirmation Modal */}
+    <ConfirmModal
+      isOpen={!!catToDelete}
+      onClose={() => setCatToDelete(null)}
+      onConfirm={() => {
+        if (catToDelete) {
+          deleteCategory(catToDelete.id);
+          setCatToDelete(null);
+        }
+      }}
+      title={language === 'th' ? 'ยืนยันการลบหมวดหมู่' : 'Confirm Delete Category'}
+      message={
+        catToDelete
+          ? language === 'th'
+            ? `คุณต้องการลบหมวดหมู่ "${catToDelete.name}" ใช่หรือไม่? งานในหมวดนี้จะยังคงอยู่`
+            : `Are you sure you want to delete category "${catToDelete.name}"?`
+          : ''
+      }
+      confirmText={language === 'th' ? 'ลบหมวดหมู่' : 'Delete'}
+      cancelText={t('cancelBtn')}
+      variant="danger"
+    />
+    </>
   );
 };
