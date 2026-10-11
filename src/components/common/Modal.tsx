@@ -63,22 +63,22 @@ export const Modal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`w-full ${maxWidthClass} bg-white/95 dark:bg-[#090e1e]/95 backdrop-blur-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-slate-200 dark:border-cyan-500/30 dark:shadow-[0_0_40px_rgba(6,182,212,0.15)] overflow-hidden transform transition-all animate-slide-up flex flex-col max-h-[88vh] sm:max-h-[90vh] bg-cyber-grid`}
+        className={`w-full ${maxWidthClass} bg-[#fdfcf9] dark:bg-[#090e1e]/95 backdrop-blur-2xl rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-[#e8e2d4] dark:border-cyan-500/30 dark:shadow-[0_0_40px_rgba(6,182,212,0.15)] overflow-hidden transform transition-all animate-slide-up flex flex-col max-h-[88vh] sm:max-h-[90vh] bg-cyber-grid`}
       >
         {/* Mobile Pull Handle Indicator */}
         <div className="sm:hidden flex justify-center pt-3 pb-1">
-          <div className="w-12 h-1.5 bg-slate-300 dark:bg-cyan-500/40 rounded-full" />
+          <div className="w-12 h-1.5 bg-[#ded5c2] dark:bg-cyan-500/40 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-cyan-500/20">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#e8e2d4] dark:border-cyan-500/20">
           <h2 id="modal-title" className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2 truncate pr-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f5ff] animate-pulse shrink-0" />
             <span className="truncate">{title}</span>
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 shrink-0"
+            className="p-1.5 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-[#ede7d8]/70 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 shrink-0"
             aria-label="Close modal"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />

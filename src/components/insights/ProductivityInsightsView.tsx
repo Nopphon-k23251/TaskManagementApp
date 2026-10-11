@@ -47,7 +47,7 @@ export const ProductivityInsightsView: React.FC = () => {
       {/* KPI 4-Card Deck */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
         {/* Today's Focus Minutes */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-sm relative overflow-hidden group hover:border-cyan-400/40 transition-all">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs relative overflow-hidden group hover:border-amber-400/40 dark:hover:border-cyan-400/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-cyan-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase">{t('todayFocusMinutes')}</span>
             <Clock className="w-4 h-4 text-cyan-600 dark:text-cyan-500 group-hover:scale-110 transition-transform" />
@@ -61,7 +61,7 @@ export const ProductivityInsightsView: React.FC = () => {
         </div>
 
         {/* Task Completion Rate */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-emerald-500/20 shadow-sm relative overflow-hidden group hover:border-emerald-400/40 transition-all">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-[#e8e2d4] dark:border-emerald-500/20 shadow-xs relative overflow-hidden group hover:border-emerald-400/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-emerald-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase">{t('completionRate')}</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-500 group-hover:scale-110 transition-transform" />
@@ -69,7 +69,7 @@ export const ProductivityInsightsView: React.FC = () => {
           <div className="text-2xl sm:text-3xl font-mono font-black text-slate-900 dark:text-emerald-300">
             {completionRate}%
           </div>
-          <div className="w-full bg-slate-200 dark:bg-slate-950 h-2 rounded-full mt-2 overflow-hidden border border-slate-300 dark:border-emerald-500/30">
+          <div className="w-full bg-[#ede7d8] dark:bg-slate-950 h-2 rounded-full mt-2 overflow-hidden border border-[#ded5c2] dark:border-emerald-500/30">
             <div
               className="h-full bg-emerald-400 rounded-full transition-all duration-500 shadow-[0_0_8px_#10b981]"
               style={{ width: `${Math.max(completionRate > 0 ? 5 : 0, completionRate)}%` }}
@@ -78,7 +78,7 @@ export const ProductivityInsightsView: React.FC = () => {
         </div>
 
         {/* Active Habit Consistency */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-amber-500/20 shadow-sm relative overflow-hidden group hover:border-amber-400/40 transition-all">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-[#e8e2d4] dark:border-amber-500/20 shadow-xs relative overflow-hidden group hover:border-amber-400/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-amber-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase">{language === 'th' ? 'Streak สูงสุด' : 'Best Streak'}</span>
             <Flame className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
@@ -92,7 +92,7 @@ export const ProductivityInsightsView: React.FC = () => {
         </div>
 
         {/* Total Tasks Managed */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-indigo-500/20 shadow-sm relative overflow-hidden group hover:border-indigo-400/40 transition-all">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-[#e8e2d4] dark:border-indigo-500/20 shadow-xs relative overflow-hidden group hover:border-indigo-400/40 transition-all">
           <div className="flex items-center justify-between text-slate-600 dark:text-indigo-400/80 mb-2">
             <span className="text-[10px] sm:text-xs font-mono font-bold uppercase">{t('totalTasks')}</span>
             <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-500 group-hover:scale-110 transition-transform" />
@@ -110,7 +110,7 @@ export const ProductivityInsightsView: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Habit Consistency Board */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-cyan-500/20 shadow-md">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-amber-500" />
@@ -132,7 +132,7 @@ export const ProductivityInsightsView: React.FC = () => {
                 return (
                   <div
                     key={h.id}
-                    className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-cyan-500/15 flex items-center justify-between gap-3"
+                    className="p-3.5 rounded-2xl bg-[#f7f4ea] dark:bg-slate-950/70 border border-[#e8e2d4] dark:border-cyan-500/15 flex items-center justify-between gap-3"
                   >
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
@@ -169,7 +169,7 @@ export const ProductivityInsightsView: React.FC = () => {
         </div>
 
         {/* Activity & Completed Milestones Feed */}
-        <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-cyan-500/20 shadow-md">
+        <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-5 h-5 text-cyan-600 dark:text-cyan-400 animate-pulse" />
             <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-mono uppercase tracking-wider">
@@ -186,7 +186,7 @@ export const ProductivityInsightsView: React.FC = () => {
               activityLogs.slice(0, 10).map((log) => (
                 <div
                   key={log.id}
-                  className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-cyan-500/10 text-xs flex items-start gap-2.5"
+                  className="p-3 rounded-2xl bg-[#f7f4ea] dark:bg-slate-950/70 border border-[#e8e2d4] dark:border-cyan-500/10 text-xs flex items-start gap-2.5"
                 >
                   <div className="w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 shadow-[0_0_6px_#00f5ff] mt-1.5 shrink-0" />
                   <div className="flex-1 min-w-0">

@@ -73,10 +73,10 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in pb-16 sm:pb-0 font-sans">
       {/* Sci-Fi Quick Add Terminal Console */}
-      <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_25px_rgba(6,182,212,0.06)]">
+      <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs dark:shadow-[0_0_25px_rgba(6,182,212,0.06)]">
         <div className="flex items-center gap-2 mb-3">
-          <Terminal className="w-4 h-4 text-cyan-400" />
-          <span className="font-mono text-xs uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-bold">
+          <Terminal className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+          <span className="font-mono text-xs uppercase tracking-wider text-cyan-700 dark:text-cyan-400 font-bold">
             {t('addTodoBtn')}
           </span>
         </div>
@@ -89,7 +89,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                 value={quickTitle}
                 onChange={(e) => setQuickTitle(e.target.value)}
                 placeholder={t('quickTodoPlaceholder')}
-                className="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 focus:border-cyan-500 dark:focus:border-cyan-400 text-slate-900 dark:text-cyan-100 placeholder-slate-500 outline-none transition-all shadow-inner"
+                className="w-full px-4 py-2.5 text-sm rounded-xl bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 focus:border-cyan-500 dark:focus:border-cyan-400 text-slate-900 dark:text-cyan-100 placeholder-slate-500 outline-none transition-all shadow-inner"
               />
             </div>
             <button
@@ -104,14 +104,14 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
           <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
             <div>
-              <label htmlFor="quick-priority" className="block font-mono text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase mb-1">
+              <label htmlFor="quick-priority" className="block font-mono text-[10px] text-slate-700 dark:text-cyan-400 font-bold uppercase mb-1">
                 {t('priorityLevelLabel')}
               </label>
               <select
                 id="quick-priority"
                 value={quickPriority}
                 onChange={(e) => setQuickPriority(e.target.value as TaskPriority)}
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-[#ede7d8]/60 dark:bg-slate-950 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none"
               >
                 <option value="low">{t('low')}</option>
                 <option value="medium">{t('medium')}</option>
@@ -121,14 +121,14 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             </div>
 
             <div>
-              <label htmlFor="quick-category" className="block font-mono text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase mb-1">
+              <label htmlFor="quick-category" className="block font-mono text-[10px] text-slate-700 dark:text-cyan-400 font-bold uppercase mb-1">
                 {t('taskCategories')}
               </label>
               <select
                 id="quick-category"
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none truncate"
+                className="w-full px-3 py-2 bg-[#ede7d8]/60 dark:bg-slate-950 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none truncate"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.name}>
@@ -143,7 +143,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
       {/* Sci-Fi Filter Segmented Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <div className="inline-flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30 shrink-0">
+        <div className="inline-flex items-center bg-[#ede7d8]/60 dark:bg-slate-950 p-1 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 shrink-0">
           <button
             onClick={() => setTodoTab('all')}
             className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
@@ -201,8 +201,8 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
       {/* Task Checklist Items Stack */}
       <div className="space-y-2.5">
         {displayedTasks.length === 0 ? (
-          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-10 text-center border border-slate-200 dark:border-cyan-500/20 shadow-xs">
-            <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-pulse" />
+          <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-10 text-center border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs">
+            <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3 animate-pulse" />
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
               {t('allCaughtUp')}
             </h3>
@@ -219,12 +219,12 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             return (
               <div
                 key={task.id}
-                className={`bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border transition-all duration-200 p-3.5 sm:p-4 shadow-sm hover:border-cyan-400/40 ${
+                className={`bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border transition-all duration-200 p-3.5 sm:p-4 shadow-xs hover:border-amber-400/50 dark:hover:border-cyan-400/40 ${
                   isCompleted
-                    ? 'border-slate-200 dark:border-slate-800 opacity-70'
+                    ? 'border-[#ded5c2] dark:border-slate-800 opacity-70'
                     : overdue
                     ? 'border-rose-300 dark:border-rose-800/80 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
-                    : 'border-slate-200/90 dark:border-cyan-500/20'
+                    : 'border-[#ded5c2] dark:border-cyan-500/20'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">

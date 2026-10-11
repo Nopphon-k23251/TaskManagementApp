@@ -78,7 +78,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           right: 0,
           zIndex: 50,
         }}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#070b14]/95 backdrop-blur-2xl border-t border-slate-200 dark:border-cyan-500/20 lg:hidden h-16 shadow-[0_-4px_25px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_25px_rgba(6,182,212,0.15)] flex items-center justify-around select-none px-1"
+        className="fixed bottom-0 left-0 right-0 z-50 bg-[#fcfaf4]/95 dark:bg-[#070b14]/95 backdrop-blur-2xl border-t border-[#e8e2d4] dark:border-cyan-500/20 lg:hidden h-16 shadow-[0_-4px_25px_rgba(0,0,0,0.15)] dark:shadow-[0_-4px_25px_rgba(6,182,212,0.15)] flex items-center justify-around select-none px-1"
       >
         {navItems.map((item) => {
           const isActive = activeTab === item.id;

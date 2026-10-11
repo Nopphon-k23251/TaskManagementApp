@@ -204,13 +204,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* View Toggle & Navigation Controls */}
           <div className="flex flex-wrap items-center gap-2">
             {/* View Mode Tabs */}
-            <div className="flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
+            <div className="flex items-center bg-[#ede7d8]/60 dark:bg-slate-950 p-1 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30">
               <button
                 onClick={() => setViewMode('agenda')}
                 className={`px-2.5 sm:px-3 py-1 text-xs font-mono font-bold rounded-lg transition-all ${
                   viewMode === 'agenda'
                     ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.4)]'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400'
                 }`}
               >
                 {t('agendaView')}
@@ -220,7 +220,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 className={`px-2.5 sm:px-3 py-1 text-xs font-mono font-bold rounded-lg transition-all ${
                   viewMode === 'month'
                     ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.4)]'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400'
                 }`}
               >
                 {t('monthView')}
@@ -230,7 +230,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 className={`px-2.5 sm:px-3 py-1 text-xs font-mono font-bold rounded-lg transition-all ${
                   viewMode === 'week'
                     ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.4)]'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400'
                 }`}
               >
                 {t('weekView')}
@@ -241,20 +241,20 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrev}
-                className="p-1.5 rounded-xl border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-slate-200"
+                className="p-1.5 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-[#ede7d8] transition-colors"
                 aria-label="Previous period"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleToday}
-                className="px-3 py-1.5 text-xs font-mono font-bold rounded-xl border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-slate-200"
+                className="px-3 py-1.5 text-xs font-mono font-bold rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-[#ede7d8] transition-colors"
               >
                 {t('todayBtn')}
               </button>
               <button
                 onClick={handleNext}
-                className="p-1.5 rounded-xl border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-slate-200"
+                className="p-1.5 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 hover:bg-[#ede7d8] transition-colors"
                 aria-label="Next period"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -269,7 +269,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         /* Mobile-First Agenda Strip & Day Focus */
         <div className="space-y-4">
           {/* Horizontal Agenda Date Strip */}
-          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 p-3 shadow-sm overflow-x-auto no-scrollbar">
+          <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-[#e8e2d4] dark:border-cyan-500/20 p-3 shadow-xs overflow-x-auto no-scrollbar">
             <div className="flex gap-2 min-w-max">
               {days.filter((d) => d.isCurrentMonth !== false).map((day) => {
                 const isSelected = day.dateString === selectedAgendaDate;
@@ -284,8 +284,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       isSelected
                         ? 'bg-gradient-to-tr from-brand-600 to-cyan-600 text-white border-cyan-400 shadow-[0_0_15px_rgba(0,245,255,0.4)] scale-105'
                         : day.isToday
-                        ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/40'
-                        : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+                        ? 'bg-amber-500/15 text-amber-800 dark:text-cyan-400 border-amber-400/40 dark:border-cyan-500/40'
+                        : 'bg-[#f7f4ea] dark:bg-slate-950 text-slate-800 dark:text-slate-300 border-[#ded5c2] dark:border-slate-800 hover:border-amber-400/50 dark:hover:border-cyan-500/30'
                     }`}
                   >
                     <span className="text-[10px] font-mono uppercase opacity-75">
@@ -320,12 +320,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {conflictingTaskIds.size > 0 && (
             <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/40 shadow-[0_0_20px_rgba(244,63,94,0.15)] flex items-center justify-between gap-3 animate-fade-in">
               <div className="flex items-center gap-2.5">
-                <AlertTriangle className="w-5 h-5 text-rose-400 animate-pulse shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-rose-500 dark:text-rose-400 animate-pulse shrink-0" />
                 <div>
-                  <h4 className="text-xs font-bold text-rose-400 font-mono">
+                  <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 font-mono">
                     {t('timeConflictBanner', { count: conflictingTaskIds.size })}
                   </h4>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                  <p className="text-[11px] text-slate-700 dark:text-slate-300">
                     {t('timeConflictWarning')}
                   </p>
                 </div>
@@ -334,21 +334,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           )}
 
           {/* Agenda Selected Day Tasks Deck */}
-          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-lg p-4 sm:p-5">
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-200/80 dark:border-cyan-500/15">
+          <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs p-4 sm:p-5">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#ded5c2] dark:border-cyan-500/15">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-cyan-400" />
+                  <Clock className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                   <span>{t('tasksOnDate', { date: formatDate(selectedAgendaDate) })}</span>
                 </h3>
-                <span className="font-mono text-[11px] font-bold text-slate-500 dark:text-cyan-400/80 truncate block">
+                <span className="font-mono text-[11px] font-bold text-slate-600 dark:text-cyan-400/80 truncate block">
                   {agendaTasks.length} {t('tasksCount', { count: agendaTasks.length })}
                 </span>
               </div>
 
               <button
                 onClick={() => onOpenCreateModal('todo', selectedAgendaDate)}
-                className="hidden sm:flex px-3 py-1.5 text-xs font-mono font-bold text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 rounded-xl shadow-[0_0_12px_rgba(6,182,212,0.3)] items-center gap-1.5"
+                className="hidden sm:flex px-3 py-1.5 text-xs font-mono font-bold text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 rounded-xl shadow-xs items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3]" />
                 <span>{t('addTaskOnDate')}</span>
@@ -357,13 +357,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
             <div className="space-y-3">
               {agendaTasks.length === 0 ? (
-                <div className="p-8 text-center border-2 border-dashed border-slate-200 dark:border-cyan-500/20 rounded-xl bg-slate-50/50 dark:bg-slate-950/40">
-                  <p className="font-mono text-xs text-slate-400 dark:text-slate-500 mb-2">
+                <div className="p-8 text-center border-2 border-dashed border-[#ded5c2] dark:border-cyan-500/20 rounded-xl bg-[#f7f4ea]/60 dark:bg-slate-950/40">
+                  <p className="font-mono text-xs text-slate-500 dark:text-slate-500 mb-2">
                     {t('noTasksOnDate')}
                   </p>
                   <button
                     onClick={() => onOpenCreateModal('todo', selectedAgendaDate)}
-                    className="font-mono text-xs font-bold text-cyan-400 hover:underline"
+                    className="font-mono text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
                   >
                     + {t('addTaskOnDate')}
                   </button>
@@ -384,12 +384,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     <div
                       key={task.id}
                       onClick={() => onEditTask(task)}
-                      className={`p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border transition-all cursor-pointer group shadow-xs ${
+                      className={`p-3.5 rounded-xl bg-[#f7f4ea] dark:bg-slate-950 border transition-all cursor-pointer group shadow-xs ${
                         hasConflict
                           ? 'border-rose-500/60 bg-rose-950/10 hover:border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)]'
                           : task.status === 'completed'
-                          ? 'border-emerald-500/30 opacity-70 hover:opacity-100 hover:border-emerald-400'
-                          : 'border-slate-200 dark:border-cyan-500/20 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.1)]'
+                          ? 'border-[#ded5c2] dark:border-emerald-500/30 opacity-70 hover:opacity-100 hover:border-emerald-400'
+                          : 'border-[#e8e2d4] dark:border-cyan-500/20 hover:border-cyan-400 hover:shadow-sm'
                       }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -505,16 +505,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
       ) : (
         /* Full Matrix Grid (Month & Week) */
-        <div className="bg-white/90 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-2xl overflow-hidden bg-cyber-grid">
+        <div className="bg-[#fdfcf9] dark:bg-slate-950 rounded-2xl border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xl overflow-hidden bg-cyber-grid">
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100 text-slate-700 dark:bg-[#070b14]/95 dark:text-cyan-400 text-center font-mono text-[11px] font-bold py-3">
+          <div className="grid grid-cols-7 border-b border-[#e8e2d4] dark:border-cyan-500/20 bg-[#ede7d8]/60 text-slate-800 dark:bg-[#070b14]/95 dark:text-cyan-400 text-center font-mono text-[11px] font-bold py-3">
             {weekdays.map((w) => (
               <div key={w}>{w}</div>
             ))}
           </div>
 
           {/* Matrix Grid */}
-          <div className="grid grid-cols-7 divide-x divide-y divide-slate-200 dark:divide-cyan-500/10">
+          <div className="grid grid-cols-7 divide-x divide-y divide-[#e8e2d4] dark:divide-cyan-500/10">
             {days.map((day) => {
               const dayTasks = filteredTasks.filter((t) => isTaskOnDate(t, day.dateString));
               const isOver = dragOverDate === day.dateString;
@@ -526,13 +526,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onDrop={(e) => handleDrop(e, day.dateString)}
                   onClick={() => onOpenCreateModal('todo', day.dateString)}
                   className={`min-h-[95px] sm:min-h-[115px] p-1.5 sm:p-2 transition-colors relative cursor-pointer group ${
-                    day.isCurrentMonth ? 'bg-transparent' : 'opacity-40 bg-slate-100/60 dark:bg-slate-900/40'
+                    day.isCurrentMonth ? 'bg-transparent' : 'opacity-40 bg-[#ede7d8]/40 dark:bg-slate-900/40'
                   } ${
                     isOver
                       ? 'bg-cyan-500/20 ring-2 ring-cyan-400 shadow-[0_0_20px_#00f5ff]'
                       : day.isToday
                       ? 'bg-cyan-500/10 shadow-[inset_0_0_12px_rgba(6,182,212,0.2)]'
-                      : 'hover:bg-cyan-500/5'
+                      : 'hover:bg-amber-100/30 dark:hover:bg-cyan-500/5'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">

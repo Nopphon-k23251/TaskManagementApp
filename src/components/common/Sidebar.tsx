@@ -82,12 +82,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar container with Sci-Fi HUD styling */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-white/95 dark:bg-[#070b14]/95 backdrop-blur-xl border-r border-slate-200 dark:border-cyan-500/20 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-64 bg-[#fcfaf4]/95 dark:bg-[#070b14]/95 backdrop-blur-xl border-r border-[#e8e2d4] dark:border-cyan-500/20 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="flex items-center gap-3 px-6 h-16 border-b border-slate-100 dark:border-cyan-500/15">
+        <div className="flex items-center gap-3 px-6 h-16 border-b border-[#e8e2d4] dark:border-cyan-500/15">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-brand-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]">
             <Layers className="w-5 h-5" />
           </div>

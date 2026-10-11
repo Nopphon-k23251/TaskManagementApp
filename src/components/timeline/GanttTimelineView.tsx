@@ -388,10 +388,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
   return (
     <div className="space-y-3.5 sm:space-y-4 animate-fade-in text-slate-800 dark:text-slate-100 font-sans">
       {/* Sci-Fi Hologram Header & Control Console */}
-      <div className="relative overflow-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-3.5 sm:p-5 border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_30px_rgba(6,182,212,0.08)]">
+      <div className="relative overflow-hidden bg-[#fdfcf9] dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-3.5 sm:p-5 border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs dark:shadow-[0_0_30px_rgba(6,182,212,0.08)]">
         {/* Ambient Sci-Fi Glow Highlights */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 dark:bg-cyan-500/15 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
-        <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-300/10 dark:bg-cyan-500/15 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
+        <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-orange-200/10 dark:bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-3">
           {/* Top Row: Title & Action Buttons */}
@@ -407,8 +407,8 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 </span>
               </div>
 
-              <h2 className="text-lg sm:text-2xl font-black tracking-tight bg-gradient-to-r from-slate-950 via-brand-600 to-cyan-600 dark:from-white dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent flex items-center gap-2">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
+              <h2 className="text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:bg-gradient-to-r dark:from-white dark:via-cyan-300 dark:to-indigo-400 dark:bg-clip-text dark:text-transparent flex items-center gap-2">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-600 dark:text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]" />
                 <span>{t('ganttTitle')}</span>
               </h2>
             </div>
@@ -428,9 +428,9 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                     }
                   }
                 }}
-                className="px-2.5 sm:px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-cyan-300 bg-slate-100 dark:bg-slate-950/80 hover:bg-slate-200 dark:hover:bg-slate-900 rounded-xl border border-slate-200 dark:border-cyan-500/30 shadow-xs transition-all flex items-center gap-1.5"
+                className="px-2.5 sm:px-3.5 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-cyan-300 bg-[#ede7d8]/70 dark:bg-slate-950/80 hover:bg-[#ede7d8] dark:hover:bg-slate-900 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30 shadow-xs transition-all flex items-center gap-1.5"
               >
-                <CalendarIcon className="w-3.5 h-3.5 text-cyan-500" />
+                <CalendarIcon className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-500" />
                 <span>{t('todayMarker')}</span>
               </button>
 
@@ -446,9 +446,9 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
           </div>
 
           {/* Controls Bar: Responsive Zoom & Mobile Deck Toggle */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-cyan-500/15 text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#ded5c2] dark:border-cyan-500/15 text-xs">
             {/* Zoom Segmented Switch */}
-            <div className="flex items-center bg-slate-100/90 dark:bg-slate-950/80 p-0.5 sm:p-1 rounded-xl border border-slate-200 dark:border-cyan-500/30">
+            <div className="flex items-center bg-[#ede7d8]/60 dark:bg-slate-950/80 p-0.5 sm:p-1 rounded-xl border border-[#ded5c2] dark:border-cyan-500/30">
               {(['day', 'week', 'month'] as ZoomLevel[]).map((lvl) => {
                 const label = lvl === 'day' ? t('zoomDay') : lvl === 'week' ? t('zoomWeek') : t('zoomMonth');
                 const isSelected = zoom === lvl;
@@ -459,7 +459,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                     className={`px-2 sm:px-3 py-1 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
                       isSelected
                         ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.4)]'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-300'
+                        : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-300'
                     }`}
                   >
                     {label}
@@ -473,17 +473,17 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
               {/* Toggle Left Task List on Mobile */}
               <button
                 onClick={() => setShowMobileTaskDeck(!showMobileTaskDeck)}
-                className="sm:hidden px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 flex items-center gap-1.5"
+                className="sm:hidden px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 flex items-center gap-1.5"
                 title="Toggle Task List Column"
               >
-                {showMobileTaskDeck ? <EyeOff className="w-3 h-3 text-cyan-400" /> : <Eye className="w-3 h-3 text-cyan-400" />}
+                {showMobileTaskDeck ? <EyeOff className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> : <Eye className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />}
                 <span>{showMobileTaskDeck ? 'ซ่อนชื่อ' : 'แสดงชื่อ'}</span>
               </button>
 
               {/* Mobile Filter Toggle Button */}
               <button
                 onClick={() => setShowFiltersMobile(!showFiltersMobile)}
-                className="sm:hidden p-1.5 rounded-lg border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-cyan-400"
+                className="sm:hidden p-1.5 rounded-lg border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-cyan-600 dark:text-cyan-400"
                 aria-label="Toggle Filters"
               >
                 <Filter className="w-3.5 h-3.5" />
@@ -494,7 +494,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-2.5 py-1 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-700 dark:text-slate-200"
+                  className="px-2.5 py-1 text-xs bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-900 dark:text-slate-200"
                 >
                   <option value="all">{t('allCategories')}</option>
                   {categories.map((c) => (
@@ -507,7 +507,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                 <select
                   value={selectedPriority}
                   onChange={(e) => setSelectedPriority(e.target.value)}
-                  className="px-2.5 py-1 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-700 dark:text-slate-200"
+                  className="px-2.5 py-1 text-xs bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-900 dark:text-slate-200"
                 >
                   <option value="all">{t('allPriorities')}</option>
                   <option value="urgent">{t('urgent')}</option>
@@ -621,13 +621,13 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
       )}
 
       {/* Main Sci-Fi Gantt Matrix Deck (Responsive Layout) */}
-      <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-xl overflow-hidden flex flex-col bg-cyber-grid">
+      <div className="bg-[#fdfcf9] dark:bg-slate-950 rounded-2xl border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xl overflow-hidden flex flex-col bg-cyber-grid">
         <div className="flex flex-1 min-h-[460px] overflow-hidden relative">
           {/* Left Column: Task Control Deck (Sticky on Desktop, Collapsible/Compact on Mobile) */}
           {showMobileTaskDeck && (
-            <div className="w-36 sm:w-64 md:w-72 shrink-0 border-r border-slate-200 dark:border-cyan-500/20 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-md flex flex-col z-20 transition-all">
+            <div className="w-36 sm:w-64 md:w-72 shrink-0 border-r border-[#e8e2d4] dark:border-cyan-500/20 bg-[#f7f4ea]/95 dark:bg-slate-950/95 backdrop-blur-md flex flex-col z-20 transition-all">
               {/* Left Header Deck */}
-              <div className="h-14 px-3 sm:px-4 flex items-center justify-between border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100/95 dark:bg-[#070b14]/95 font-mono text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-cyan-400/90 uppercase tracking-wider">
+              <div className="h-14 px-3 sm:px-4 flex items-center justify-between border-b border-[#e8e2d4] dark:border-cyan-500/20 bg-[#ede7d8]/95 dark:bg-[#070b14]/95 font-mono text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-cyan-400/90 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5 truncate">
                   <Radio className="w-3 h-3 text-cyan-600 dark:text-cyan-400 animate-pulse shrink-0" />
                   <span className="truncate">TASKS [{displayTasks.length}]</span>
@@ -639,7 +639,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
               </div>
 
               {/* Task Row Headers List */}
-              <div className="divide-y divide-slate-200 dark:divide-cyan-500/10 overflow-y-auto">
+              <div className="divide-y divide-[#e8e2d4] dark:divide-cyan-500/10 overflow-y-auto">
                 {displayTasks.map((task) => {
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
                   const duration = getDaysDifference(task.startDate || task.dueDate, task.dueDate);
@@ -744,10 +744,10 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
                         {/* Progress Percent & Duration in Left Deck */}
                         <div className="flex items-center gap-1.5 shrink-0 ml-1">
-                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-200/90 dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/30 text-slate-700 dark:text-cyan-300 shadow-xs">
+                          <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#ede7d8]/90 dark:bg-slate-900 border border-[#ded5c2] dark:border-cyan-500/30 text-slate-800 dark:text-cyan-300 shadow-xs">
                             {progress}%
                           </span>
-                          <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-500 dark:text-cyan-400/80 min-w-[20px] text-right">
+                          <span className="hidden sm:inline font-mono text-[10px] font-bold text-slate-600 dark:text-cyan-400/80 min-w-[20px] text-right">
                             {duration}d
                           </span>
                         </div>
@@ -755,7 +755,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
                       {/* Expanded Subtask Rows */}
                       {isExpanded && (
-                        <div className="bg-slate-100/70 dark:bg-slate-900/70 divide-y divide-slate-200/60 dark:divide-cyan-500/10 border-t border-slate-200/60 dark:border-cyan-500/10">
+                        <div className="bg-[#f7f4ea]/80 dark:bg-slate-900/70 divide-y divide-[#e8e2d4]/70 dark:divide-cyan-500/10 border-t border-[#ded5c2] dark:border-cyan-500/10">
                           {task.subtasks.map((st) => (
                             <div
                               key={st.id}
@@ -820,17 +820,17 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
               style={{ width: `${timelineDays.length * dayWidth}px` }}
             >
               {/* Sticky Timeline Date Header */}
-              <div className="h-14 sticky top-0 z-10 flex border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100/95 dark:bg-[#070b14]/95 backdrop-blur-md">
+              <div className="h-14 sticky top-0 z-10 flex border-b border-[#e8e2d4] dark:border-cyan-500/20 bg-[#ede7d8]/95 dark:bg-[#070b14]/95 backdrop-blur-md">
                 {timelineDays.map((day) => (
                   <div
                     key={day.dateStr}
                     style={{ width: `${dayWidth}px` }}
-                    className={`shrink-0 flex flex-col items-center justify-center border-r border-slate-200 dark:border-cyan-500/10 font-mono text-[10px] transition-colors ${
+                    className={`shrink-0 flex flex-col items-center justify-center border-r border-[#e8e2d4] dark:border-cyan-500/10 font-mono text-[10px] transition-colors ${
                       day.isToday
-                        ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-black shadow-[inset_0_0_12px_rgba(6,182,212,0.2)]'
+                        ? 'bg-amber-400/20 text-amber-900 dark:text-cyan-300 font-black shadow-[inset_0_0_12px_rgba(245,158,11,0.2)]'
                         : day.isWeekend
-                        ? 'bg-slate-200/50 dark:bg-slate-900/60 text-slate-500 font-medium'
-                        : 'text-slate-600 dark:text-slate-400 font-semibold'
+                        ? 'bg-[#e2d8be]/40 dark:bg-slate-900/60 text-slate-600 font-medium'
+                        : 'text-slate-800 dark:text-slate-400 font-semibold'
                     }`}
                   >
                     <span className="text-[9px] tracking-tighter opacity-80">{day.monthName} {day.dayNumber}</span>
@@ -845,11 +845,11 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                   <div
                     key={'grid-' + day.dateStr}
                     style={{ width: `${dayWidth}px` }}
-                    className={`shrink-0 border-r border-slate-200/70 dark:border-cyan-500/5 ${
+                    className={`shrink-0 border-r border-[#e8e2d4]/70 dark:border-cyan-500/5 ${
                       day.isToday
-                        ? 'bg-cyan-500/10 dark:bg-cyan-500/5 relative'
+                        ? 'bg-amber-400/10 dark:bg-cyan-500/5 relative'
                         : day.isWeekend
-                        ? 'bg-slate-100/40 dark:bg-slate-950/40'
+                        ? 'bg-[#ede7d8]/30 dark:bg-slate-950/40'
                         : ''
                     }`}
                   >

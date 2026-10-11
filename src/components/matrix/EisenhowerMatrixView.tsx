@@ -99,7 +99,7 @@ export const EisenhowerMatrixView: React.FC<EisenhowerMatrixViewProps> = ({
       desc: t('quadrantBacklogDesc'),
       icon: Inbox,
       tasks: backlogTasks,
-      borderClass: 'border-slate-300 dark:border-slate-700/50',
+      borderClass: 'border-[#ded5c2] dark:border-slate-700/50',
       bgHeader: 'bg-slate-500/10 text-slate-700 dark:text-slate-400',
       badgeClass: 'bg-slate-500 text-white',
       glow: 'shadow-xs',
@@ -128,10 +128,10 @@ export const EisenhowerMatrixView: React.FC<EisenhowerMatrixViewProps> = ({
           return (
             <div
               key={quad.id}
-              className={`bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl border ${quad.borderClass} ${quad.glow} p-4 sm:p-5 flex flex-col min-h-[290px] shadow-sm`}
+              className={`bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl border ${quad.borderClass} ${quad.glow} p-4 sm:p-5 flex flex-col min-h-[290px] shadow-xs`}
             >
               {/* Header */}
-              <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#e8e2d4] dark:border-slate-800">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className={`p-2 rounded-xl ${quad.bgHeader} shrink-0`}>
                     <Icon className="w-4 h-4" />
@@ -153,7 +153,7 @@ export const EisenhowerMatrixView: React.FC<EisenhowerMatrixViewProps> = ({
 
                 <button
                   onClick={() => onOpenCreateModal('todo', quad.defaultDate || today)}
-                  className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-cyan-400 transition-colors"
+                  className="p-1.5 rounded-xl bg-[#ede7d8]/70 hover:bg-[#ede7d8] dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-cyan-400 transition-colors"
                   title="Add task in quadrant"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -163,7 +163,7 @@ export const EisenhowerMatrixView: React.FC<EisenhowerMatrixViewProps> = ({
               {/* Task list in Quadrant */}
               <div className="flex-1 space-y-2 mt-3 overflow-y-auto max-h-[320px] pr-1">
                 {quad.tasks.length === 0 ? (
-                  <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-center p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/40 border border-dashed border-slate-200 dark:border-slate-900">
+                  <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-center p-4 rounded-2xl bg-[#f7f4ea]/60 dark:bg-slate-950/40 border border-dashed border-[#ded5c2] dark:border-slate-900">
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                       {language === 'th' ? 'ไม่มีงานในช่องนี้' : 'No tasks in this quadrant'}
                     </p>
@@ -176,7 +176,7 @@ export const EisenhowerMatrixView: React.FC<EisenhowerMatrixViewProps> = ({
                     return (
                       <div
                         key={task.id}
-                        className="p-3 rounded-2xl bg-slate-50/80 hover:bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/15 hover:border-cyan-400/40 shadow-xs transition-all group"
+                        className="p-3 rounded-2xl bg-[#f7f4ea] hover:bg-[#fffdf9] dark:bg-slate-950/80 border border-[#e8e2d4] dark:border-cyan-500/15 hover:border-cyan-400/40 shadow-xs transition-all group"
                       >
                         <div className="flex items-start justify-between gap-2.5">
                           <button

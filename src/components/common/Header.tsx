@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-white/90 dark:bg-[#070b14]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-cyan-500/20 transition-colors shadow-xs">
+    <header className="sticky top-0 z-30 flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 bg-[#fcfaf4]/90 dark:bg-[#070b14]/90 backdrop-blur-xl border-b border-[#e8e2d4] dark:border-cyan-500/20 transition-colors shadow-xs">
       {/* Mobile Search Overlay */}
       {showMobileSearch ? (
         <div className="flex items-center gap-2 w-full animate-fade-in py-1">

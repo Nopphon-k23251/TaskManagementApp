@@ -13,8 +13,8 @@
 .bg-cyber-grid {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+    linear-gradient(to right, rgba(168, 148, 120, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(168, 148, 120, 0.08) 1px, transparent 1px);
 }
 
 .dark .bg-cyber-grid {
@@ -106,7 +106,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(241, 245, 249, 0.8);
+  background: rgba(237, 233, 222, 0.8);
 }
 
 .dark ::-webkit-scrollbar-track {
@@ -114,12 +114,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.5);
+  background: rgba(184, 174, 155, 0.6);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.8);
+  background: rgba(145, 134, 114, 0.85);
 }
 
 .dark ::-webkit-scrollbar-thumb {

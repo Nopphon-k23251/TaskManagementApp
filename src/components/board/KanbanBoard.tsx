@@ -39,37 +39,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       id: 'todo' as TaskStatus,
       title: t('toDoCol'),
       icon: Circle,
-      iconColor: 'text-slate-500 dark:text-slate-400',
-      borderColor: 'border-slate-200/90 dark:border-cyan-500/20',
-      glowColor: 'shadow-[0_0_15px_rgba(148,163,184,0.15)]',
-      bgColor: 'bg-slate-50/70 dark:bg-[#090e1e]/80',
+      iconColor: 'text-slate-600 dark:text-slate-400',
+      borderColor: 'border-[#ded5c2] dark:border-cyan-500/20',
+      glowColor: 'shadow-xs dark:shadow-[0_0_15px_rgba(148,163,184,0.15)]',
+      bgColor: 'bg-[#f7f4ea]/90 dark:bg-[#090e1e]/80',
     },
     {
       id: 'in_progress' as TaskStatus,
       title: t('inProgressCol'),
       icon: Clock,
-      iconColor: 'text-cyan-600 dark:text-cyan-400',
-      borderColor: 'border-cyan-200/80 dark:border-cyan-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(6,182,212,0.15)]',
-      bgColor: 'bg-cyan-50/35 dark:bg-cyan-950/30',
+      iconColor: 'text-cyan-700 dark:text-cyan-400',
+      borderColor: 'border-cyan-300/80 dark:border-cyan-500/40',
+      glowColor: 'shadow-xs dark:shadow-[0_0_15px_rgba(6,182,212,0.15)]',
+      bgColor: 'bg-cyan-50/50 dark:bg-cyan-950/30',
     },
     {
       id: 'review' as TaskStatus,
       title: t('reviewCol'),
       icon: Eye,
-      iconColor: 'text-indigo-600 dark:text-indigo-400',
-      borderColor: 'border-indigo-200/80 dark:border-indigo-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(99,102,241,0.15)]',
-      bgColor: 'bg-indigo-50/35 dark:bg-indigo-950/30',
+      iconColor: 'text-indigo-700 dark:text-indigo-400',
+      borderColor: 'border-indigo-300/80 dark:border-indigo-500/40',
+      glowColor: 'shadow-xs dark:shadow-[0_0_15px_rgba(99,102,241,0.15)]',
+      bgColor: 'bg-indigo-50/50 dark:bg-indigo-950/30',
     },
     {
       id: 'completed' as TaskStatus,
       title: t('completedCol'),
       icon: CheckCircle2,
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
-      borderColor: 'border-emerald-200/80 dark:border-emerald-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(16,185,129,0.15)]',
-      bgColor: 'bg-emerald-50/35 dark:bg-emerald-950/30',
+      iconColor: 'text-emerald-700 dark:text-emerald-400',
+      borderColor: 'border-emerald-300/80 dark:border-emerald-500/40',
+      glowColor: 'shadow-xs dark:shadow-[0_0_15px_rgba(16,185,129,0.15)]',
+      bgColor: 'bg-emerald-50/50 dark:bg-emerald-950/30',
     },
   ];
 
@@ -113,13 +113,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-16 sm:pb-0 font-sans">
       {/* View Switcher: Kanban (4 Columns) vs Eisenhower Matrix (4 Quadrants) */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="inline-flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-cyan-500/30 text-xs font-mono font-bold">
+        <div className="inline-flex items-center bg-[#ede7d8]/60 dark:bg-slate-950 p-1 rounded-2xl border border-[#ded5c2] dark:border-cyan-500/30 text-xs font-mono font-bold">
           <button
             onClick={() => setViewMode('kanban')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all ${
               viewMode === 'kanban'
                 ? 'bg-gradient-to-r from-cyan-500 to-brand-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400'
             }`}
           >
             <Columns3 className="w-4 h-4" />
@@ -130,7 +130,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all ${
               viewMode === 'matrix'
                 ? 'bg-gradient-to-r from-cyan-500 to-brand-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-cyan-400'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -155,7 +155,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       ) : (
         <>
           {/* Top Sci-Fi Filter Console with Mobile Toggle */}
-          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] p-3.5 sm:p-4">
+          <div className="bg-[#fdfcf9] dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-[#e8e2d4] dark:border-cyan-500/20 shadow-xs dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] p-3.5 sm:p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 dark:text-cyan-300">
             <Filter className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
@@ -168,7 +168,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFiltersMobile(!showFiltersMobile)}
-              className="sm:hidden px-2.5 py-1 text-xs font-mono font-bold rounded-lg border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 flex items-center gap-1.5"
+              className="sm:hidden px-2.5 py-1 text-xs font-mono font-bold rounded-lg border border-[#ded5c2] dark:border-cyan-500/30 bg-[#ede7d8]/70 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 flex items-center gap-1.5"
             >
               <span>[FILTERS]</span>
               {showFiltersMobile ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -180,7 +180,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:bg-rose-950/40 rounded-lg border border-rose-300 dark:border-rose-500/30 transition-colors"
                 title={t('resetFilters')}
               >
-                <RotateCcw className="w-3 h-3" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span>{t('resetFilters')}</span>
               </button>
             )}
@@ -188,7 +188,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
         </div>
 
         {/* Filter Controls (Collapsible on mobile) */}
-        <div className={`mt-3 pt-3 border-t border-slate-200/80 dark:border-cyan-500/15 ${showFiltersMobile ? 'block' : 'hidden sm:block'}`}>
+        <div className={`mt-3 pt-3 border-t border-[#ded5c2] dark:border-cyan-500/15 ${showFiltersMobile ? 'block' : 'hidden sm:block'}`}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
             {/* Priority Filter */}
             <div>
@@ -198,7 +198,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <select
                 value={filters.priority || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, priority: e.target.value as any }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 {priorities.map((p) => (
                   <option key={p.value} value={p.value}>
@@ -216,7 +216,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <select
                 value={filters.category || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 <option value="all">{t('allCategories')}</option>
                 {categories.map((c) => (
@@ -235,7 +235,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               <select
                 value={filters.dueDateRange || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, dueDateRange: e.target.value as any }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-[#f7f4ea] dark:bg-slate-950 border border-[#ded5c2] dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 <option value="all">{t('allDates')}</option>
                 <option value="today">{t('dueToday')}</option>
@@ -254,7 +254,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           className={`px-3 py-1.5 text-xs font-mono font-bold rounded-xl whitespace-nowrap border transition-all ${
             mobileSelectedColumn === 'all'
               ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-cyan-500/20'
+              : 'bg-[#fdfcf9] dark:bg-slate-900 text-slate-700 dark:text-slate-400 border-[#ded5c2] dark:border-cyan-500/20'
           }`}
         >
           {t('allColumns')} ({filteredTasks.length})
@@ -268,7 +268,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               className={`px-3 py-1.5 text-xs font-mono font-bold rounded-xl whitespace-nowrap border transition-all ${
                 mobileSelectedColumn === col.id
                   ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white border-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-cyan-500/20'
+                  : 'bg-[#fdfcf9] dark:bg-slate-900 text-slate-700 dark:text-slate-400 border-[#ded5c2] dark:border-cyan-500/20'
               }`}
             >
               {col.title} ({count})
@@ -301,20 +301,20 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 }`}
               >
                 {/* Column Header */}
-                <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-slate-200/80 dark:border-cyan-500/15">
+                <div className="p-3.5 sm:p-4 flex items-center justify-between border-b border-[#ded5c2] dark:border-cyan-500/15">
                   <div className="flex items-center gap-2">
                     <Icon className={`w-4 h-4 ${col.iconColor} drop-shadow-[0_0_6px_currentColor]`} />
                     <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
                       {col.title}
                     </h3>
-                    <span className="px-2 py-0.5 text-xs font-mono font-bold rounded-full bg-slate-200 dark:bg-slate-950 text-slate-700 dark:text-cyan-400 border border-slate-300 dark:border-cyan-500/30">
+                    <span className="px-2 py-0.5 text-xs font-mono font-bold rounded-full bg-[#ede7d8] dark:bg-slate-950 text-slate-800 dark:text-cyan-400 border border-[#ded5c2] dark:border-cyan-500/30">
                       {columnTasks.length}
                     </span>
                   </div>
 
-                    <button
+                  <button
                     onClick={() => onOpenCreateModal(col.id)}
-                    className="p-1 rounded-lg text-slate-500 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-slate-200 dark:hover:bg-cyan-500/10 transition-colors"
+                    className="p-1 rounded-lg text-slate-600 hover:text-cyan-700 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-[#ede7d8] dark:hover:bg-cyan-500/10 transition-colors"
                     title={`+ Add task to ${col.title}`}
                     aria-label={`Add task to ${col.title}`}
                   >

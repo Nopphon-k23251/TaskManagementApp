@@ -89,14 +89,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      className={`group relative bg-white dark:bg-[#0d152a]/95 backdrop-blur-xl rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 cursor-grab active:cursor-grabbing hover:shadow-xl select-none ${
+      className={`group relative bg-[#fdfcf9] dark:bg-[#0d152a]/95 backdrop-blur-xl rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 cursor-grab active:cursor-grabbing hover:shadow-md select-none ${
         isDragging
           ? 'opacity-40 scale-95 border-cyan-400 shadow-[0_0_30px_#00f5ff]'
           : depStatus.hasWarning
           ? 'border-rose-500/60 shadow-[0_0_15px_rgba(244,63,94,0.3)] ring-1 ring-rose-500/40'
           : overdue
           ? 'border-rose-400 dark:border-rose-800/80 shadow-[0_0_12px_rgba(244,63,94,0.2)]'
-          : 'border-slate-200/90 dark:border-cyan-500/20 shadow-xs hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]'
+          : 'border-[#ded5c2] dark:border-cyan-500/20 shadow-xs hover:border-amber-400/60 dark:hover:border-cyan-400/50 hover:shadow-xs dark:hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]'
       }`}
     >
       {/* Top Header: Category & Priority & Menu */}
@@ -148,7 +148,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="p-1 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-cyan-300 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none"
+              className="p-1 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-cyan-300 hover:bg-[#ede7d8]/60 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none"
               aria-label="Task options"
             >
               <MoreVertical className="w-4 h-4" />
@@ -157,14 +157,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
             {showMenu && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="absolute right-0 mt-1 w-44 bg-white dark:bg-slate-950 rounded-xl shadow-2xl border border-slate-200 dark:border-cyan-500/30 py-1 z-30 animate-fade-in text-xs font-mono"
+                className="absolute right-0 mt-1 w-44 bg-[#fdfcf9] dark:bg-slate-950 rounded-xl shadow-xl border border-[#ded5c2] dark:border-cyan-500/30 py-1 z-30 animate-fade-in text-xs font-mono"
               >
                 <button
                   onClick={() => {
                     setShowMenu(false);
                     onEdit(task);
                   }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-cyan-500/10"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[#ede7d8]/60 dark:hover:bg-cyan-500/10"
                 >
                   <Edit3 className="w-3.5 h-3.5 text-cyan-500 dark:text-cyan-400" />
                   <span>{t('editTaskModalTitle')}</span>
@@ -175,7 +175,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
                       setShowMenu(false);
                       updateTaskStatus(task.id, nextStatus);
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-cyan-500/10"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[#ede7d8]/60 dark:hover:bg-cyan-500/10"
                   >
                     <ArrowRight className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     <span>{statusLabel[nextStatus]}</span>
@@ -187,7 +187,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
                       setShowMenu(false);
                       updateTaskStatus(task.id, prevStatus);
                     }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-cyan-500/10"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-[#ede7d8]/60 dark:hover:bg-cyan-500/10"
                   >
                     <ArrowLeft className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                     <span>{statusLabel[prevStatus]}</span>
@@ -236,7 +236,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
               {completedSubtasks}/{totalSubtasks}
             </span>
           </div>
-          <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-300 dark:border-slate-800">
+          <div className="w-full h-1.5 bg-[#ede7d8] dark:bg-slate-900 rounded-full overflow-hidden border border-[#ded5c2] dark:border-slate-800">
             <div
               className={`h-full transition-all duration-300 rounded-full energy-stripes ${
                 completedSubtasks === totalSubtasks
@@ -255,7 +255,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
           {task.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-300 dark:bg-slate-900/90 dark:text-cyan-300 dark:border-cyan-500/30"
+              className="font-mono text-[9px] font-semibold px-2 py-0.5 rounded-md bg-[#ede7d8]/70 text-slate-800 border border-[#ded5c2] dark:bg-slate-900/90 dark:text-cyan-300 dark:border-cyan-500/30"
             >
               #{tag}
             </span>
@@ -264,7 +264,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, compact = fals
       )}
 
       {/* Footer: Date Range & Mobile Quick Advance */}
-      <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-cyan-500/15 text-xs">
+      <div className="flex items-center justify-between pt-2 border-t border-[#ded5c2] dark:border-cyan-500/15 text-xs">
         <div
           className={`flex items-center gap-1.5 font-mono text-[11px] font-semibold ${
             overdue || depStatus.hasWarning
