@@ -232,7 +232,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                   timerMode === 'focus'
                     ? 'bg-gradient-to-r from-cyan-500 to-brand-600 text-white shadow-xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-cyan-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
                 }`}
               >
                 {t('focusMode')}
@@ -242,7 +242,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                   timerMode === 'short_break'
                     ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-emerald-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
                 }`}
               >
                 {t('shortBreak')}
@@ -252,7 +252,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
                   timerMode === 'long_break'
                     ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xs'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-indigo-400'
+                    : 'text-slate-700 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
                 {t('longBreak')}
@@ -262,7 +262,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
           {/* Currently Focused Task Card */}
           <div className="w-full mb-6 p-3 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/20 text-left">
-            <p className="text-[10px] font-mono uppercase text-slate-400 dark:text-cyan-400/80 font-bold mb-1">
+            <p className="text-[10px] font-mono uppercase text-slate-600 dark:text-cyan-400/80 font-bold mb-1">
               {t('focusingOn')}
             </p>
             {activeFocusTask ? (
@@ -271,7 +271,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                   <p className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
                     {activeFocusTask.title}
                   </p>
-                  <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400">
+                  <span className="text-[10px] font-mono text-cyan-700 dark:text-cyan-400 font-bold">
                     {activeFocusTask.category}
                   </span>
                 </div>
@@ -284,7 +284,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
                 <span>{t('selectTaskToFocus')}</span>
                 {todayIncomplete.length > 0 && (
                   <select
@@ -293,7 +293,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                       if (found) setActiveFocusTask(found);
                     }}
                     defaultValue=""
-                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded-lg px-2 py-1 text-xs text-slate-800 dark:text-cyan-100 font-mono outline-none"
+                    className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/30 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-cyan-100 font-mono outline-none"
                   >
                     <option value="" disabled>
                       {t('selectTaskToFocus')}
@@ -319,7 +319,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 r="44%"
                 stroke="currentColor"
                 strokeWidth="8"
-                className="text-slate-100 dark:text-slate-900"
+                className="text-slate-200 dark:text-slate-900"
                 fill="none"
               />
               <circle
@@ -333,10 +333,10 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 strokeLinecap="round"
                 className={`transition-all duration-1000 ${
                   timerMode === 'focus'
-                    ? 'text-cyan-400 drop-shadow-[0_0_10px_#00f5ff]'
+                    ? 'text-cyan-500 drop-shadow-[0_0_10px_#00f5ff]'
                     : timerMode === 'short_break'
-                    ? 'text-emerald-400 drop-shadow-[0_0_10px_#10b981]'
-                    : 'text-indigo-400 drop-shadow-[0_0_10px_#6366f1]'
+                    ? 'text-emerald-500 drop-shadow-[0_0_10px_#10b981]'
+                    : 'text-indigo-500 drop-shadow-[0_0_10px_#6366f1]'
                 }`}
                 fill="none"
               />
@@ -347,7 +347,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
               <span className="font-mono text-5xl sm:text-6xl font-black text-slate-900 dark:text-cyan-100 tracking-tight">
                 {formatTimerDisplay(timeLeft)}
               </span>
-              <span className="font-mono text-xs uppercase tracking-widest text-slate-400 dark:text-cyan-400/80 mt-1 font-bold">
+              <span className="font-mono text-xs uppercase tracking-widest text-slate-600 dark:text-cyan-400/80 mt-1 font-bold">
                 {timerMode === 'focus' ? 'Deep Work' : 'Recharge'}
               </span>
             </div>
@@ -378,7 +378,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
             <button
               onClick={resetTimer}
-              className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-cyan-500/20 text-slate-600 dark:text-slate-400 hover:text-cyan-400 transition-all active:scale-95"
+              className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-cyan-500/20 text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all active:scale-95"
               title={t('resetTimer')}
               aria-label={t('resetTimer')}
             >
@@ -391,7 +391,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
               className={`p-3 rounded-2xl border transition-all active:scale-95 flex items-center gap-1.5 ${
                 isTestingSound
                   ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_15px_rgba(0,245,255,0.4)] scale-105'
-                  : 'bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-cyan-500/20 text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                  : 'bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-900 border border-slate-200 dark:border-cyan-500/20 text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
               }`}
               title={t('testSoundBtn')}
               aria-label={t('testSoundBtn')}
@@ -406,7 +406,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
           <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-cyan-500/20 shadow-md">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Sparkles className="w-4 h-4 text-cyan-500 dark:text-cyan-400" />
                 <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-mono uppercase tracking-wider">
                   {t('todayTasksTitle')} ({todayIncomplete.length})
                 </h3>
@@ -414,7 +414,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
               <button
                 onClick={() => onOpenCreateModal('todo', today)}
-                className="px-2.5 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-600 dark:text-cyan-300 text-xs font-mono font-bold flex items-center gap-1 transition-all"
+                className="px-2.5 py-1 rounded-xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-300 text-cyan-800 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/20 dark:border-cyan-500/30 dark:text-cyan-300 text-xs font-mono font-bold flex items-center gap-1 transition-all"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>{language === 'th' ? 'เพิ่มงานวันนี้' : 'Add Task'}</span>
@@ -426,7 +426,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
               {todayTasks.length === 0 ? (
                 <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-dashed border-slate-200 dark:border-slate-800 space-y-3">
                   <CheckCircle2 className="w-8 h-8 text-slate-400 mx-auto" />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-mono">
                     {t('noTasksToday')}
                   </p>
                   <button
@@ -450,7 +450,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                           ? 'border-cyan-400 bg-cyan-500/10 dark:bg-cyan-950/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
                           : isCompleted
                           ? 'border-slate-200 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-950/40 opacity-60'
-                          : 'border-slate-200 dark:border-cyan-500/15 bg-slate-50 dark:bg-slate-950/80 hover:border-cyan-500/40'
+                          : 'border-slate-200/90 dark:border-cyan-500/15 bg-slate-50/80 hover:bg-white dark:bg-slate-950/80 hover:border-cyan-500/40 shadow-xs'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2.5">
@@ -462,11 +462,11 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                             }
                             updateTaskStatus(task.id, isCompleted ? 'todo' : 'completed');
                           }}
-                          className="mt-0.5 text-slate-400 hover:text-emerald-400 transition-colors shrink-0"
+                          className="mt-0.5 text-slate-400 hover:text-emerald-500 transition-colors shrink-0"
                         >
                           <CheckCircle2
                             className={`w-4 h-4 ${
-                              isCompleted ? 'text-emerald-400 fill-emerald-400/20' : 'text-slate-400'
+                              isCompleted ? 'text-emerald-500 fill-emerald-500/20' : 'text-slate-400'
                             }`}
                           />
                         </button>
@@ -480,12 +480,12 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                               {task.category}
                             </span>
                             <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded ${
+                              className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${
                                 task.priority === 'urgent'
-                                  ? 'bg-rose-950 text-rose-300'
+                                  ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-transparent'
                                   : task.priority === 'high'
-                                  ? 'bg-amber-950 text-amber-300'
-                                  : 'bg-cyan-950 text-cyan-300'
+                                  ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-transparent'
+                                  : 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-300 dark:border-transparent'
                               }`}
                             >
                               {t(task.priority)}
@@ -494,9 +494,9 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
                           <p
                             onClick={() => onEditTask(task)}
-                            className={`text-xs font-bold cursor-pointer hover:text-cyan-400 transition-colors ${
+                            className={`text-xs font-bold cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors ${
                               isCompleted
-                                ? 'line-through text-slate-400 dark:text-slate-500'
+                                ? 'line-through text-slate-500 dark:text-slate-500'
                                 : 'text-slate-900 dark:text-slate-100'
                             }`}
                           >
@@ -513,7 +513,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                             className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold flex items-center gap-1 shrink-0 transition-all ${
                               isSelected
                                 ? 'bg-cyan-500 text-slate-950 shadow-[0_0_10px_#00f5ff]'
-                                : 'bg-slate-200 dark:bg-slate-900 text-slate-700 dark:text-cyan-300 hover:bg-cyan-500/20'
+                                : 'bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-cyan-300 hover:bg-cyan-50 hover:text-cyan-800 border border-slate-300 dark:border-transparent'
                             }`}
                           >
                             <Target className="w-3 h-3" />
@@ -529,7 +529,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
             <button
               onClick={() => onNavigateTab('tasks')}
-              className="mt-4 w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 text-xs font-mono font-bold text-slate-600 dark:text-cyan-400 hover:text-cyan-300 flex items-center justify-center gap-1.5 transition-all"
+              className="mt-4 w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 text-xs font-mono font-bold text-slate-700 dark:text-cyan-400 hover:text-cyan-600 dark:hover:text-cyan-300 flex items-center justify-center gap-1.5 transition-all"
             >
               <span>{language === 'th' ? 'ดูงานทั้งหมด & จัดการ' : 'View All Tasks & Matrix'}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -547,7 +547,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-mono uppercase tracking-wider">
                 {t('habitsTitle')}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 {t('habitsSub')}
               </p>
             </div>
@@ -555,7 +555,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
           <button
             onClick={() => setShowAddHabit(!showAddHabit)}
-            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 hover:from-amber-500/30 hover:to-rose-500/30 transition-all"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-rose-500/20 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-mono font-bold flex items-center gap-1.5 hover:from-amber-500/30 hover:to-rose-500/30 transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>{t('addHabitBtn')}</span>
@@ -571,7 +571,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
               onChange={(e) => setNewHabitTitle(e.target.value)}
               placeholder={t('newHabitPlaceholder')}
               autoFocus
-              className="flex-1 px-4 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-cyan-100 placeholder-slate-400 outline-none"
+              className="flex-1 px-4 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 placeholder-slate-500 outline-none"
             />
             <button
               type="submit"
@@ -594,7 +594,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                 className={`p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 ${
                   isDoneToday
                     ? 'border-emerald-500/40 bg-emerald-500/10 dark:bg-emerald-950/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                    : 'border-slate-200 dark:border-cyan-500/15 bg-slate-50 dark:bg-slate-950/70 hover:border-cyan-500/40'
+                    : 'border-slate-200/90 dark:border-cyan-500/15 bg-slate-50/80 hover:bg-white dark:bg-slate-950/70 hover:border-cyan-500/40 shadow-xs'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -620,18 +620,18 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                       className={`text-xs font-bold truncate ${
                         isDoneToday
                           ? 'text-emerald-700 dark:text-emerald-300 line-through'
-                          : 'text-slate-800 dark:text-slate-200'
+                          : 'text-slate-900 dark:text-slate-200'
                       }`}
                     >
                       {habit.title}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-amber-500">
+                      <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-amber-600 dark:text-amber-400">
                         <Flame className="w-3 h-3 fill-current" />
                         <span>{habit.streak} {t('streakDays')}</span>
                       </span>
                       {habit.bestStreak && habit.bestStreak > 0 && (
-                        <span className="font-mono text-[9px] text-slate-400 dark:text-slate-500 flex items-center gap-0.5">
+                        <span className="font-mono text-[9px] text-slate-600 dark:text-slate-400 flex items-center gap-0.5">
                           <Award className="w-2.5 h-2.5" />
                           <span>{habit.bestStreak}d best</span>
                         </span>
@@ -642,7 +642,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
 
                 <button
                   onClick={() => deleteHabit(habit.id)}
-                  className="text-slate-300 hover:text-rose-500 transition-colors p-1"
+                  className="text-slate-400 hover:text-rose-600 dark:text-slate-500 dark:hover:text-rose-400 transition-colors p-1"
                   title="Delete habit"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

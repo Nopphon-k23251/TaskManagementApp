@@ -89,7 +89,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                 value={quickTitle}
                 onChange={(e) => setQuickTitle(e.target.value)}
                 placeholder={t('quickTodoPlaceholder')}
-                className="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 dark:focus:border-cyan-400 text-slate-800 dark:text-cyan-100 placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all shadow-inner"
+                className="w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 focus:border-cyan-500 dark:focus:border-cyan-400 text-slate-900 dark:text-cyan-100 placeholder-slate-500 outline-none transition-all shadow-inner"
               />
             </div>
             <button
@@ -104,14 +104,14 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
           <div className="grid grid-cols-2 gap-3 pt-1 text-xs">
             <div>
-              <label htmlFor="quick-priority" className="block font-mono text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase mb-1">
+              <label htmlFor="quick-priority" className="block font-mono text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase mb-1">
                 {t('priorityLevelLabel')}
               </label>
               <select
                 id="quick-priority"
                 value={quickPriority}
                 onChange={(e) => setQuickPriority(e.target.value as TaskPriority)}
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-cyan-100 font-mono text-xs focus:border-cyan-400 focus:outline-none"
+                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none"
               >
                 <option value="low">{t('low')}</option>
                 <option value="medium">{t('medium')}</option>
@@ -121,14 +121,14 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             </div>
 
             <div>
-              <label htmlFor="quick-category" className="block font-mono text-[10px] text-cyan-600 dark:text-cyan-400 font-bold uppercase mb-1">
+              <label htmlFor="quick-category" className="block font-mono text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase mb-1">
                 {t('taskCategories')}
               </label>
               <select
                 id="quick-category"
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-cyan-500/30 text-slate-800 dark:text-cyan-100 font-mono text-xs focus:border-cyan-400 focus:outline-none truncate"
+                className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-300 dark:border-cyan-500/30 text-slate-900 dark:text-cyan-100 font-mono text-xs focus:border-cyan-500 focus:outline-none truncate"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.name}>
@@ -149,7 +149,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'all'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
             }`}
           >
             {t('allTab')} ({filteredTasks.length})
@@ -159,7 +159,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'active'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
             }`}
           >
             {t('activeTab')} ({activeCount})
@@ -169,7 +169,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'today'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
             }`}
           >
             {t('todayTab')}
@@ -179,7 +179,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
             className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-all whitespace-nowrap ${
               todoTab === 'completed'
                 ? 'bg-gradient-to-r from-brand-600 to-cyan-600 text-white shadow-[0_0_10px_rgba(6,182,212,0.3)]'
-                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+                : 'text-slate-700 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400'
             }`}
           >
             {t('completedTab')} ({completedCount})
@@ -203,10 +203,10 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
         {displayedTasks.length === 0 ? (
           <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl p-10 text-center border border-slate-200 dark:border-cyan-500/20 shadow-xs">
             <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3 animate-pulse" />
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
               {t('allCaughtUp')}
             </h3>
-            <p className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs font-mono text-slate-600 dark:text-slate-400 mt-1">
               {t('noTasksInTab')}
             </p>
           </div>
@@ -224,7 +224,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                     ? 'border-slate-200 dark:border-slate-800 opacity-70'
                     : overdue
                     ? 'border-rose-300 dark:border-rose-800/80 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
-                    : 'border-slate-200 dark:border-cyan-500/20'
+                    : 'border-slate-200/90 dark:border-cyan-500/20'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -232,12 +232,12 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                     {/* Toggle Check Trigger */}
                     <button
                       onClick={() => updateTaskStatus(task.id, isCompleted ? 'todo' : 'completed')}
-                      className="mt-0.5 text-slate-400 hover:text-cyan-400 transition-colors shrink-0 focus:outline-none"
+                      className="mt-0.5 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors shrink-0 focus:outline-none"
                     >
                       {isCompleted ? (
-                        <CheckSquare className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_6px_#10b981]" />
+                        <CheckSquare className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_6px_#10b981]" />
                       ) : (
-                        <Square className="w-5 h-5 text-slate-400 hover:text-cyan-400" />
+                        <Square className="w-5 h-5 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400" />
                       )}
                     </button>
 
@@ -255,19 +255,19 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                           );
                         })()}
                         <span
-                          className={`font-mono text-[9px] font-bold px-2 py-0.2 rounded ${
+                          className={`font-mono text-[9px] font-bold px-2 py-0.2 rounded border ${
                             task.priority === 'urgent'
-                              ? 'bg-rose-950 text-rose-300'
+                              ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-transparent'
                               : task.priority === 'high'
-                              ? 'bg-amber-950 text-amber-300'
-                              : 'bg-cyan-950 text-cyan-300'
+                              ? 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-transparent'
+                              : 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-300 dark:border-transparent'
                           }`}
                         >
                           {t(task.priority)}
                         </span>
                         <span
                           className={`font-mono text-[10px] font-semibold flex items-center gap-1 ${
-                            overdue ? 'text-rose-500 font-bold' : 'text-slate-400 dark:text-cyan-400/70'
+                            overdue ? 'text-rose-600 font-bold' : 'text-slate-600 dark:text-cyan-400/70'
                           }`}
                         >
                           <Calendar className="w-3 h-3" />
@@ -277,15 +277,15 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
 
                       <h4
                         onClick={() => onEditTask(task)}
-                        className={`font-bold text-sm text-slate-900 dark:text-slate-100 cursor-pointer hover:text-cyan-400 transition-colors ${
-                          isCompleted ? 'line-through text-slate-400 dark:text-slate-500' : ''
+                        className={`font-bold text-sm text-slate-900 dark:text-slate-100 cursor-pointer hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors ${
+                          isCompleted ? 'line-through text-slate-500 dark:text-slate-500' : ''
                         }`}
                       >
                         {task.title}
                       </h4>
 
                       {task.description && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">
                           {task.description}
                         </p>
                       )}
@@ -296,14 +296,14 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       onClick={() => onEditTask(task)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors"
                       title="Edit task"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setTaskToDelete(task)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-rose-950/50 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-rose-950/50 transition-colors"
                       title={language === 'th' ? 'ลบงานนี้' : 'Delete task'}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -311,7 +311,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                     {task.subtasks.length > 0 && (
                       <button
                         onClick={() => setExpandedTaskId(isExpanded ? null : task.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                       </button>
@@ -329,15 +329,15 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
                         className="flex items-center gap-2 text-xs cursor-pointer group"
                       >
                         {st.completed ? (
-                          <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0" />
                         ) : (
-                          <Square className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 shrink-0" />
+                          <Square className="w-4 h-4 text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 shrink-0" />
                         )}
                         <span
                           className={`font-mono text-xs ${
                             st.completed
                               ? 'line-through text-slate-400 dark:text-slate-500'
-                              : 'text-slate-700 dark:text-slate-300'
+                              : 'text-slate-800 dark:text-slate-300'
                           }`}
                         >
                           {st.title}

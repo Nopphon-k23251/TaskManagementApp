@@ -39,37 +39,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       id: 'todo' as TaskStatus,
       title: t('toDoCol'),
       icon: Circle,
-      iconColor: 'text-slate-400',
-      borderColor: 'border-slate-700/80 dark:border-cyan-500/20',
+      iconColor: 'text-slate-500 dark:text-slate-400',
+      borderColor: 'border-slate-200/90 dark:border-cyan-500/20',
       glowColor: 'shadow-[0_0_15px_rgba(148,163,184,0.15)]',
-      bgColor: 'bg-slate-900/60 dark:bg-[#090e1e]/80',
+      bgColor: 'bg-slate-50/70 dark:bg-[#090e1e]/80',
     },
     {
       id: 'in_progress' as TaskStatus,
       title: t('inProgressCol'),
       icon: Clock,
-      iconColor: 'text-cyan-400',
-      borderColor: 'border-cyan-500/40 dark:border-cyan-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(6,182,212,0.2)]',
-      bgColor: 'bg-cyan-950/20 dark:bg-cyan-950/30',
+      iconColor: 'text-cyan-600 dark:text-cyan-400',
+      borderColor: 'border-cyan-200/80 dark:border-cyan-500/40',
+      glowColor: 'shadow-[0_0_15px_rgba(6,182,212,0.15)]',
+      bgColor: 'bg-cyan-50/35 dark:bg-cyan-950/30',
     },
     {
       id: 'review' as TaskStatus,
       title: t('reviewCol'),
       icon: Eye,
-      iconColor: 'text-indigo-400',
-      borderColor: 'border-indigo-500/40 dark:border-indigo-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(99,102,241,0.2)]',
-      bgColor: 'bg-indigo-950/20 dark:bg-indigo-950/30',
+      iconColor: 'text-indigo-600 dark:text-indigo-400',
+      borderColor: 'border-indigo-200/80 dark:border-indigo-500/40',
+      glowColor: 'shadow-[0_0_15px_rgba(99,102,241,0.15)]',
+      bgColor: 'bg-indigo-50/35 dark:bg-indigo-950/30',
     },
     {
       id: 'completed' as TaskStatus,
       title: t('completedCol'),
       icon: CheckCircle2,
-      iconColor: 'text-emerald-400',
-      borderColor: 'border-emerald-500/40 dark:border-emerald-500/40',
-      glowColor: 'shadow-[0_0_15px_rgba(16,185,129,0.2)]',
-      bgColor: 'bg-emerald-950/20 dark:bg-emerald-950/30',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      borderColor: 'border-emerald-200/80 dark:border-emerald-500/40',
+      glowColor: 'shadow-[0_0_15px_rgba(16,185,129,0.15)]',
+      bgColor: 'bg-emerald-50/35 dark:bg-emerald-950/30',
     },
   ];
 
@@ -157,8 +157,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           {/* Top Sci-Fi Filter Console with Mobile Toggle */}
           <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] p-3.5 sm:p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-cyan-300">
-            <Filter className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900 dark:text-cyan-300">
+            <Filter className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             <span className="font-mono uppercase tracking-wider">{t('taskFilters')}</span>
             {isFilterActive && (
               <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f5ff] animate-pulse" />
@@ -168,7 +168,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFiltersMobile(!showFiltersMobile)}
-              className="sm:hidden px-2.5 py-1 text-xs font-mono font-bold rounded-lg border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-cyan-300 flex items-center gap-1.5"
+              className="sm:hidden px-2.5 py-1 text-xs font-mono font-bold rounded-lg border border-slate-200 dark:border-cyan-500/30 bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-cyan-300 flex items-center gap-1.5"
             >
               <span>[FILTERS]</span>
               {showFiltersMobile ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -177,7 +177,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             {isFilterActive && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-semibold text-rose-500 hover:text-rose-400 dark:bg-rose-950/40 rounded-lg border border-rose-500/30 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:bg-rose-950/40 rounded-lg border border-rose-300 dark:border-rose-500/30 transition-colors"
                 title={t('resetFilters')}
               >
                 <RotateCcw className="w-3 h-3" />
@@ -192,13 +192,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
             {/* Priority Filter */}
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-cyan-400/80 mb-1">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/80 mb-1">
                 {t('priorityLabel')}
               </label>
               <select
                 value={filters.priority || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, priority: e.target.value as any }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-800 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 {priorities.map((p) => (
                   <option key={p.value} value={p.value}>
@@ -210,13 +210,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
             {/* Category Filter */}
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-cyan-400/80 mb-1">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/80 mb-1">
                 {t('categoryLabel')}
               </label>
               <select
                 value={filters.category || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, category: e.target.value }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-800 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 <option value="all">{t('allCategories')}</option>
                 {categories.map((c) => (
@@ -229,13 +229,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
             {/* Due Date Range */}
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-cyan-400/80 mb-1">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/80 mb-1">
                 {t('dueDateLabel')}
               </label>
               <select
                 value={filters.dueDateRange || 'all'}
                 onChange={(e) => setFilters((prev) => ({ ...prev, dueDateRange: e.target.value as any }))}
-                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-800 dark:text-slate-200"
+                className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-cyan-500/30 rounded-xl focus:border-cyan-500 outline-none text-slate-900 dark:text-slate-200"
               >
                 <option value="all">{t('allDates')}</option>
                 <option value="today">{t('dueToday')}</option>
@@ -312,9 +312,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                     </span>
                   </div>
 
-                  <button
+                    <button
                     onClick={() => onOpenCreateModal(col.id)}
-                    className="p-1 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-200 dark:hover:bg-cyan-500/10 transition-colors"
+                    className="p-1 rounded-lg text-slate-500 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-slate-200 dark:hover:bg-cyan-500/10 transition-colors"
                     title={`+ Add task to ${col.title}`}
                     aria-label={`Add task to ${col.title}`}
                   >
@@ -326,12 +326,12 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 <div className="p-2 sm:p-3 space-y-3 min-h-[150px] max-h-[calc(100vh-280px)] overflow-y-auto">
                   {columnTasks.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-6 text-center border-2 border-dashed border-slate-200 dark:border-cyan-500/20 rounded-xl bg-white/40 dark:bg-slate-950/40">
-                      <p className="text-xs font-mono text-slate-400 dark:text-slate-500 mb-2">
+                      <p className="text-xs font-mono text-slate-500 dark:text-slate-500 mb-2">
                         {t('noTasksInCol')}
                       </p>
                       <button
                         onClick={() => onOpenCreateModal(col.id)}
-                        className="text-xs font-mono font-bold text-cyan-500 dark:text-cyan-400 hover:underline flex items-center gap-1"
+                        className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
                       >
                         <Plus className="w-3 h-3" />
                         <span>{t('addFirstTask')}</span>

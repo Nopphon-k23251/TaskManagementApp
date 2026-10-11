@@ -124,7 +124,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="text-2xl sm:text-3xl font-mono font-black text-slate-900 dark:text-cyan-300">
             {total}
           </div>
-          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-500 dark:text-slate-400 truncate">
+          <div className="mt-1.5 text-[11px] font-mono font-medium text-slate-600 dark:text-slate-400 truncate">
             {todo} {t('toDoCol')} · {inProgress} {t('inProgressCol')}
           </div>
         </div>
@@ -155,7 +155,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className={`text-2xl sm:text-3xl font-mono font-black ${overdueCount > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-slate-100'}`}>
             {overdueCount}
           </div>
-          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
+          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400 truncate">
             {overdueCount > 0 ? `⚠️ ${t('overdueTasks')}` : `✓ ${t('done')}`}
           </div>
         </div>
@@ -169,7 +169,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
           <div className="text-2xl sm:text-3xl font-mono font-black text-amber-600 dark:text-amber-300">
             {blockedTasks.length}
           </div>
-          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate">
+          <div className="mt-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400 truncate">
             {delayedWarningTasks.length > 0 ? `⚠️ ${delayedWarningTasks.length} ${t('delayedWarningTitle')}` : `✓ ${t('unblockAllPrereqs').split(' ')[0]}`}
           </div>
         </div>
@@ -233,7 +233,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-medium">
+                          <span className="text-[10px] font-mono text-slate-600 dark:text-slate-400 font-medium">
                             {task.category}
                           </span>
                         </div>
@@ -241,7 +241,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
                       <div
                         className={`text-xs font-mono font-bold shrink-0 ml-2 ${
-                          overdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-cyan-400/80'
+                          overdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-cyan-400/80'
                         }`}
                       >
                         {formatDate(task.dueDate)}
@@ -326,17 +326,17 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
 
             <div className="space-y-3 font-mono">
               {activityLogs.length === 0 ? (
-                <div className="p-4 text-center text-xs text-slate-400">
+                <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">
                   {t('noActivity')}
                 </div>
               ) : (
                 activityLogs.slice(0, 5).map((log) => (
                   <div key={log.id} className="relative pl-4 border-l-2 border-slate-200 dark:border-cyan-500/30 text-xs">
                     <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-cyan-500 dark:bg-cyan-400 shadow-[0_0_6px_#00f5ff]" />
-                    <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                    <p className="font-bold text-slate-900 dark:text-slate-200 truncate">
                       {log.taskTitle}
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-cyan-400/80">
+                    <p className="text-[11px] text-slate-600 dark:text-cyan-400/80">
                       {log.details || log.action}
                     </p>
                   </div>

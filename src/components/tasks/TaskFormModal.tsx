@@ -265,7 +265,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
             }}
             placeholder={t('taskTitlePlaceholder')}
-            className={`w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border focus:bg-white dark:focus:bg-slate-900 outline-none transition-all ${
+            className={`w-full px-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border focus:bg-white dark:focus:bg-slate-900 outline-none transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 ${
               errors.title
                 ? 'border-rose-500 ring-1 ring-rose-500'
                 : 'border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 focus:shadow-[0_0_12px_rgba(0,245,255,0.2)]'
@@ -292,8 +292,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               onClick={() => handleDueDateChange(getTodayString())}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
                 dueDate === getTodayString()
-                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
-                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+                  ? 'bg-cyan-600 text-white border-cyan-500 shadow-sm dark:bg-cyan-500 dark:border-cyan-400 dark:shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
               }`}
             >
               {t('dateToday')}
@@ -303,8 +303,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               onClick={() => handleDueDateChange(addDaysToDate(getTodayString(), 1))}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
                 dueDate === addDaysToDate(getTodayString(), 1)
-                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
-                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+                  ? 'bg-cyan-600 text-white border-cyan-500 shadow-sm dark:bg-cyan-500 dark:border-cyan-400 dark:shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
               }`}
             >
               {t('dateTomorrow')}
@@ -314,8 +314,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               onClick={() => handleDueDateChange(addDaysToDate(getTodayString(), 7))}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
                 dueDate === addDaysToDate(getTodayString(), 7)
-                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
-                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+                  ? 'bg-cyan-600 text-white border-cyan-500 shadow-sm dark:bg-cyan-500 dark:border-cyan-400 dark:shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
               }`}
             >
               {t('dateNextWeek')}
@@ -335,12 +335,12 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 }}
                 className={`pl-3 pr-8 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border font-mono outline-none cursor-pointer transition-all ${
                   errors.dueDate
-                    ? 'border-rose-500 ring-1 ring-rose-500 text-rose-400'
+                    ? 'border-rose-500 ring-1 ring-rose-500 text-rose-500'
                     : dueDate !== getTodayString() &&
                       dueDate !== addDaysToDate(getTodayString(), 1) &&
                       dueDate !== addDaysToDate(getTodayString(), 7)
-                    ? 'border-cyan-400 ring-2 ring-cyan-400/20 bg-cyan-950/20 text-cyan-300'
-                    : 'border-slate-200 dark:border-cyan-500/30 hover:border-cyan-400 text-slate-800 dark:text-cyan-100'
+                    ? 'border-cyan-500 ring-2 ring-cyan-500/20 bg-cyan-50 text-cyan-900 dark:bg-cyan-950/40 dark:text-cyan-300'
+                    : 'border-slate-200 dark:border-cyan-500/30 hover:border-cyan-400 text-slate-900 dark:text-cyan-100'
                 }`}
               />
               <button
@@ -382,8 +382,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 onClick={() => setPriority(p.value)}
                 className={`py-1.5 text-xs font-mono font-bold rounded-xl border transition-all ${
                   priority === p.value
-                    ? 'border-cyan-400 ring-2 ring-cyan-400/30 bg-cyan-950/80 text-cyan-300 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
-                    : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:border-cyan-500/30'
+                    ? 'border-cyan-500 ring-2 ring-cyan-500/30 bg-cyan-100 text-cyan-900 shadow-sm dark:border-cyan-400 dark:bg-cyan-950/80 dark:text-cyan-300 dark:shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-400 hover:border-cyan-500/30'
                 }`}
               >
                 {p.label}
@@ -418,7 +418,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('taskDescPlaceholder')}
-                className="w-full px-4 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none"
+                className="w-full px-4 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
               />
             </div>
 
@@ -431,7 +431,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 id="task-status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium"
+                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium text-slate-900 dark:text-slate-100"
               >
                 <option value="todo">{t('toDoCol')}</option>
                 <option value="in_progress">{t('inProgressCol')}</option>
@@ -450,7 +450,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               <button
                 type="button"
                 onClick={onOpenCategories}
-                className="text-[11px] font-mono font-bold text-cyan-500 dark:text-cyan-400 hover:underline flex items-center gap-1"
+                className="text-[11px] font-mono font-bold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
               >
                 <FolderTree className="w-3 h-3" />
                 <span>{t('manageCategories')}</span>
@@ -461,7 +461,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             id="task-category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium"
+            className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium text-slate-900 dark:text-slate-100"
           >
             {categories.map((cat) => (
               <option key={cat.id} value={cat.name}>
@@ -488,7 +488,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                     (e.currentTarget as HTMLInputElement).showPicker?.();
                   } catch {}
                 }}
-                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
+                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all ${
                   errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
                 }`}
               />
@@ -532,7 +532,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                     (e.currentTarget as HTMLInputElement).showPicker?.();
                   } catch {}
                 }}
-                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
+                className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-50 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all ${
                   errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
                 }`}
               />
@@ -566,7 +566,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
         <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-cyan-500/20 space-y-3">
           <div className="flex items-center justify-between">
             <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
+              <Clock className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
               <span>{t('timeSlot')}</span>
             </label>
             
@@ -588,8 +588,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               }}
               className={`px-2.5 py-1 text-[11px] font-mono font-bold rounded-lg border transition-all flex items-center gap-1.5 ${
                 isAllDay
-                  ? 'bg-cyan-500/20 text-cyan-400 border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.3)]'
-                  : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-transparent hover:text-cyan-400'
+                  ? 'bg-cyan-100 text-cyan-800 border-cyan-300 shadow-xs dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-400 dark:shadow-[0_0_8px_rgba(6,182,212,0.3)]'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-transparent hover:text-cyan-600'
               }`}
             >
               <Zap className="w-3 h-3" />
@@ -726,7 +726,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                   handleAddDependency(e.target.value);
                 }
               }}
-              className="w-full max-w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none truncate"
+              className="w-full max-w-full px-3 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none truncate text-slate-900 dark:text-slate-100"
             >
               <option value="">{t('dependenciesPlaceholder')}</option>
               {availableDependencyCandidates.map((cand) => (
@@ -755,8 +755,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                     key={depId}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-medium rounded-lg border transition-all ${
                       isParentDone
-                        ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
-                        : 'bg-amber-950/60 text-amber-300 border-amber-500/40'
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-500/40'
+                        : 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-500/40'
                     }`}
                   >
                     <span>
@@ -765,7 +765,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemoveDependency(depId)}
-                      className="hover:text-rose-400 ml-1"
+                      className="hover:text-rose-500 ml-1"
                       title="Remove dependency"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -794,12 +794,12 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 }
               }}
               placeholder={t('addSubtaskPlaceholder')}
-              className="flex-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none"
+              className="flex-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
             />
             <button
               type="button"
               onClick={handleAddSubtask}
-              className="px-3 py-1.5 text-xs font-mono font-bold text-cyan-400 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/30 rounded-xl transition-colors"
+              className="px-3 py-1.5 text-xs font-mono font-bold text-cyan-800 bg-cyan-100 hover:bg-cyan-200 border border-cyan-300 dark:text-cyan-400 dark:bg-cyan-950/80 dark:hover:bg-cyan-900 dark:border-cyan-500/30 rounded-xl transition-colors"
             >
               {t('addBtn')}
             </button>
@@ -811,13 +811,13 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 key={st.id}
                 className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 text-xs"
               >
-                <span className={st.completed ? 'line-through text-slate-400' : 'text-slate-200'}>
+                <span className={st.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}>
                   {st.title}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSubtask(st.id)}
-                  className="text-slate-400 hover:text-rose-400"
+                  className="text-slate-400 hover:text-rose-500"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -843,12 +843,12 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                 }
               }}
               placeholder={t('addTagPlaceholder')}
-              className="flex-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none"
+              className="flex-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-cyan-300 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700"
+              className="px-3 py-1.5 text-xs font-mono font-bold text-slate-700 dark:text-cyan-300 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-200"
             >
               {t('addBtn')}
             </button>
@@ -858,13 +858,13 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-xs"
+                className="inline-flex items-center gap-1 font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-950/80 dark:text-cyan-300 dark:border-cyan-500/40 shadow-xs"
               >
                 #{tag}
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="hover:text-rose-400"
+                  className="hover:text-rose-500"
                 >
                   &times;
                 </button>

@@ -268,7 +268,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
 
             {/* Proportional Live Badge Preview */}
             <div className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-100/70 dark:bg-slate-950/70 border border-slate-200 dark:border-cyan-500/10">
-              <span className="text-[9px] font-mono font-bold uppercase text-slate-400 dark:text-cyan-400/70">
+              <span className="text-[9px] font-mono font-bold uppercase text-slate-600 dark:text-cyan-400/70">
                 ตัวอย่าง
               </span>
               <div
@@ -286,14 +286,14 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
         {/* Existing Categories List */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-cyan-400/80">
+            <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-600 dark:text-cyan-400/80">
               {t('existingCategories', { count: categories.length })}
             </h4>
           </div>
 
           <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
             {categories.length === 0 ? (
-              <p className="text-xs font-mono text-slate-400 text-center py-3">{t('noCategoriesYet')}</p>
+              <p className="text-xs font-mono text-slate-600 dark:text-slate-400 text-center py-3">{t('noCategoriesYet')}</p>
             ) : (
               categories.map((cat) => {
                 const badgeStyle = getCategoryBadgeStyle(cat.name, categories);
@@ -309,7 +309,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                             type="text"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
-                            className="flex-1 px-2.5 py-1 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded outline-none font-bold"
+                            className="flex-1 px-2.5 py-1 text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-cyan-500/30 rounded outline-none font-bold text-slate-900 dark:text-slate-100"
                           />
                           <button
                             onClick={() => saveEdit(cat.id)}
@@ -335,7 +335,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                               onChange={(e) => setEditText(e.target.value)}
                               className="w-3.5 h-3.5 rounded cursor-pointer bg-transparent border-0 p-0"
                             />
-                            <span className="text-[9px] font-mono uppercase text-slate-500">Text</span>
+                            <span className="text-[9px] font-mono uppercase text-slate-600 dark:text-slate-400">Text</span>
                           </div>
                           <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
                             <input
@@ -344,7 +344,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                               onChange={(e) => setEditBorder(e.target.value)}
                               className="w-3.5 h-3.5 rounded cursor-pointer bg-transparent border-0 p-0"
                             />
-                            <span className="text-[9px] font-mono uppercase text-slate-500">Stroke</span>
+                            <span className="text-[9px] font-mono uppercase text-slate-600 dark:text-slate-400">Stroke</span>
                           </div>
                           <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-900 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-800">
                             <input
@@ -353,7 +353,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                               onChange={(e) => setEditBg(e.target.value)}
                               className="w-3.5 h-3.5 rounded cursor-pointer bg-transparent border-0 p-0"
                             />
-                            <span className="text-[9px] font-mono uppercase text-slate-500">Bg</span>
+                            <span className="text-[9px] font-mono uppercase text-slate-600 dark:text-slate-400">Bg</span>
                           </div>
                         </div>
                       </div>

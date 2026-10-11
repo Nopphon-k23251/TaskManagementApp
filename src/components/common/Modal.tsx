@@ -71,14 +71,14 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-cyan-500/20">
-          <h2 id="modal-title" className="text-sm sm:text-base font-black text-slate-800 dark:text-white flex items-center gap-2 truncate pr-2">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-cyan-500/20">
+          <h2 id="modal-title" className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2 truncate pr-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f5ff] animate-pulse shrink-0" />
             <span className="truncate">{title}</span>
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 shrink-0"
+            className="p-1.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-cyan-400 hover:bg-slate-100 dark:hover:bg-cyan-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 shrink-0"
             aria-label="Close modal"
           >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />

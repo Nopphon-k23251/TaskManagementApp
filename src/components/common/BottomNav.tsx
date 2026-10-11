@@ -91,15 +91,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               onClick={() => setActiveTab(item.id)}
               className={`flex flex-col items-center justify-center flex-1 h-full py-1.5 focus:outline-none relative transition-all ${
                 isActive
-                  ? 'text-cyan-600 dark:text-cyan-400 font-bold scale-105'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'text-cyan-700 dark:text-cyan-400 font-bold scale-105'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-slate-200'
               }`}
             >
               <div className="relative flex items-center justify-center">
                 <Icon
                   className={`w-5 h-5 mb-0.5 transition-all ${
                     isActive
-                      ? 'stroke-[2.5] text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_8px_rgba(0,245,255,0.7)]'
+                      ? 'stroke-[2.5] text-cyan-700 dark:text-cyan-400 drop-shadow-[0_0_8px_rgba(0,245,255,0.7)]'
                       : 'stroke-2'
                   }`}
                 />

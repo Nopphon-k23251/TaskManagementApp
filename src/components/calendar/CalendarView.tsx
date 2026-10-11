@@ -400,33 +400,33 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             {task.startTime && task.dueTime ? (
                               <span className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border flex items-center gap-1 ${
                                 hasConflict
-                                  ? 'bg-rose-950/80 text-rose-300 border-rose-500/50 shadow-[0_0_8px_rgba(244,63,94,0.3)]'
-                                  : 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.2)]'
+                                  ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-500/50 shadow-[0_0_8px_rgba(244,63,94,0.3)]'
+                                  : 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/80 dark:text-cyan-300 dark:border-cyan-500/40 shadow-[0_0_8px_rgba(6,182,212,0.2)]'
                               }`}>
-                                <Clock className="w-3 h-3 text-cyan-400" />
+                                <Clock className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                                 <span>{task.startTime} - {task.dueTime} น.</span>
                               </span>
                             ) : task.dueTime ? (
-                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-amber-950/80 text-amber-300 border-amber-500/40 flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-amber-400" />
+                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-500/40 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                                 <span>กำหนดส่ง {task.dueTime} น.</span>
                               </span>
                             ) : task.startTime ? (
-                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-cyan-950/80 text-cyan-300 border-cyan-500/40 flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-cyan-400" />
+                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/80 dark:text-cyan-300 dark:border-cyan-500/40 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                                 <span>เริ่ม {task.startTime} น.</span>
                               </span>
                             ) : (
-                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-800 flex items-center gap-1">
-                                <Zap className="w-3 h-3 text-cyan-400" />
+                              <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg border bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 flex items-center gap-1">
+                                <Zap className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
                                 <span>{t('allDayTask')}</span>
                               </span>
                             )}
 
                             {/* Time Conflict Warning Tag */}
                             {hasConflict && (
-                              <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse flex items-center gap-0.5">
-                                <AlertTriangle className="w-2.5 h-2.5 text-rose-400" />
+                              <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/40 animate-pulse flex items-center gap-0.5">
+                                <AlertTriangle className="w-2.5 h-2.5 text-rose-500" />
                                 <span>{language === 'th' ? 'เวลาทับซ้อน' : 'Time Conflict'}</span>
                               </span>
                             )}
@@ -440,30 +440,32 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             </span>
 
                             {/* Priority Badge */}
-                            <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                              task.priority === 'urgent' ? 'bg-rose-950 text-rose-300' : 'bg-cyan-950 text-cyan-300'
+                            <span className={`font-mono text-[9px] font-bold px-1.5 py-0.2 rounded border ${
+                              task.priority === 'urgent'
+                                ? 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-transparent'
+                                : 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-300 dark:border-transparent'
                             }`}>
                               {t(task.priority)}
                             </span>
 
                             {/* Multi-day schedule indicator */}
                             {isMultiDay && (
-                              <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-500/30">
+                              <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 border border-indigo-200 dark:bg-indigo-950/80 dark:text-indigo-300 dark:border-indigo-500/30">
                                 {isDueToday ? '🚩 ' + t('dueOnThisDay') : isStartDay ? (language === 'th' ? '🚀 เริ่มวันนี้' : '🚀 Starts Today') : (language === 'th' ? `🔄 วันที่ ${currentDayNum}/${totalDays}` : `🔄 Day ${currentDayNum}/${totalDays}`)}
                               </span>
                             )}
                           </div>
 
                           {/* Task Title */}
-                          <h4 className={`font-bold text-sm text-slate-900 dark:text-slate-100 group-hover:text-cyan-400 transition-colors ${
-                            task.status === 'completed' ? 'line-through text-slate-400 dark:text-slate-500' : ''
+                          <h4 className={`font-bold text-sm text-slate-900 dark:text-slate-100 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors ${
+                            task.status === 'completed' ? 'line-through text-slate-500 dark:text-slate-500' : ''
                           }`}>
                             {task.title}
                           </h4>
 
                           {/* Description Snippet */}
                           {task.description && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                            <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
                               {task.description}
                             </p>
                           )}
@@ -472,7 +474,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         {/* Right: Subtasks & Status Quick Toggle */}
                         <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
                           {totalSubtasks > 0 && (
-                            <span className="font-mono text-[10px] font-bold text-cyan-400/90 bg-cyan-950/50 px-2 py-1 rounded-lg border border-cyan-500/20 flex items-center gap-1">
+                            <span className="font-mono text-[10px] font-bold text-cyan-700 bg-cyan-100 border-cyan-300 dark:text-cyan-400/90 dark:bg-cyan-950/50 px-2 py-1 rounded-lg border dark:border-cyan-500/20 flex items-center gap-1">
                               <ListTree className="w-3 h-3" />
                               <span>{completedSubtasks}/{totalSubtasks}</span>
                             </span>
@@ -505,7 +507,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         /* Full Matrix Grid (Month & Week) */
         <div className="bg-white/90 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-2xl overflow-hidden bg-cyber-grid">
           {/* Weekday Headers */}
-          <div className="grid grid-cols-7 border-b border-slate-200 dark:border-cyan-500/20 bg-slate-900/95 dark:bg-[#070b14]/95 text-center font-mono text-[11px] font-bold py-3 text-cyan-400">
+          <div className="grid grid-cols-7 border-b border-slate-200 dark:border-cyan-500/20 bg-slate-100 text-slate-700 dark:bg-[#070b14]/95 dark:text-cyan-400 text-center font-mono text-[11px] font-bold py-3">
             {weekdays.map((w) => (
               <div key={w}>{w}</div>
             ))}
@@ -524,7 +526,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   onDrop={(e) => handleDrop(e, day.dateString)}
                   onClick={() => onOpenCreateModal('todo', day.dateString)}
                   className={`min-h-[95px] sm:min-h-[115px] p-1.5 sm:p-2 transition-colors relative cursor-pointer group ${
-                    day.isCurrentMonth ? 'bg-transparent' : 'opacity-40 bg-slate-900/40'
+                    day.isCurrentMonth ? 'bg-transparent' : 'opacity-40 bg-slate-100/60 dark:bg-slate-900/40'
                   } ${
                     isOver
                       ? 'bg-cyan-500/20 ring-2 ring-cyan-400 shadow-[0_0_20px_#00f5ff]'
@@ -538,13 +540,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       className={`font-mono text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${
                         day.isToday
                           ? 'bg-cyan-500 text-slate-950 shadow-[0_0_8px_#00f5ff]'
-                          : 'text-slate-700 dark:text-slate-300'
+                          : 'text-slate-800 dark:text-slate-300'
                       }`}
                     >
                       {day.dayNumber}
                     </span>
                     {dayTasks.length > 0 && (
-                      <span className="font-mono text-[9px] font-bold text-cyan-400/80">
+                      <span className="font-mono text-[9px] font-bold text-cyan-700 dark:text-cyan-400/80">
                         {dayTasks.length}
                       </span>
                     )}
@@ -562,10 +564,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                         }}
                         className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold truncate border shadow-xs hover:scale-[1.02] transition-all ${
                           task.status === 'completed'
-                            ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-300 line-through opacity-70'
+                            ? 'border-emerald-300 bg-emerald-50 text-emerald-800 line-through opacity-75 dark:border-emerald-500/30 dark:bg-emerald-950/40 dark:text-emerald-300'
                             : task.startTime || task.dueTime
-                            ? 'border-cyan-400/50 bg-cyan-950/80 text-cyan-200 hover:border-cyan-300'
-                            : 'border-cyan-500/30 bg-slate-900/90 text-cyan-300 hover:border-cyan-400'
+                            ? 'border-cyan-300 bg-cyan-50 text-cyan-900 hover:border-cyan-400 dark:border-cyan-400/50 dark:bg-cyan-950/80 dark:text-cyan-200 dark:hover:border-cyan-300'
+                            : 'border-slate-300 bg-slate-50 text-slate-800 hover:border-slate-400 dark:border-cyan-500/30 dark:bg-slate-900/90 dark:text-cyan-300 dark:hover:border-cyan-400'
                         }`}
                       >
                         {task.startTime ? `⏰ ${task.startTime} ` : task.dueTime ? `⏰ ${task.dueTime} ` : ''}
@@ -573,7 +575,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       </div>
                     ))}
                     {dayTasks.length > 3 && (
-                      <span className="font-mono text-[9px] text-cyan-400 font-bold px-1 block">
+                      <span className="font-mono text-[9px] text-cyan-700 dark:text-cyan-400 font-bold px-1 block">
                         +{dayTasks.length - 3} {language === 'th' ? 'งาน' : 'more'}
                       </span>
                     )}

@@ -969,7 +969,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
               )}
 
               {/* Gantt Task Bars Row List */}
-              <div className="divide-y divide-slate-800/60 dark:divide-cyan-500/10 relative z-10">
+              <div className="divide-y divide-slate-200 dark:divide-cyan-500/10 relative z-10">
                 {displayTasks.map((task) => {
                   const geom = getTaskBarGeometry(task);
                   const depStatus = getTaskDependencyStatus(task, filteredTasks);
@@ -1048,7 +1048,7 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
 
                       {/* Expanded Subtask Timeline Bars */}
                       {isExpanded && (
-                        <div className="bg-slate-900/20 dark:bg-slate-950/40 divide-y divide-slate-800/40 dark:divide-cyan-500/5 border-t border-slate-800/40 dark:border-cyan-500/5">
+                        <div className="bg-slate-100/60 dark:bg-slate-950/40 divide-y divide-slate-200 dark:divide-cyan-500/5 border-t border-slate-200 dark:border-cyan-500/5">
                           {task.subtasks.map((st) => (
                             <div key={st.id} className="h-9 relative flex items-center">
                               {/* Hologram Subtask Mini Bar */}
@@ -1060,8 +1060,8 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                                 }}
                                 className={`absolute h-6 rounded-lg cursor-pointer flex items-center justify-between px-2 transition-all select-none ${
                                   st.completed
-                                    ? 'bg-gradient-to-r from-emerald-600/80 to-teal-600/80 text-white border border-emerald-400/50 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:brightness-110'
-                                    : 'bg-slate-800/80 dark:bg-slate-900/90 text-cyan-200 border border-cyan-500/30 hover:border-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:bg-cyan-950/60'
+                                    ? 'bg-gradient-to-r from-emerald-600/90 to-teal-600/90 text-white border border-emerald-400/50 shadow-xs dark:shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:brightness-110'
+                                    : 'bg-cyan-50 text-cyan-900 border border-cyan-300 dark:bg-slate-900/90 dark:text-cyan-200 dark:border-cyan-500/30 hover:border-cyan-400 shadow-xs dark:shadow-[0_0_8px_rgba(6,182,212,0.2)]'
                                 }`}
                                 title={`Click to mark ${st.completed ? 'incomplete' : 'complete'}`}
                               >
@@ -1069,14 +1069,14 @@ export const GanttTimelineView: React.FC<GanttTimelineViewProps> = ({
                                   {st.completed ? (
                                     <CheckCircle2 className="w-3 h-3 text-emerald-200 shrink-0" />
                                   ) : (
-                                    <CornerDownRight className="w-3 h-3 text-cyan-400 shrink-0" />
+                                    <CornerDownRight className="w-3 h-3 text-cyan-600 dark:text-cyan-400 shrink-0" />
                                   )}
                                   <span className={`text-[10px] font-bold truncate ${st.completed ? 'line-through opacity-85' : ''}`}>
                                     {st.title}
                                   </span>
                                 </div>
 
-                                <span className="font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-black/40 border border-white/10 shrink-0">
+                                <span className="font-mono text-[8px] font-bold px-1 py-0.2 rounded bg-black/10 dark:bg-black/40 border border-black/10 dark:border-white/10 shrink-0">
                                   {st.completed ? 'DONE' : 'TODO'}
                                 </span>
                               </div>
