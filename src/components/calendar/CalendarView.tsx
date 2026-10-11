@@ -62,25 +62,44 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const month = currentDate.getMonth();
 
   const days: CalendarDay[] =
-    viewMode === 'month' ? getMonthDays(year, month) : getWeekDays(currentDate);
+    viewMode === 'week' ? getWeekDays(currentDate) : getMonthDays(year, month);
 
   const handlePrev = () => {
-    if (viewMode === 'month') {
-      setCurrentDate(new Date(year, month - 1, 1));
-    } else {
+    if (viewMode === 'week') {
       const prev = new Date(currentDate);
       prev.setDate(currentDate.getDate() - 7);
       setCurrentDate(prev);
+      const wDays = getWeekDays(prev);
+      if (wDays.length > 0) setSelectedAgendaDate(wDays[0].dateString);
+    } else {
+      const prev = new Date(year, month - 1, 1);
+      setCurrentDate(prev);
+      const mDays = getMonthDays(prev.getFullYear(), prev.getMonth());
+      if (mDays.length > 0) {
+        // If today is in this month, select today, else select the 1st of month
+        const todayStr = getTodayString();
+        const hasToday = mDays.some((d) => d.dateString === todayStr);
+        setSelectedAgendaDate(hasToday ? todayStr : `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-01`);
+      }
     }
   };
 
   const handleNext = () => {
-    if (viewMode === 'month') {
-      setCurrentDate(new Date(year, month + 1, 1));
-    } else {
+    if (viewMode === 'week') {
       const next = new Date(currentDate);
       next.setDate(currentDate.getDate() + 7);
       setCurrentDate(next);
+      const wDays = getWeekDays(next);
+      if (wDays.length > 0) setSelectedAgendaDate(wDays[0].dateString);
+    } else {
+      const next = new Date(year, month + 1, 1);
+      setCurrentDate(next);
+      const mDays = getMonthDays(next.getFullYear(), next.getMonth());
+      if (mDays.length > 0) {
+        const todayStr = getTodayString();
+        const hasToday = mDays.some((d) => d.dateString === todayStr);
+        setSelectedAgendaDate(hasToday ? todayStr : `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-01`);
+      }
     }
   };
 
@@ -252,7 +271,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* Horizontal Agenda Date Strip */}
           <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 p-3 shadow-sm overflow-x-auto no-scrollbar">
             <div className="flex gap-2 min-w-max">
-              {days.slice(0, 14).map((day) => {
+              {days.filter((d) => d.isCurrentMonth !== false).map((day) => {
                 const isSelected = day.dateString === selectedAgendaDate;
                 const tasksOnThisDay = filteredTasks.filter((t) => isTaskOnDate(t, day.dateString));
                 const hasDueToday = tasksOnThisDay.some((t) => t.dueDate === day.dateString);

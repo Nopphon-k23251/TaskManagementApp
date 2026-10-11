@@ -8,12 +8,15 @@ import {
   AlertTriangle,
   Zap,
   Calendar,
-  Clock
+  Clock,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Task, TaskPriority, TaskStatus, SubTask } from '../../types/task';
 import { Modal } from '../common/Modal';
 import { validateTaskForm } from '../../utils/sanitizer';
-import { getTodayString } from '../../utils/date';
+import { getTodayString, addDaysToDate } from '../../utils/date';
 import { detectCircularDependency } from '../../utils/dependencies';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -45,6 +48,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const [category, setCategory] = useState<string>(categories[0]?.name || 'General');
   const [startDate, setStartDate] = useState(getTodayString());
   const [dueDate, setDueDate] = useState(defaultDate || getTodayString());
+  const [isMultiDay, setIsMultiDay] = useState<boolean>(false);
   const [startTime, setStartTime] = useState<string>('');
   const [dueTime, setDueTime] = useState<string>('');
   const [isAllDay, setIsAllDay] = useState<boolean>(true);
@@ -57,6 +61,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [depError, setDepError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
 
   const priorities: { value: TaskPriority; label: string }[] = [
     { value: 'low', label: t('low') },
@@ -70,6 +75,26 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     (t) => (!taskToEdit || t.id !== taskToEdit.id) && !dependencies.includes(t.id)
   );
 
+  const handleDueDateChange = (newDate: string) => {
+    setDueDate(newDate);
+    if (!isMultiDay) {
+      setStartDate(newDate);
+    } else if (startDate > newDate) {
+      setStartDate(newDate);
+    }
+    if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
+    if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+  };
+
+  const handleStartDateChange = (newDate: string) => {
+    setStartDate(newDate);
+    if (dueDate < newDate) {
+      setDueDate(newDate);
+    }
+    if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+    if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
+  };
+
   useEffect(() => {
     if (taskToEdit) {
       setTitle(taskToEdit.title);
@@ -79,12 +104,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setCategory(taskToEdit.category);
       setStartDate(taskToEdit.startDate || taskToEdit.dueDate);
       setDueDate(taskToEdit.dueDate);
+      setIsMultiDay(Boolean(taskToEdit.startDate && taskToEdit.startDate !== taskToEdit.dueDate));
       setStartTime(taskToEdit.startTime || '');
       setDueTime(taskToEdit.dueTime || '');
       setIsAllDay(!taskToEdit.startTime && !taskToEdit.dueTime);
       setDependencies(taskToEdit.dependencies || []);
       setSubtasks(taskToEdit.subtasks || []);
       setTags(taskToEdit.tags || []);
+      setShowAdvanced(true);
     } else {
       setTitle('');
       setDescription('');
@@ -93,12 +120,14 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
       setCategory(categories[0]?.name || 'General');
       setStartDate(defaultDate || getTodayString());
       setDueDate(defaultDate || getTodayString());
+      setIsMultiDay(false);
       setStartTime('');
       setDueTime('');
       setIsAllDay(true);
       setDependencies([]);
       setSubtasks([]);
       setTags([]);
+      setShowAdvanced(false);
     }
     setErrors({});
     setDepError(null);
@@ -252,64 +281,164 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           )}
         </div>
 
-        {/* Description */}
+        {/* Quick Due Date Presets */}
         <div>
-          <label htmlFor="task-desc" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
-            {t('taskDescLabel')}
+          <label htmlFor="quick-due-date-input" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+            {t('dueDateLabel')} <span className="text-rose-500">*</span>
           </label>
-          <textarea
-            id="task-desc"
-            rows={2}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={t('taskDescPlaceholder')}
-            className="w-full px-4 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none"
-          />
-        </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => handleDueDateChange(getTodayString())}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
+                dueDate === getTodayString()
+                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+              }`}
+            >
+              {t('dateToday')}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDueDateChange(addDaysToDate(getTodayString(), 1))}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
+                dueDate === addDaysToDate(getTodayString(), 1)
+                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+              }`}
+            >
+              {t('dateTomorrow')}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleDueDateChange(addDaysToDate(getTodayString(), 7))}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold border transition-all ${
+                dueDate === addDaysToDate(getTodayString(), 7)
+                  ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                  : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-cyan-500/30'
+              }`}
+            >
+              {t('dateNextWeek')}
+            </button>
 
-        {/* Priority & Status */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Priority */}
-          <div>
-            <label className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
-              {t('priorityLevelLabel')}
-            </label>
-            <div className="grid grid-cols-4 gap-1.5">
-              {priorities.map((p) => (
-                <button
-                  type="button"
-                  key={p.value}
-                  onClick={() => setPriority(p.value)}
-                  className={`py-1.5 text-xs font-mono font-bold rounded-xl border transition-all ${
-                    priority === p.value
-                      ? 'border-cyan-400 ring-2 ring-cyan-400/30 bg-cyan-950/80 text-cyan-300 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
-                      : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:border-cyan-500/30'
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+            {/* Custom Date Input with Clickable Calendar Button */}
+            <div className="relative flex items-center">
+              <input
+                id="quick-due-date-input"
+                type="date"
+                value={dueDate}
+                onChange={(e) => handleDueDateChange(e.target.value)}
+                onClick={(e) => {
+                  try {
+                    (e.currentTarget as HTMLInputElement).showPicker?.();
+                  } catch {}
+                }}
+                className={`pl-3 pr-8 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-950 border font-mono outline-none cursor-pointer transition-all ${
+                  errors.dueDate
+                    ? 'border-rose-500 ring-1 ring-rose-500 text-rose-400'
+                    : dueDate !== getTodayString() &&
+                      dueDate !== addDaysToDate(getTodayString(), 1) &&
+                      dueDate !== addDaysToDate(getTodayString(), 7)
+                    ? 'border-cyan-400 ring-2 ring-cyan-400/20 bg-cyan-950/20 text-cyan-300'
+                    : 'border-slate-200 dark:border-cyan-500/30 hover:border-cyan-400 text-slate-800 dark:text-cyan-100'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('quick-due-date-input') as HTMLInputElement | null;
+                  try {
+                    el?.showPicker?.();
+                  } catch {
+                    el?.focus();
+                  }
+                }}
+                className="absolute right-2 text-cyan-600 dark:text-cyan-400 hover:scale-110 transition-transform p-0.5 cursor-pointer"
+                title="เลือกวันจากปฏิทิน"
+                aria-label="Select Date"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
+          {errors.dueDate && (
+            <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
+              <AlertCircle className="w-3.5 h-3.5" />
+              {errors.dueDate}
+            </p>
+          )}
+        </div>
 
-          {/* Status */}
-          <div>
-            <label htmlFor="task-status" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
-              {t('statusColLabel')}
-            </label>
-            <select
-              id="task-status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as TaskStatus)}
-              className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium"
-            >
-              <option value="todo">{t('toDoCol')}</option>
-              <option value="in_progress">{t('inProgressCol')}</option>
-              <option value="review">{t('reviewCol')}</option>
-              <option value="completed">{t('completedCol')}</option>
-            </select>
+        {/* Priority Quick Selector */}
+        <div>
+          <label className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+            {t('priorityLevelLabel')}
+          </label>
+          <div className="grid grid-cols-4 gap-1.5">
+            {priorities.map((p) => (
+              <button
+                type="button"
+                key={p.value}
+                onClick={() => setPriority(p.value)}
+                className={`py-1.5 text-xs font-mono font-bold rounded-xl border transition-all ${
+                  priority === p.value
+                    ? 'border-cyan-400 ring-2 ring-cyan-400/30 bg-cyan-950/80 text-cyan-300 shadow-[0_0_10px_rgba(0,245,255,0.3)]'
+                    : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:border-cyan-500/30'
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Toggle Advanced Details Accordion */}
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            <span>{showAdvanced ? t('lessDetails') : t('moreDetails')}</span>
+            {showAdvanced ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+
+        {showAdvanced && (
+          <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-cyan-500/15 animate-fade-in">
+            {/* Description */}
+            <div>
+              <label htmlFor="task-desc" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+                {t('taskDescLabel')}
+              </label>
+              <textarea
+                id="task-desc"
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t('taskDescPlaceholder')}
+                className="w-full px-4 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 outline-none transition-all resize-none"
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <label htmlFor="task-status" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5">
+                {t('statusColLabel')}
+              </label>
+              <select
+                id="task-status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-cyan-500/30 rounded-xl focus:border-cyan-400 outline-none font-medium"
+              >
+                <option value="todo">{t('toDoCol')}</option>
+                <option value="in_progress">{t('inProgressCol')}</option>
+                <option value="review">{t('reviewCol')}</option>
+                <option value="completed">{t('completedCol')}</option>
+              </select>
+            </div>
 
         {/* Dynamic Category Selection */}
         <div>
@@ -348,22 +477,37 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             <label htmlFor="task-start-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5 truncate">
               {t('startDateLabel')}
             </label>
-            <div className="relative group">
+            <div className="relative flex items-center">
               <input
                 id="task-start-date"
                 type="date"
                 value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  if (errors.startDate) setErrors((prev) => ({ ...prev, startDate: '' }));
+                onChange={(e) => handleStartDateChange(e.target.value)}
+                onClick={(e) => {
+                  try {
+                    (e.currentTarget as HTMLInputElement).showPicker?.();
+                  } catch {}
                 }}
                 className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
                   errors.startDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
                 }`}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('task-start-date') as HTMLInputElement | null;
+                  try {
+                    el?.showPicker?.();
+                  } catch {
+                    el?.focus();
+                  }
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-600 dark:text-cyan-400 hover:scale-110 transition-transform p-1 cursor-pointer"
+                title="เลือกวันเริ่มต้น"
+                aria-label="Select Start Date"
+              >
                 <Calendar className="w-4 h-4 drop-shadow-[0_0_6px_rgba(0,245,255,0.6)]" />
-              </div>
+              </button>
             </div>
             {errors.startDate && (
               <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
@@ -377,22 +521,37 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             <label htmlFor="task-due-date" className="block font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-cyan-400/90 mb-1.5 truncate">
               {t('dueDateLabel')} <span className="text-rose-500">*</span>
             </label>
-            <div className="relative group">
+            <div className="relative flex items-center">
               <input
                 id="task-due-date"
                 type="date"
                 value={dueDate}
-                onChange={(e) => {
-                  setDueDate(e.target.value);
-                  if (errors.dueDate) setErrors((prev) => ({ ...prev, dueDate: '' }));
+                onChange={(e) => handleDueDateChange(e.target.value)}
+                onClick={(e) => {
+                  try {
+                    (e.currentTarget as HTMLInputElement).showPicker?.();
+                  } catch {}
                 }}
                 className={`w-full pl-3.5 pr-10 py-2.5 text-xs bg-slate-100 dark:bg-[#0c1428] text-slate-900 dark:text-cyan-100 font-mono rounded-xl border focus:border-cyan-400 outline-none cursor-pointer transition-all shadow-inner ${
                   errors.dueDate ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400/70'
                 }`}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform">
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('task-due-date') as HTMLInputElement | null;
+                  try {
+                    el?.showPicker?.();
+                  } catch {
+                    el?.focus();
+                  }
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-600 dark:text-cyan-400 hover:scale-110 transition-transform p-1 cursor-pointer"
+                title="เลือกวันกำหนดส่ง"
+                aria-label="Select Due Date"
+              >
                 <Calendar className="w-4 h-4 drop-shadow-[0_0_6px_rgba(0,245,255,0.6)]" />
-              </div>
+              </button>
             </div>
             {errors.dueDate && (
               <p className="flex items-center gap-1 mt-1 text-xs text-rose-500 font-mono">
@@ -713,8 +872,10 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             ))}
           </div>
         </div>
+      </div>
+    )}
 
-        {/* Actions Footer */}
+    {/* Actions Footer */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-cyan-500/15">
           <button
             type="button"

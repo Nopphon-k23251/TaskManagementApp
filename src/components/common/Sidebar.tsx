@@ -1,17 +1,17 @@
 import React from 'react';
 import { 
-  LayoutDashboard, 
   Kanban, 
   Clock, 
   CalendarDays, 
-  CheckSquare, 
   Settings, 
   Flame, 
   CheckCircle2, 
   Layers,
   FolderTree,
   Activity,
-  Radio
+  Radio,
+  Target,
+  TrendingUp
 } from 'lucide-react';
 import { ActiveTab } from '../../types/task';
 import { useTasks } from '../../context/TaskContext';
@@ -37,42 +37,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { tasks } = useTasks();
   const { t } = useLanguage();
 
-  const totalCount = tasks.length;
   const completedCount = tasks.filter((t) => t.status === 'completed').length;
   const inProgressCount = tasks.filter((t) => t.status === 'in_progress').length;
   const urgentCount = tasks.filter((t) => t.priority === 'urgent' && t.status !== 'completed').length;
 
   const navItems = [
     {
-      id: 'overview' as ActiveTab,
-      label: t('overview'),
-      icon: LayoutDashboard,
-      badge: null,
+      id: 'focus' as ActiveTab,
+      label: t('tabFocus'),
+      icon: Target,
+      badge: urgentCount > 0 ? urgentCount : null,
+      isGlow: true,
     },
     {
-      id: 'board' as ActiveTab,
-      label: t('board'),
+      id: 'tasks' as ActiveTab,
+      label: t('tabTasks'),
       icon: Kanban,
       badge: inProgressCount > 0 ? inProgressCount : null,
     },
     {
-      id: 'timeline' as ActiveTab,
-      label: t('timeline'),
-      icon: Clock,
-      badge: null,
-      isGlow: true,
-    },
-    {
       id: 'calendar' as ActiveTab,
-      label: t('calendar'),
+      label: t('tabCalendar'),
       icon: CalendarDays,
       badge: null,
     },
     {
-      id: 'todo' as ActiveTab,
-      label: t('todo'),
-      icon: CheckSquare,
-      badge: totalCount - completedCount > 0 ? totalCount - completedCount : null,
+      id: 'insights' as ActiveTab,
+      label: t('tabInsights'),
+      icon: TrendingUp,
+      badge: null,
     },
   ];
 

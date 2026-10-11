@@ -1,10 +1,9 @@
 import React from 'react';
 import { 
-  LayoutDashboard, 
+  Target, 
   Kanban, 
-  Clock, 
   CalendarDays, 
-  CheckSquare, 
+  TrendingUp, 
   Plus
 } from 'lucide-react';
 import { ActiveTab } from '../../types/task';
@@ -26,37 +25,32 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   const { t } = useLanguage();
 
   const inProgressCount = tasks.filter((t) => t.status === 'in_progress').length;
-  const pendingCount = tasks.filter((t) => t.status !== 'completed').length;
+  const urgentCount = tasks.filter((t) => t.priority === 'urgent' && t.status !== 'completed').length;
 
   const navItems = [
     {
-      id: 'overview' as ActiveTab,
-      label: t('overview').replace('งาน', ''),
-      icon: LayoutDashboard,
+      id: 'focus' as ActiveTab,
+      label: t('tabFocus'),
+      icon: Target,
+      badge: urgentCount > 0 ? urgentCount : undefined,
+      badgeColor: 'bg-rose-500 text-white',
     },
     {
-      id: 'board' as ActiveTab,
-      label: t('board').replace('งาน', ''),
+      id: 'tasks' as ActiveTab,
+      label: t('tabTasks'),
       icon: Kanban,
       badge: inProgressCount > 0 ? inProgressCount : undefined,
       badgeColor: 'bg-amber-500 text-slate-950',
     },
     {
-      id: 'timeline' as ActiveTab,
-      label: t('timeline'),
-      icon: Clock,
-    },
-    {
       id: 'calendar' as ActiveTab,
-      label: t('calendar').replace('งาน', ''),
+      label: t('tabCalendar'),
       icon: CalendarDays,
     },
     {
-      id: 'todo' as ActiveTab,
-      label: t('todo').replace('สิ่งที่ต้องทำ', 'สิ่งที่ทำ'),
-      icon: CheckSquare,
-      badge: pendingCount > 0 ? pendingCount : undefined,
-      badgeColor: 'bg-cyan-400 text-slate-950 shadow-[0_0_8px_#00f5ff]',
+      id: 'insights' as ActiveTab,
+      label: t('tabInsights'),
+      icon: TrendingUp,
     },
   ];
 

@@ -8,10 +8,13 @@ import {
   Filter, 
   RotateCcw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Columns3,
+  LayoutGrid
 } from 'lucide-react';
 import { Task, TaskStatus, TaskPriority } from '../../types/task';
 import { TaskCard } from './TaskCard';
+import { EisenhowerMatrixView } from '../matrix/EisenhowerMatrixView';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -26,6 +29,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 }) => {
   const { filteredTasks, updateTaskStatus, filters, setFilters, resetFilters, categories } = useTasks();
   const { t } = useLanguage();
+  const [viewMode, setViewMode] = useState<'kanban' | 'matrix'>('kanban');
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
   const [mobileSelectedColumn, setMobileSelectedColumn] = useState<TaskStatus | 'all'>('all');
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
@@ -107,8 +111,51 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-16 sm:pb-0 font-sans">
-      {/* Top Sci-Fi Filter Console with Mobile Toggle */}
-      <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] p-3.5 sm:p-4">
+      {/* View Switcher: Kanban (4 Columns) vs Eisenhower Matrix (4 Quadrants) */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="inline-flex items-center bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-cyan-500/30 text-xs font-mono font-bold">
+          <button
+            onClick={() => setViewMode('kanban')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all ${
+              viewMode === 'kanban'
+                ? 'bg-gradient-to-r from-cyan-500 to-brand-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            <Columns3 className="w-4 h-4" />
+            <span>{t('viewKanban')}</span>
+          </button>
+          <button
+            onClick={() => setViewMode('matrix')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all ${
+              viewMode === 'matrix'
+                ? 'bg-gradient-to-r from-cyan-500 to-brand-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-cyan-400'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span>{t('viewMatrix')}</span>
+          </button>
+        </div>
+
+        <button
+          onClick={() => onOpenCreateModal('todo')}
+          className="px-4 py-2 text-xs font-bold font-mono text-white bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 rounded-xl shadow-xs transition-all flex items-center gap-1.5 ml-auto"
+        >
+          <Plus className="w-4 h-4 stroke-[3]" />
+          <span>{t('createTaskBtn')}</span>
+        </button>
+      </div>
+
+      {viewMode === 'matrix' ? (
+        <EisenhowerMatrixView
+          onOpenCreateModal={onOpenCreateModal}
+          onEditTask={onEditTask}
+        />
+      ) : (
+        <>
+          {/* Top Sci-Fi Filter Console with Mobile Toggle */}
+          <div className="bg-white/90 dark:bg-[#090e1e]/90 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-cyan-500/20 shadow-lg dark:shadow-[0_0_20px_rgba(6,182,212,0.06)] p-3.5 sm:p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-cyan-300">
             <Filter className="w-4 h-4 text-cyan-400" />
@@ -303,7 +350,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </div>
             );
           })}
-      </div>
-    </div>
-  );
+        </div>
+      </>
+    )}
+  </div>
+);
 };

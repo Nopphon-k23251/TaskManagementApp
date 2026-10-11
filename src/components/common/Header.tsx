@@ -13,18 +13,22 @@ import {
   CloudOff, 
   X,
   Languages,
-  FolderTree
+  FolderTree,
+  Clock
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTimer, TIMER_DURATIONS } from '../../context/TimerContext';
+import { ActiveTab } from '../../types/task';
 
 interface HeaderProps {
   onOpenTaskModal: () => void;
   onOpenSettingsModal: () => void;
   onOpenCategoryModal: () => void;
   onToggleMobileSidebar: () => void;
+  onNavigateTab?: (tab: ActiveTab) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,11 +36,13 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSettingsModal,
   onOpenCategoryModal,
   onToggleMobileSidebar,
+  onNavigateTab,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, loginWithGoogle, logout, isFirebaseActive } = useAuth();
   const { filters, setFilters } = useTasks();
   const { language, toggleLanguage, t } = useLanguage();
+  const { timerMode, timeLeft, isRunning, formatTimerDisplay } = useTimer();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -137,6 +143,28 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Search className="w-4 h-4" />
             </button>
+
+            {/* Live Mini-Timer Pill */}
+            {(isRunning || timeLeft < TIMER_DURATIONS[timerMode]) && (
+              <button
+                onClick={() => onNavigateTab?.('focus')}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-mono font-bold transition-all shadow-xs shrink-0 cursor-pointer ${
+                  isRunning
+                    ? timerMode === 'focus'
+                      ? 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/25 animate-pulse'
+                      : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/25 animate-pulse'
+                    : 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:text-cyan-400'
+                }`}
+                title={isRunning ? (language === 'th' ? 'กำลังจับเวลา - กดเพื่อไปยังหน้าโฟกัส' : 'Timer running - click to view Focus mode') : (language === 'th' ? 'หยุดเวลาชั่วคราว - กดเพื่อไปยังหน้าโฟกัส' : 'Timer paused - click to view Focus mode')}
+                aria-label="Focus Timer Shortcut"
+              >
+                <Clock className={`w-3.5 h-3.5 ${isRunning ? (timerMode === 'focus' ? 'text-cyan-500' : 'text-emerald-500') : 'text-slate-400'}`} />
+                <span>{formatTimerDisplay(timeLeft)}</span>
+                <span className="hidden xl:inline text-[10px] uppercase font-normal opacity-75">
+                  {timerMode === 'focus' ? 'Focus' : 'Break'}
+                </span>
+              </button>
+            )}
 
             {/* Language Switcher (TH / EN) */}
             <button

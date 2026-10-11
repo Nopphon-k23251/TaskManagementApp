@@ -2,6 +2,8 @@ export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'completed';
 
+export type TimerMode = 'focus' | 'short_break' | 'long_break';
+
 export type Language = 'th' | 'en';
 
 export interface CategoryItem {
@@ -59,7 +61,34 @@ export interface AppUser {
   isDemo?: boolean;
 }
 
-export type ActiveTab = 'overview' | 'board' | 'timeline' | 'calendar' | 'todo';
+export type ActiveTab = 
+  | 'focus' 
+  | 'tasks' 
+  | 'calendar' 
+  | 'insights'
+  | 'overview' 
+  | 'board' 
+  | 'timeline' 
+  | 'todo';
+
+export interface Habit {
+  id: string;
+  title: string;
+  icon?: string;
+  category?: string;
+  completedDates: string[]; // ISO date string YYYY-MM-DD
+  streak: number;
+  bestStreak?: number;
+  createdAt: string;
+}
+
+export interface FocusSession {
+  id: string;
+  taskId?: string;
+  taskTitle?: string;
+  durationMinutes: number;
+  completedAt: string;
+}
 
 export interface TaskFilterOptions {
   searchQuery: string;
@@ -68,3 +97,4 @@ export interface TaskFilterOptions {
   category?: string | 'all';
   dueDateRange?: 'all' | 'today' | 'this_week' | 'overdue';
 }
+

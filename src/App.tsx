@@ -3,11 +3,14 @@ import { ActiveTab, Task, TaskStatus } from './types/task';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { TaskProvider } from './context/TaskContext';
+import { TimerProvider } from './context/TimerContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Header } from './components/common/Header';
 import { Sidebar } from './components/common/Sidebar';
 import { BottomNav } from './components/common/BottomNav';
-import { OverviewDashboard } from './components/dashboard/OverviewDashboard';
+import { TodayFocusView } from './components/focus/TodayFocusView';
+import { TimeUpModal } from './components/focus/TimeUpModal';
+import { ProductivityInsightsView } from './components/insights/ProductivityInsightsView';
 import { KanbanBoard } from './components/board/KanbanBoard';
 import { GanttTimelineView } from './components/timeline/GanttTimelineView';
 import { CalendarView } from './components/calendar/CalendarView';
@@ -19,7 +22,7 @@ import { CategoryManagerModal } from './components/common/CategoryManagerModal';
 import { AuthErrorModal } from './components/common/AuthErrorModal';
 
 const AppContent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('focus');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -66,26 +69,20 @@ const AppContent: React.FC = () => {
           onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
           onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          onNavigateTab={(tab) => setActiveTab(tab)}
         />
 
         <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-28 lg:pb-8">
-          {activeTab === 'overview' && (
-            <OverviewDashboard
+          {(activeTab === 'focus' || activeTab === 'overview') && (
+            <TodayFocusView
               onNavigateTab={(tab) => setActiveTab(tab)}
               onEditTask={handleViewTask}
-              onOpenCreateModal={() => handleOpenCreateModal()}
-            />
-          )}
-
-          {activeTab === 'board' && (
-            <KanbanBoard
               onOpenCreateModal={handleOpenCreateModal}
-              onEditTask={handleViewTask}
             />
           )}
 
-          {activeTab === 'timeline' && (
-            <GanttTimelineView
+          {(activeTab === 'tasks' || activeTab === 'board') && (
+            <KanbanBoard
               onOpenCreateModal={handleOpenCreateModal}
               onEditTask={handleViewTask}
             />
@@ -93,6 +90,17 @@ const AppContent: React.FC = () => {
 
           {activeTab === 'calendar' && (
             <CalendarView
+              onOpenCreateModal={handleOpenCreateModal}
+              onEditTask={handleViewTask}
+            />
+          )}
+
+          {activeTab === 'insights' && (
+            <ProductivityInsightsView />
+          )}
+
+          {activeTab === 'timeline' && (
+            <GanttTimelineView
               onOpenCreateModal={handleOpenCreateModal}
               onEditTask={handleViewTask}
             />
@@ -125,6 +133,7 @@ const AppContent: React.FC = () => {
         onClose={() => {
           setIsTaskModalOpen(false);
           setTaskToEdit(null);
+          setDefaultTaskDate(undefined);
         }}
         taskToEdit={taskToEdit}
         defaultStatus={defaultTaskStatus}
@@ -146,6 +155,9 @@ const AppContent: React.FC = () => {
 
       {/* Google Auth Diagnostic & Error Modal */}
       <AuthErrorModal />
+
+      {/* Global Focus Time Up Alert Modal */}
+      <TimeUpModal onNavigateToFocus={() => setActiveTab('focus')} />
     </div>
   );
 };
@@ -156,7 +168,9 @@ export function App() {
       <LanguageProvider>
         <AuthProvider>
           <TaskProvider>
-            <AppContent />
+            <TimerProvider>
+              <AppContent />
+            </TimerProvider>
           </TaskProvider>
         </AuthProvider>
       </LanguageProvider>

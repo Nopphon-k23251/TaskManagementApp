@@ -4,7 +4,9 @@ import {
   TaskStatus, 
   CategoryItem, 
   ActivityLog, 
-  TaskFilterOptions 
+  TaskFilterOptions,
+  Habit,
+  FocusSession
 } from '../types/task';
 import { useAuth } from './AuthContext';
 import { 
@@ -15,6 +17,7 @@ import {
   syncCategoriesToFirestore 
 } from '../services/firebase';
 import { getTodayString, addDaysToDate, isOverdue, isToday, isThisWeek } from '../utils/date';
+import { toggleHabitDate } from '../utils/habits';
 import { sanitizeInput, validateJsonImportPayload } from '../utils/sanitizer';
 import { appRateLimiter } from '../utils/security';
 
@@ -41,6 +44,10 @@ interface TaskContextType {
   filteredTasks: Task[];
   categories: CategoryItem[];
   activityLogs: ActivityLog[];
+  habits: Habit[];
+  focusSessions: FocusSession[];
+  activeFocusTask: Task | null;
+  todayFocusMinutes: number;
   filters: TaskFilterOptions;
   isRealtimeSyncing: boolean;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilterOptions>>;
@@ -61,6 +68,12 @@ interface TaskContextType {
   reorderTasks: (newTasks: Task[]) => void;
   exportTasksJson: () => string;
   importTasksJson: (jsonStr: string) => boolean;
+  setActiveFocusTask: (task: Task | null) => void;
+  toggleHabit: (id: string, dateStr?: string) => Promise<void>;
+  addHabit: (title: string, category?: string, icon?: string) => Promise<string>;
+  deleteHabit: (id: string) => Promise<void>;
+  logFocusSession: (session: { taskId?: string; taskTitle?: string; durationMinutes: number }) => Promise<void>;
+  rolloverUnfinishedTasks: () => Promise<number>;
 }
 
 const DEFAULT_FILTERS: TaskFilterOptions = {
@@ -152,6 +165,39 @@ const INITIAL_SAMPLE_TASKS: Task[] = [
   }
 ];
 
+export const INITIAL_SAMPLE_HABITS: Habit[] = [
+  {
+    id: 'habit-1',
+    title: 'อ่านหนังสือ / อัปเดตความรู้ 20 นาที',
+    icon: 'BookOpen',
+    category: 'งานวิจัย',
+    completedDates: [addDaysToDate(getTodayString(), -2), addDaysToDate(getTodayString(), -1), getTodayString()],
+    streak: 3,
+    bestStreak: 7,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'habit-2',
+    title: 'ออกกำลังกาย / ยืดเส้นสาย 15 นาที',
+    icon: 'Activity',
+    category: 'ทั่วไป',
+    completedDates: [addDaysToDate(getTodayString(), -1), getTodayString()],
+    streak: 2,
+    bestStreak: 5,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'habit-3',
+    title: 'ดื่มน้ำสะอาดให้ครบ 2 ลิตร',
+    icon: 'Droplets',
+    category: 'ทั่วไป',
+    completedDates: [addDaysToDate(getTodayString(), -1)],
+    streak: 1,
+    bestStreak: 12,
+    createdAt: new Date().toISOString(),
+  },
+];
+
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -169,6 +215,37 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return INITIAL_SAMPLE_TASKS;
   });
+
+  const [habits, setHabits] = useState<Habit[]>(() => {
+    const cached = localStorage.getItem('tm_habits');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return INITIAL_SAMPLE_HABITS;
+  });
+
+  const [focusSessions, setFocusSessions] = useState<FocusSession[]>(() => {
+    const cached = localStorage.getItem('tm_focus_sessions');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  const [activeFocusTask, setActiveFocusTask] = useState<Task | null>(null);
+
+  const todayFocusMinutes = useMemo(() => {
+    const today = getTodayString();
+    return focusSessions
+      .filter((s) => s.completedAt.startsWith(today))
+      .reduce((sum, s) => sum + s.durationMinutes, 0);
+  }, [focusSessions]);
 
   const [categories, setCategories] = useState<CategoryItem[]>(() => {
     const cached = localStorage.getItem('tm_categories');
@@ -214,6 +291,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (event.data?.type === 'CATEGORIES_UPDATED' && Array.isArray(event.data.categories)) {
           setCategories(event.data.categories);
         }
+        if (event.data?.type === 'HABITS_UPDATED' && Array.isArray(event.data.habits)) {
+          setHabits(event.data.habits);
+        }
       };
       return () => {
         bc.close();
@@ -245,6 +325,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     localStorage.setItem('tm_activity_logs', JSON.stringify(activityLogs));
   }, [activityLogs]);
+
+  useEffect(() => {
+    localStorage.setItem('tm_habits', JSON.stringify(habits));
+  }, [habits]);
+
+  useEffect(() => {
+    localStorage.setItem('tm_focus_sessions', JSON.stringify(focusSessions));
+  }, [focusSessions]);
 
   // Realtime Cloud Synchronization with Firestore (Cross-Device: Desktop <-> Mobile)
   useEffect(() => {
@@ -347,6 +435,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     setTasks(nextTasks);
+    if (activeFocusTask?.id === id && updatedTargetTask) {
+      setActiveFocusTask(updatedTargetTask);
+    }
     broadcastLocalUpdate(nextTasks);
 
     // Sync to Firestore
@@ -362,6 +453,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const nextTasks = tasks.filter((t) => t.id !== id);
     setTasks(nextTasks);
+    if (activeFocusTask?.id === id) {
+      setActiveFocusTask(null);
+    }
     broadcastLocalUpdate(nextTasks);
 
     // Sync to Firestore
@@ -390,6 +484,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     setTasks(nextTasks);
+    if (activeFocusTask?.id === id && updatedTargetTask) {
+      setActiveFocusTask(updatedTargetTask);
+    }
     broadcastLocalUpdate(nextTasks);
 
     // Sync to Firestore
@@ -531,6 +628,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
     setTasks(seeded);
     setCategories(DEFAULT_CATEGORIES);
+    setHabits(INITIAL_SAMPLE_HABITS);
     setActivityLogs([]);
     broadcastLocalUpdate(seeded, DEFAULT_CATEGORIES);
 
@@ -547,6 +645,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
     setTasks([]);
+    setActiveFocusTask(null);
     setActivityLogs([]);
     broadcastLocalUpdate([]);
   };
@@ -560,6 +659,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const remaining = tasks.filter((t) => t.status !== 'completed');
     setTasks(remaining);
+    if (activeFocusTask && activeFocusTask.status === 'completed') {
+      setActiveFocusTask(null);
+    }
     broadcastLocalUpdate(remaining, categories);
     addActivity('all', 'Completed Tasks', 'deleted', `ล้างงานที่เสร็จสิ้นแล้วทั้งหมด (${completedTasks.length} งาน)`);
   };
@@ -578,6 +680,90 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         syncSaveTaskToFirestore({ ...task, userId: user.uid }).catch(() => {});
       });
     }
+  };
+
+  const toggleHabit = async (id: string, dateStr: string = getTodayString()) => {
+    const updated = habits.map((h) => {
+      if (h.id === id) {
+        return toggleHabitDate(h, dateStr);
+      }
+      return h;
+    });
+    setHabits(updated);
+    localStorage.setItem('tm_habits', JSON.stringify(updated));
+    if (broadcastChannelRef.current) {
+      broadcastChannelRef.current.postMessage({ type: 'HABITS_UPDATED', habits: updated });
+    }
+  };
+
+  const addHabit = async (title: string, category: string = 'ทั่วไป', icon?: string): Promise<string> => {
+    const newHabit: Habit = {
+      id: 'habit-' + Date.now(),
+      title: title.trim(),
+      category,
+      icon,
+      completedDates: [],
+      streak: 0,
+      bestStreak: 0,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [newHabit, ...habits];
+    setHabits(updated);
+    localStorage.setItem('tm_habits', JSON.stringify(updated));
+    if (broadcastChannelRef.current) {
+      broadcastChannelRef.current.postMessage({ type: 'HABITS_UPDATED', habits: updated });
+    }
+    return newHabit.id;
+  };
+
+  const deleteHabit = async (id: string) => {
+    const updated = habits.filter((h) => h.id !== id);
+    setHabits(updated);
+    localStorage.setItem('tm_habits', JSON.stringify(updated));
+    if (broadcastChannelRef.current) {
+      broadcastChannelRef.current.postMessage({ type: 'HABITS_UPDATED', habits: updated });
+    }
+  };
+
+  const logFocusSession = async (session: { taskId?: string; taskTitle?: string; durationMinutes: number }) => {
+    const newSession: FocusSession = {
+      id: 'session-' + Date.now(),
+      taskId: session.taskId,
+      taskTitle: session.taskTitle,
+      durationMinutes: session.durationMinutes,
+      completedAt: new Date().toISOString(),
+    };
+    const updated = [newSession, ...focusSessions];
+    setFocusSessions(updated);
+    localStorage.setItem('tm_focus_sessions', JSON.stringify(updated));
+  };
+
+  const rolloverUnfinishedTasks = async (): Promise<number> => {
+    const today = getTodayString();
+    let count = 0;
+    const updatedTasks = tasks.map((t) => {
+      if (t.status !== 'completed' && t.dueDate < today) {
+        count++;
+        return {
+          ...t,
+          dueDate: today,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return t;
+    });
+
+    if (count > 0) {
+      setTasks(updatedTasks);
+      broadcastLocalUpdate(updatedTasks);
+      addActivity(
+        'task-rollover',
+        `ยกยอดงานค้าง ${count} งานมาทำวันนี้`,
+        'rescheduled',
+        `ย้ายกำหนดส่งของงานที่เลยกำหนด ${count} รายการมาเป็นวันนี้`
+      );
+    }
+    return count;
   };
 
   const exportTasksJson = (): string => {
@@ -685,6 +871,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         filteredTasks,
         categories,
         activityLogs,
+        habits,
+        focusSessions,
+        activeFocusTask,
+        todayFocusMinutes,
         filters,
         isRealtimeSyncing,
         setFilters,
@@ -705,6 +895,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         reorderTasks,
         exportTasksJson,
         importTasksJson,
+        setActiveFocusTask,
+        toggleHabit,
+        addHabit,
+        deleteHabit,
+        logFocusSession,
+        rolloverUnfinishedTasks,
       }}
     >
       {children}
