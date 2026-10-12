@@ -12,7 +12,7 @@ import {
   Terminal
 } from 'lucide-react';
 import { Task, TaskPriority } from '../../types/task';
-import { formatDate, getTodayString, isOverdue } from '../../utils/date';
+import { formatDate, getTodayString, isOverdue, isTaskForToday } from '../../utils/date';
 import { getCategoryBadgeStyle } from '../../utils/category';
 import { ConfirmModal } from '../common/ConfirmModal';
 import { useTasks } from '../../context/TaskContext';
@@ -63,7 +63,7 @@ export const TodoList: React.FC<TodoListProps> = ({ onEditTask }) => {
   const displayedTasks = filteredTasks.filter((task) => {
     if (todoTab === 'active') return task.status !== 'completed';
     if (todoTab === 'completed') return task.status === 'completed';
-    if (todoTab === 'today') return task.dueDate === getTodayString();
+    if (todoTab === 'today') return isTaskForToday(task, getTodayString());
     return true;
   });
 

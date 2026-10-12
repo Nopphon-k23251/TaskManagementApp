@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Play, 
   Pause, 
@@ -15,13 +15,14 @@ import {
   Sparkles,
   RefreshCw,
   Award,
-  Volume2
+  Volume2,
+  X
 } from 'lucide-react';
 import { Task } from '../../types/task';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTimer, TIMER_DURATIONS } from '../../context/TimerContext';
-import { getTodayString, formatDateLocale, isOverdue } from '../../utils/date';
+import { getTodayString, formatDateLocale, isOverdue, isTaskForToday } from '../../utils/date';
 import { getCategoryBadgeStyle } from '../../utils/category';
 import { isHabitCompletedOn } from '../../utils/habits';
 import { 
@@ -56,7 +57,6 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
   } = useTasks();
 
   const { language, t } = useLanguage();
-  const today = getTodayString();
 
   // Global Pomodoro Timer from TimerContext
   const {
@@ -77,11 +77,65 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
   const [isRolloverLoading, setIsRolloverLoading] = useState<boolean>(false);
   const [rolloverNotice, setRolloverNotice] = useState<string | null>(null);
 
-  // Today's scheduled tasks
-  const todayTasks = tasks.filter((t) => t.dueDate === today);
-  const todayIncomplete = todayTasks.filter((t) => t.status !== 'completed');
-  const todayCompleted = todayTasks.filter((t) => t.status === 'completed');
-  const overdueTasks = tasks.filter((t) => isOverdue(t.dueDate) && t.status !== 'completed');
+  const [today, setToday] = useState<string>(getTodayString());
+
+  useEffect(() => {
+    const updateToday = () => {
+      const current = getTodayString();
+      setToday((prev) => (prev !== current ? current : prev));
+    };
+
+    const interval = setInterval(updateToday, 60000);
+    window.addEventListener('focus', updateToday);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', updateToday);
+    };
+  }, []);
+
+  // Today's scheduled/active tasks (scheduled for today, active multi-day, or overdue incomplete)
+  const todayTasks = useMemo(() => {
+    return tasks.filter((t) => isTaskForToday(t, today));
+  }, [tasks, today]);
+
+  const todayIncomplete = useMemo(() => {
+    return todayTasks.filter((t) => t.status !== 'completed');
+  }, [todayTasks]);
+
+  const todayCompleted = useMemo(() => {
+    return todayTasks.filter((t) => t.status === 'completed');
+  }, [todayTasks]);
+
+  const overdueTasks = useMemo(() => {
+    return tasks.filter((t) => isOverdue(t.dueDate) && t.status !== 'completed');
+  }, [tasks, today]);
+
+  // All incomplete tasks across the app for Pomodoro dropdown options
+  const allIncompleteTasks = useMemo(() => {
+    return tasks.filter((t) => t.status !== 'completed');
+  }, [tasks]);
+
+  const sortedTodayTasks = useMemo(() => {
+    return [...todayTasks].sort((a, b) => {
+      if (a.status === 'completed' && b.status !== 'completed') return 1;
+      if (a.status !== 'completed' && b.status === 'completed') return -1;
+
+      const aOverdue = isOverdue(a.dueDate) ? 1 : 0;
+      const bOverdue = isOverdue(b.dueDate) ? 1 : 0;
+      if (aOverdue !== bOverdue) return bOverdue - aOverdue;
+
+      const priorityWeights: Record<string, number> = { urgent: 4, high: 3, medium: 2, low: 1 };
+      const aWeight = priorityWeights[a.priority] || 0;
+      const bWeight = priorityWeights[b.priority] || 0;
+      if (aWeight !== bWeight) return bWeight - aWeight;
+
+      if (a.startTime && b.startTime) return a.startTime.localeCompare(b.startTime);
+      if (a.startTime) return -1;
+      if (b.startTime) return 1;
+
+      return (a.order ?? 999) - (b.order ?? 999);
+    });
+  }, [todayTasks]);
 
   const handleCompleteActiveTask = async () => {
     if (!activeFocusTask) return;
@@ -267,7 +321,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
             </p>
             {activeFocusTask ? (
               <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
                     {activeFocusTask.title}
                   </p>
@@ -275,35 +329,64 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                     {activeFocusTask.category}
                   </span>
                 </div>
-                <button
-                  onClick={handleCompleteActiveTask}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold font-mono flex items-center gap-1 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>{t('markTaskComplete')}</span>
-                </button>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setActiveFocusTask(null)}
+                    className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-[#ede7d8] dark:hover:bg-slate-800 transition-all text-xs"
+                    title={language === 'th' ? 'เปลี่ยนงาน / ยกเลิก' : 'Deselect task'}
+                    aria-label="Deselect task"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleCompleteActiveTask}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold font-mono flex items-center gap-1 shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>{t('markTaskComplete')}</span>
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className="flex items-center justify-between gap-2 text-xs text-slate-700 dark:text-slate-400">
-                <span>{t('selectTaskToFocus')}</span>
-                {todayIncomplete.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-700 dark:text-slate-400">
+                <span className="shrink-0">{t('selectTaskToFocus')}</span>
+                {allIncompleteTasks.length > 0 ? (
                   <select
                     onChange={(e) => {
-                      const found = todayIncomplete.find((t) => t.id === e.target.value);
+                      const found = tasks.find((t) => t.id === e.target.value);
                       if (found) setActiveFocusTask(found);
                     }}
-                    defaultValue=""
-                    className="bg-[#fdfcf9] dark:bg-slate-900 border border-[#ded5c2] dark:border-cyan-500/30 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-cyan-100 font-mono outline-none"
+                    value=""
+                    className="bg-[#fdfcf9] dark:bg-slate-900 border border-[#ded5c2] dark:border-cyan-500/30 rounded-lg px-2 py-1 text-xs text-slate-900 dark:text-cyan-100 font-mono outline-none max-w-full sm:max-w-xs truncate"
                   >
                     <option value="" disabled>
                       {t('selectTaskToFocus')}
                     </option>
-                    {todayIncomplete.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.title}
-                      </option>
-                    ))}
+                    {todayIncomplete.length > 0 && (
+                      <optgroup label={language === 'th' ? '📌 งานสำหรับวันนี้ / งานค้าง' : '📌 Today & Overdue'}>
+                        {todayIncomplete.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {allIncompleteTasks.filter((t) => !todayIncomplete.some((ti) => ti.id === t.id)).length > 0 && (
+                      <optgroup label={language === 'th' ? '📋 งานอื่นๆ ทั้งหมด' : '📋 Other Active Tasks'}>
+                        {allIncompleteTasks
+                          .filter((t) => !todayIncomplete.some((ti) => ti.id === t.id))
+                          .map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.title}
+                            </option>
+                          ))}
+                      </optgroup>
+                    )}
                   </select>
+                ) : (
+                  <span className="text-[11px] font-mono text-slate-400">
+                    ({language === 'th' ? 'ไม่มีงานค้าง' : 'No pending tasks'})
+                  </span>
                 )}
               </div>
             )}
@@ -437,9 +520,15 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                   </button>
                 </div>
               ) : (
-                todayTasks.map((task) => {
+                sortedTodayTasks.map((task) => {
                   const isCompleted = task.status === 'completed';
                   const isSelected = activeFocusTask?.id === task.id;
+                  const isTaskOverdue = isOverdue(task.dueDate) && !isCompleted;
+                  const isMultiDay = Boolean(
+                    task.startDate &&
+                    task.dueDate &&
+                    task.startDate.split('T')[0] !== task.dueDate.split('T')[0]
+                  );
                   const badge = getCategoryBadgeStyle(task.category, categories);
 
                   return (
@@ -450,6 +539,8 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                           ? 'border-cyan-500 bg-cyan-500/10 dark:bg-cyan-950/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
                           : isCompleted
                           ? 'border-[#ded5c2] dark:border-slate-900 bg-[#ede7d8]/40 dark:bg-slate-950/40 opacity-60'
+                          : isTaskOverdue
+                          ? 'border-rose-300 dark:border-rose-900/40 bg-rose-50/50 hover:bg-rose-50 dark:bg-rose-950/20 hover:border-rose-400 shadow-xs'
                           : 'border-[#e8e2d4] dark:border-cyan-500/15 bg-[#f7f4ea] hover:bg-[#fffdf9] dark:bg-slate-950/80 hover:border-cyan-500/40 shadow-xs'
                       }`}
                     >
@@ -490,6 +581,24 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                             >
                               {t(task.priority)}
                             </span>
+                            {isTaskOverdue && (
+                              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-transparent flex items-center gap-0.5">
+                                <span>⚠️</span>
+                                <span>{language === 'th' ? 'เลยกำหนด' : 'Overdue'}</span>
+                              </span>
+                            )}
+                            {isMultiDay && (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded border bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800 flex items-center gap-0.5">
+                                <Calendar className="w-2.5 h-2.5" />
+                                <span>{language === 'th' ? 'ไทม์ไลน์' : 'Span'}</span>
+                              </span>
+                            )}
+                            {task.startTime && (
+                              <span className="text-[9px] font-mono text-slate-500 dark:text-slate-400 flex items-center gap-0.5">
+                                <Clock className="w-2.5 h-2.5" />
+                                <span>{task.startTime}{task.dueTime ? `-${task.dueTime}` : ''}</span>
+                              </span>
+                            )}
                           </div>
 
                           <p
@@ -517,7 +626,7 @@ export const TodayFocusView: React.FC<TodayFocusViewProps> = ({
                             }`}
                           >
                             <Target className="w-3 h-3" />
-                            <span>{isSelected ? 'โฟกัสอยู่' : t('focusThisTask')}</span>
+                            <span>{isSelected ? (language === 'th' ? 'โฟกัสอยู่' : 'Focusing') : t('focusThisTask')}</span>
                           </button>
                         )}
                       </div>

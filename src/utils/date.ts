@@ -40,11 +40,58 @@ export function getTodayString(): string {
 export function isOverdue(dueDateStr: string): boolean {
   if (!dueDateStr) return false;
   const today = getTodayString();
-  return dueDateStr < today;
+  const cleanDue = dueDateStr.split('T')[0].trim();
+  return cleanDue < today;
 }
 
 export function isToday(dateStr: string): boolean {
-  return dateStr === getTodayString();
+  if (!dateStr) return false;
+  return dateStr.split('T')[0].trim() === getTodayString();
+}
+
+/**
+ * Checks if a task is active, occurring, scheduled, or due on a given date.
+ * Handles single-day and multi-day spans safely.
+ */
+export function isTaskOnDate(
+  task: { startDate?: string; dueDate?: string },
+  dateStr: string = getTodayString()
+): boolean {
+  if (!task.dueDate && !task.startDate) return false;
+  const target = (dateStr || getTodayString()).split('T')[0].trim();
+  const start = (task.startDate || task.dueDate || '').split('T')[0].trim();
+  const due = (task.dueDate || task.startDate || '').split('T')[0].trim();
+
+  if (!start && !due) return false;
+  const minDate = start && due ? (start <= due ? start : due) : (start || due);
+  const maxDate = start && due ? (start <= due ? due : start) : (due || start);
+
+  return minDate <= target && target <= maxDate;
+}
+
+/**
+ * Checks if a task is relevant for today's work/focus.
+ * This includes:
+ * 1. Tasks scheduled/active on today (single-day or multi-day range)
+ * 2. Unfinished overdue tasks from past days that need attention today
+ * 3. Tasks currently marked 'in_progress' whose scheduled start is today or earlier
+ */
+export function isTaskForToday(
+  task: { startDate?: string; dueDate?: string; status?: string },
+  todayStr: string = getTodayString()
+): boolean {
+  const currentToday = todayStr || getTodayString();
+
+  // 1. Is scheduled / occurring on today (multi-day or single-day)
+  if (isTaskOnDate(task, currentToday)) return true;
+
+  // 2. Overdue unfinished tasks must be visible & workable today
+  if (task.status !== 'completed' && task.dueDate && isOverdue(task.dueDate)) return true;
+
+  // 3. Any task currently in progress is active and workable today
+  if (task.status === 'in_progress') return true;
+
+  return false;
 }
 
 export function isThisWeek(dateStr: string): boolean {

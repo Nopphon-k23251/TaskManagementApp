@@ -16,7 +16,14 @@ import {
   syncDeleteTaskFromFirestore,
   syncCategoriesToFirestore 
 } from '../services/firebase';
-import { getTodayString, addDaysToDate, isOverdue, isToday, isThisWeek } from '../utils/date';
+import { 
+  getTodayString, 
+  addDaysToDate, 
+  isOverdue, 
+  isToday, 
+  isThisWeek,
+  isTaskOnDate 
+} from '../utils/date';
 import { toggleHabitDate } from '../utils/habits';
 import { sanitizeInput, validateJsonImportPayload } from '../utils/sanitizer';
 import { appRateLimiter } from '../utils/security';
@@ -516,6 +523,39 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateTaskDate = async (id: string, newDueDate: string) => {
+    let updatedTargetTask: Task | null = null;
+    const nextTasks = tasks.map((task) => {
+      if (task.id === id) {
+        addActivity(id, task.title, 'rescheduled', `เลื่อนกำหนดส่งเป็น: ${newDueDate}`);
+        const isSingleDay = !task.startDate || task.startDate === task.dueDate;
+        let newStartDate = task.startDate;
+        if (isSingleDay) {
+          newStartDate = newDueDate;
+        } else if (task.startDate && task.startDate > newDueDate) {
+          newStartDate = newDueDate;
+        }
+        const updated = {
+          ...task,
+          startDate: newStartDate,
+          dueDate: newDueDate,
+          updatedAt: new Date().toISOString(),
+        };
+        updatedTargetTask = updated;
+        return updated;
+      }
+      return task;
+    });
+
+    setTasks(nextTasks);
+    broadcastLocalUpdate(nextTasks);
+
+    // Sync to Firestore
+    if (isFirebaseActive && user && !user.isDemo && updatedTargetTask) {
+      await syncSaveTaskToFirestore({ ...(updatedTargetTask as Task), userId: user.uid });
+    }
+  };
+
   const toggleSubtask = async (taskId: string, subtaskId: string) => {
     let updatedTargetTask: Task | null = null;
     const nextTasks = tasks.map((task) => {
@@ -850,7 +890,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // 5. Due Date Filter
-      if (filters.dueDateRange === 'today' && !isToday(task.dueDate)) {
+      if (filters.dueDateRange === 'today' && !isToday(task.dueDate) && !isTaskOnDate(task, getTodayString())) {
         return false;
       }
       if (filters.dueDateRange === 'this_week' && !isThisWeek(task.dueDate)) {
@@ -883,7 +923,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteTask,
         updateTaskStatus,
         updateTaskDueDate,
-        updateTaskDate: updateTaskDueDate,
+        updateTaskDate,
         toggleSubtask,
         resetFilters: () => setFilters(DEFAULT_FILTERS),
         addCategory,

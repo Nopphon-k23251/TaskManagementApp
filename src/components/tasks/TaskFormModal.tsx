@@ -88,6 +88,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
 
   const handleStartDateChange = (newDate: string) => {
     setStartDate(newDate);
+    setIsMultiDay(newDate !== dueDate);
     if (dueDate < newDate) {
       setDueDate(newDate);
     }

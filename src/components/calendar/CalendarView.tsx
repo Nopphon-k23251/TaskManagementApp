@@ -18,24 +18,18 @@ import {
   formatDate, 
   getTodayString, 
   getDaysDifference,
-  CalendarDay 
+  CalendarDay,
+  isTaskOnDate
 } from '../../utils/date';
 import { getCategoryBadgeStyle } from '../../utils/category';
 import { useTasks } from '../../context/TaskContext';
 import { useLanguage } from '../../context/LanguageContext';
 
+export { isTaskOnDate };
+
 interface CalendarViewProps {
   onOpenCreateModal: (defaultStatus?: TaskStatus, defaultDate?: string) => void;
   onEditTask: (task: Task) => void;
-}
-
-/**
- * Checks if a task is active, occurring, or due on a given date.
- */
-export function isTaskOnDate(task: Task, dateStr: string): boolean {
-  const start = task.startDate || task.dueDate;
-  const end = task.dueDate;
-  return start <= dateStr && dateStr <= end;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
